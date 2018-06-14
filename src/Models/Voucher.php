@@ -2,6 +2,7 @@
 
 namespace FrittenKeeZ\Vouchers\Models;
 
+use FrittenKeeZ\Vouchers\Helpers;
 use Illuminate\Database\Eloquent\Model;
 
 class Voucher extends Model
@@ -30,4 +31,52 @@ class Voucher extends Model
         'expires_at'  => 'datetime',
         'redeemed_at' => 'datetime',
     ];
+
+    /**
+     * Constructor.
+     *
+     * @param  array  $attributes
+     * @return void
+     */
+    public function __construct(array $attributes = [])
+    {
+        $this->table = Helpers::table('vouchers');
+
+        parent::__construct($attributes);
+    }
+
+    /**
+     * Associated entities.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function voucherEntities()
+    {
+        return $this->hasMany(Helpers::model('entity'));
+    }
+
+    /**
+     * Associated redeemers.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function redeemers()
+    {
+        return $this->hasMany(Helpers::model('redeemer'));
+    }
+
+    /**
+     * Get all associated entities - optionally with a specific type (class).
+     *
+     * @param  string|null  $type
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getEntities(string $type = null)
+    {
+        if (! empty($type)) {
+            return $this->voucherEntities()->where('entity_type', '=', $type)->get()->map->entity;
+        }
+
+        return $this->voucherEntities->map->entity;
+    }
 }
