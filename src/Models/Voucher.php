@@ -2,7 +2,7 @@
 
 namespace FrittenKeeZ\Vouchers\Models;
 
-use FrittenKeeZ\Vouchers\Helpers;
+use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Database\Eloquent\Model;
 
 class Voucher extends Model
@@ -40,7 +40,7 @@ class Voucher extends Model
      */
     public function __construct(array $attributes = [])
     {
-        $this->table = Helpers::table('vouchers');
+        $this->table = Config::table('vouchers');
 
         parent::__construct($attributes);
     }
@@ -52,7 +52,7 @@ class Voucher extends Model
      */
     public function voucherEntities()
     {
-        return $this->hasMany(Helpers::model('entity'));
+        return $this->hasMany(Config::model('entity'));
     }
 
     /**
@@ -62,7 +62,7 @@ class Voucher extends Model
      */
     public function redeemers()
     {
-        return $this->hasMany(Helpers::model('redeemer'));
+        return $this->hasMany(Config::model('redeemer'));
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace FrittenKeeZ\Vouchers\Models;
 
-use FrittenKeeZ\Vouchers\Helpers;
+use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Database\Eloquent\Model;
 
 class Redeemer extends Model
@@ -33,7 +33,7 @@ class Redeemer extends Model
      */
     public function __construct(array $attributes = [])
     {
-        $this->table = Helpers::table('redeemers');
+        $this->table = Config::table('redeemers');
 
         parent::__construct($attributes);
     }
@@ -45,6 +45,6 @@ class Redeemer extends Model
      */
     public function voucher()
     {
-        return $this->belongsTo(Helpers::model('voucher'));
+        return $this->belongsTo(Config::model('voucher'));
     }
 }

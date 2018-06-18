@@ -7,11 +7,31 @@ namespace FrittenKeeZ\Vouchers;
 class Vouchers
 {
     /**
-     * Voucher options.
+     * Voucher config.
      *
-     * @var array
+     * @var \FrittenKeeZ\Vouchers\Config
      */
-    protected $options = [];
+    protected $config;
+
+    /**
+     * Constructor.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->reset();
+    }
+
+    /**
+     * Get current voucher config.
+     *
+     * @return \FrittenKeeZ\Vouchers\Config
+     */
+    public function getConfig(): Config
+    {
+        return clone $this->config;
+    }
 
     /**
      * Create an amount of vouchers.
@@ -27,7 +47,7 @@ class Vouchers
             return [];
         }
 
-        $model = Helpers::model('voucher');
+        $model = Config::model('voucher');
         $vouchers = [];
         foreach ($this->batch($amount) as $code) {
             $vouchers[] = $model::create(compact('code'));
@@ -52,12 +72,10 @@ class Vouchers
             return [];
         }
 
-        $characters = config('vouchers.characters');
-        $mask = config('vouchers.mask');
         $codes = [];
         for ($i = 0; $i < $amount; $i++) {
             do {
-                $code = $this->generate($mask, $characters);
+                $code = $this->generate();
             } while ($this->exists($code, $codes));
 
             $codes[] = $code;
@@ -70,20 +88,44 @@ class Vouchers
      * Generate a random code in the given mask format limited to the provided character list.
      *
      * All asterisks (*) in the mask will be replaced by a random character.
+     * If no mask or character list is provided, defaults will be used from config.
      *
-     * @param  string  $mask
-     * @param  string  $characters
+     * @param  string|null  $mask
+     * @param  string|null  $characters
      * @return string
      */
-    public function generate(string $mask, string $characters): string
+    public function generate(string $mask = null, string $characters = null): string
     {
-        if (empty($mask) || empty($characters)) {
-            return $mask;
-        }
+        $mask = $mask ?: $this->config->getMask();
+        $characters = $characters ?: $this->config->getCharacters();
 
-        return preg_replace_callback('/\*/', function (array $matches) use ($characters) {
+        $code = preg_replace_callback('/\*/', function (array $matches) use ($characters) {
             return $characters[random_int(0, mb_strlen($characters) - 1)];
         }, $mask);
+
+        return $this->wrap(
+            $code,
+            $this->config->getPrefix(),
+            $this->config->getSuffix(),
+            $this->config->getSeparator()
+        );
+    }
+
+    /**
+     * Wrap string in prefix and suffix with separator.
+     *
+     * @param  string       $str
+     * @param  string|null  $prefix
+     * @param  string|null  $suffix
+     * @param  string       $separator
+     * @return string
+     */
+    public function wrap(string $str, ?string $prefix, ?string $suffix, string $separator): string
+    {
+        $prefix = empty($prefix) ? '' : $prefix . $separator;
+        $suffix = empty($suffix) ? '' : $separator . $suffix;
+
+        return $prefix . $str . $suffix;
     }
 
     /**
@@ -97,7 +139,7 @@ class Vouchers
      */
     public function exists(string $code, array $codes = []): bool
     {
-        $model = Helpers::model('voucher');
+        $model = Config::model('voucher');
 
         return in_array($code, $codes) || $model::where('code', '=', $code)->exists();
     }
@@ -109,6 +151,26 @@ class Vouchers
      */
     public function reset(): void
     {
-        $this->options = [];
+        $this->config = new Config();
+    }
+
+    /**
+     * Proxy 'with' and 'without' calls to config.
+     *
+     * Will trigger undefined method error for all invalid calls.
+     *
+     * @param  string  $name
+     * @param  array   $args
+     * @return $this
+     */
+    public function __call(string $name, array $args)
+    {
+        if (starts_with($name, 'with') && method_exists($this->config, $name)) {
+            $this->config->$name(...$args);
+
+            return $this;
+        }
+
+        trigger_error('Call to undefined method ' . static::class . '::' . $name . '()', E_USER_ERROR);
     }
 }

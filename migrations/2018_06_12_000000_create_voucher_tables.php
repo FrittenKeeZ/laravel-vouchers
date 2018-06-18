@@ -1,6 +1,6 @@
 <?php
 
-use FrittenKeeZ\Vouchers\Helpers;
+use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -14,7 +14,7 @@ class CreateVoucherTables extends Migration
      */
     public function up()
     {
-        Schema::create(Helpers::table('vouchers'), function (Blueprint $table) {
+        Schema::create(Config::table('vouchers'), function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('code')->unique();
             $table->text('metadata')->nullable();
@@ -24,7 +24,7 @@ class CreateVoucherTables extends Migration
             $table->timestamps();
         });
 
-        Schema::create(Helpers::table('redeemers'), function (Blueprint $table) {
+        Schema::create(Config::table('redeemers'), function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('voucher_id')->unsigned();
             $table->morphs('redeemer');
@@ -35,11 +35,11 @@ class CreateVoucherTables extends Migration
             $table
                 ->foreign('voucher_id')
                 ->references('id')
-                ->on(Helpers::table('vouchers'))
+                ->on(Config::table('vouchers'))
                 ->onDelete('cascade');
         });
 
-        Schema::create(Helpers::table('entities'), function (Blueprint $table) {
+        Schema::create(Config::table('entities'), function (Blueprint $table) {
             $table->bigInteger('voucher_id')->unsigned();
             $table->morphs('entity');
 
@@ -47,7 +47,7 @@ class CreateVoucherTables extends Migration
             $table
                 ->foreign('voucher_id')
                 ->references('id')
-                ->on(Helpers::table('vouchers'))
+                ->on(Config::table('vouchers'))
                 ->onDelete('cascade');
         });
     }
@@ -59,8 +59,8 @@ class CreateVoucherTables extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(Helpers::table('entities'));
-        Schema::dropIfExists(Helpers::table('redeemers'));
-        Schema::dropIfExists(Helpers::table('vouchers'));
+        Schema::dropIfExists(Config::table('entities'));
+        Schema::dropIfExists(Config::table('redeemers'));
+        Schema::dropIfExists(Config::table('vouchers'));
     }
 }

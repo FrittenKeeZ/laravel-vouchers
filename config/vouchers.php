@@ -22,6 +22,22 @@ return [
      */
     'mask' => '****-****',
 
+    /**
+     * Code prefix.
+     * If defined all codes will start with this string.
+     *
+     * Ex. FOO-1234-5678
+     */
+    'prefix' => null,
+
+    /**
+     * Code suffix.
+     * If defined all codes will end with this string.
+     *
+     * Ex. 1234-5678-BAR
+     */
+    'suffix' => null,
+
     /*
      * Separator for code prefix and suffix.
      */
