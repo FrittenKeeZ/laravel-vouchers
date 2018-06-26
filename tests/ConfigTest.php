@@ -2,6 +2,8 @@
 
 namespace FrittenKeeZ\Vouchers\Tests;
 
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use FrittenKeeZ\Vouchers\Config;
 use FrittenKeeZ\Vouchers\Models\Redeemer;
 use FrittenKeeZ\Vouchers\Models\Voucher;
@@ -155,5 +157,67 @@ class ConfigTest extends TestCase
         $this->assertSame('', $config->getPrefix());
         $this->assertSame('', $config->getSuffix());
         $this->assertSame('', $config->getSeparator());
+    }
+
+    /**
+     * Test additional options using 'with' methods.
+     *
+     * @return void
+     */
+    public function testAdditionalOptions(): void
+    {
+        $config = new Config();
+
+        // Test metadata
+        $metadata = [
+            'limit' => 42,
+            'foo' => 'bar',
+            'next' => [
+                'level' => 'shizzle',
+            ],
+        ];
+        $this->assertSame($metadata, $config->withMetadata($metadata)->getMetadata());
+
+        // Test start time.
+        $interval = CarbonInterval::create('P10DT30M45S');
+        $this->assertSame(
+            Carbon::now()->toDateTimeString(),
+            $config->withStartTime(Carbon::now())->getStartTime()->toDateTimeString()
+        );
+        $this->assertSame(
+            Carbon::now()->add($interval)->toDateTimeString(),
+            $config->withStartTimeIn($interval)->getStartTime()->toDateTimeString()
+        );
+        $this->assertSame(
+            Carbon::now()->startOfDay()->toDateTimeString(),
+            $config->withStartDate(Carbon::now())->getStartTime()->toDateTimeString()
+        );
+        $this->assertSame(
+            Carbon::now()->add($interval)->startOfDay()->toDateTimeString(),
+            $config->withStartDateIn($interval)->getStartTime()->toDateTimeString()
+        );
+
+        // Test expire time.
+        $interval = CarbonInterval::create('P15DT20M10S');
+        $this->assertSame(
+            Carbon::now()->toDateTimeString(),
+            $config->withExpireTime(Carbon::now())->getExpireTime()->toDateTimeString()
+        );
+        $this->assertSame(
+            Carbon::now()->add($interval)->toDateTimeString(),
+            $config->withExpireTimeIn($interval)->getExpireTime()->toDateTimeString()
+        );
+        $this->assertSame(
+            Carbon::now()->endOfDay()->toDateTimeString(),
+            $config->withExpireDate(Carbon::now())->getExpireTime()->toDateTimeString()
+        );
+        $this->assertSame(
+            Carbon::now()->add($interval)->endOfDay()->toDateTimeString(),
+            $config->withExpireDateIn($interval)->getExpireTime()->toDateTimeString()
+        );
+
+        // Test entities.
+        $entities = [new Redeemer(), new Redeemer(), new Redeemer()];
+        $this->assertSame($entities, $config->withEntities(...$entities)->getEntities());
     }
 }
