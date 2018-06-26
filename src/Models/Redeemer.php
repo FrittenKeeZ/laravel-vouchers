@@ -4,6 +4,7 @@ namespace FrittenKeeZ\Vouchers\Models;
 
 use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Redeemer extends Model
 {
@@ -43,7 +44,7 @@ class Redeemer extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function voucher()
+    public function voucher(): BelongsTo
     {
         return $this->belongsTo(Config::model('voucher'));
     }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace FrittenKeeZ\Vouchers;
 
+use Illuminate\Support\Facades\DB;
+
 class Vouchers
 {
     /**
@@ -48,10 +50,24 @@ class Vouchers
         }
 
         $model = Config::model('voucher');
+        $options = [
+            'metadata'   => $this->config->getMetadata(),
+            'starts_at'  => $this->config->getStartTime(),
+            'expires_at' => $this->config->getExpireTime(),
+        ];
+        $entities = $this->config->getEntities();
         $vouchers = [];
-        foreach ($this->batch($amount) as $code) {
-            $vouchers[] = $model::create(compact('code'));
-        }
+        // Ensure nothing is committed to the database if anything fails.
+        DB::transaction(function () use ($amount, $model, $options, $entities, &$vouchers) {
+            foreach ($this->batch($amount) as $code) {
+                $voucher = $model::create(compact('code') + $options);
+                if (is_array($entities)) {
+                    //
+                }
+
+                $vouchers[] = $voucher;
+            }
+        });
 
         $this->reset();
 

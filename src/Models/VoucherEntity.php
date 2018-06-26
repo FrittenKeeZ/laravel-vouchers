@@ -4,9 +4,25 @@ namespace FrittenKeeZ\Vouchers\Models;
 
 use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class VoucherEntity extends Model
 {
+    /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected $primaryKey = null;
+
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
     /**
      * Indicates if the model should be timestamped.
      *
@@ -32,7 +48,7 @@ class VoucherEntity extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function entity()
+    public function entity(): MorphTo
     {
         return $this->morphTo('entity');
     }
@@ -42,7 +58,7 @@ class VoucherEntity extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function voucher()
+    public function voucher(): BelongsTo
     {
         return $this->belongsTo(Config::model('voucher'));
     }

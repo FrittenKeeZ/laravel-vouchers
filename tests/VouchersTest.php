@@ -2,7 +2,10 @@
 
 namespace FrittenKeeZ\Vouchers\Tests;
 
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use FrittenKeeZ\Vouchers\Vouchers;
+use FrittenKeeZ\Vouchers\Models\Voucher;
 
 class VouchersTest extends TestCase
 {
@@ -54,6 +57,58 @@ class VouchersTest extends TestCase
         foreach ($vouchers->batch(10) as $code) {
             $this->assertRegExp($regex, $code);
         }
+
+        // Test negative batch amount.
+        $this->assertEmpty($vouchers->batch(-10));
+    }
+
+    /**
+     * Test voucher creation.
+     *
+     * @return void
+     */
+    public function testVoucherCreation(): void
+    {
+        $vouchers = new Vouchers();
+
+        // Simple voucher.
+        $voucher = $vouchers->create();
+        $this->assertInstanceOf(Voucher::class, $voucher);
+        $this->assertNull($voucher->metadata);
+        $this->assertNull($voucher->starts_at);
+        $this->assertNull($voucher->expires_at);
+
+        // With metdata, start time and expire time.
+        $metadata = ['foo' => 'bar', 'baz' => 'boom'];
+        $startInterval = CarbonInterval::create('P1D');
+        $expireInterval = CarbonInterval::create('P30D');
+        $voucher = $vouchers
+            ->withMetadata($metadata)
+            ->withStartTimeIn($startInterval)
+            ->withExpireTimeIn($expireInterval)
+            ->create()
+        ;
+        $this->assertInstanceOf(Voucher::class, $voucher);
+        $this->assertSame($metadata, $voucher->metadata);
+        $this->assertSame(
+            Carbon::now()->add($startInterval)->toDateTimeString(),
+            $voucher->starts_at->toDateTimeString()
+        );
+        $this->assertSame(
+            Carbon::now()->add($expireInterval)->toDateTimeString(),
+            $voucher->expires_at->toDateTimeString()
+        );
+
+        // Test amount.
+        $amount = 10;
+        $batch = $vouchers->create($amount);
+        $this->assertSame($amount, count($batch));
+        foreach ($batch as $voucher) {
+            $this->assertInstanceOf(Voucher::class, $voucher);
+        }
+
+        // Test negative amount.
+        $this->assertEmpty($vouchers->create(-10));
     }
 
     /**
@@ -68,8 +123,13 @@ class VouchersTest extends TestCase
      * @param  string       $expected
      * @return void
      */
-    public function testStringWrapping(string $str, ?string $prefix, ?string $suffix, string $separator, string $expected): void
-    {
+    public function testStringWrapping(
+        string $str,
+        ?string $prefix,
+        ?string $suffix,
+        string $separator,
+        string $expected
+    ): void {
         $this->assertSame($expected, (new Vouchers)->wrap($str, $prefix, $suffix, $separator));
     }
 

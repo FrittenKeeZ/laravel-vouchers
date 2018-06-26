@@ -5,8 +5,8 @@ namespace FrittenKeeZ\Vouchers\Tests;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use FrittenKeeZ\Vouchers\Config;
-use FrittenKeeZ\Vouchers\Models\Redeemer;
 use FrittenKeeZ\Vouchers\Models\Voucher;
+use FrittenKeeZ\Vouchers\Models\Redeemer;
 use FrittenKeeZ\Vouchers\Models\VoucherEntity;
 
 class ConfigTest extends TestCase

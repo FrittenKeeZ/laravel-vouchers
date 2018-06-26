@@ -18,7 +18,7 @@ class VouchersServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->publishes([$this->getConfigPath() => config_path('vouchers.php')]);
 
@@ -30,7 +30,7 @@ class VouchersServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom($this->getConfigPath(), 'vouchers');
 
@@ -40,21 +40,11 @@ class VouchersServiceProvider extends ServiceProvider
     }
 
     /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
-    {
-        return ['vouchers'];
-    }
-
-    /**
      * Get config path.
      *
      * @return string
      */
-    protected function getConfigPath()
+    protected function getConfigPath(): string
     {
         return __DIR__ . '/../config/vouchers.php';
     }

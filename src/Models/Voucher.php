@@ -4,6 +4,8 @@ namespace FrittenKeeZ\Vouchers\Models;
 
 use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Voucher extends Model
 {
@@ -50,7 +52,7 @@ class Voucher extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function voucherEntities()
+    public function voucherEntities(): HasMany
     {
         return $this->hasMany(Config::model('entity'));
     }
@@ -60,7 +62,7 @@ class Voucher extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function redeemers()
+    public function redeemers(): HasMany
     {
         return $this->hasMany(Config::model('redeemer'));
     }
@@ -71,7 +73,7 @@ class Voucher extends Model
      * @param  string|null  $type
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getEntities(string $type = null)
+    public function getEntities(string $type = null): Collection
     {
         if (! empty($type)) {
             return $this->voucherEntities()->where('entity_type', '=', $type)->get()->map->entity;

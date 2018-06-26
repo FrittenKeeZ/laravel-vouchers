@@ -9,7 +9,7 @@ class Vouchers extends Facade
     /**
      * {@inheritdoc}
      */
-    protected static function getFacadeAccessor()
+    protected static function getFacadeAccessor(): string
     {
         return 'vouchers';
     }

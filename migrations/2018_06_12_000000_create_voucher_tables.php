@@ -43,6 +43,9 @@ class CreateVoucherTables extends Migration
             $table->bigInteger('voucher_id')->unsigned();
             $table->morphs('entity');
 
+            // Unique index.
+            $table->unique(['voucher_id', 'entity_type', 'entity_id'], 'entity');
+
             // Foreign key references.
             $table
                 ->foreign('voucher_id')
