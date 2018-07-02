@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use FrittenKeeZ\Vouchers\Vouchers;
 use FrittenKeeZ\Vouchers\Models\Voucher;
+use FrittenKeeZ\Vouchers\Tests\Models\User;
 
 class VouchersTest extends TestCase
 {
@@ -77,15 +78,18 @@ class VouchersTest extends TestCase
         $this->assertNull($voucher->metadata);
         $this->assertNull($voucher->starts_at);
         $this->assertNull($voucher->expires_at);
+        $this->assertEmpty($voucher->getEntities());
 
         // With metdata, start time and expire time.
         $metadata = ['foo' => 'bar', 'baz' => 'boom'];
         $startInterval = CarbonInterval::create('P1D');
         $expireInterval = CarbonInterval::create('P30D');
+        $users = factory(User::class, 3)->create();
         $voucher = $vouchers
             ->withMetadata($metadata)
             ->withStartTimeIn($startInterval)
             ->withExpireTimeIn($expireInterval)
+            ->withEntities(...$users->all())
             ->create()
         ;
         $this->assertInstanceOf(Voucher::class, $voucher);
@@ -98,6 +102,9 @@ class VouchersTest extends TestCase
             Carbon::now()->add($expireInterval)->toDateTimeString(),
             $voucher->expires_at->toDateTimeString()
         );
+        foreach ($voucher->getEntities() as $index => $entity) {
+            $this->assertTrue($users[$index]->is($entity));
+        }
 
         // Test amount.
         $amount = 10;

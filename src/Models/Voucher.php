@@ -68,6 +68,23 @@ class Voucher extends Model
     }
 
     /**
+     * Add related entities.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model ...$entities
+     * @return void
+     */
+    public function addEntities(Model ...$entities): void
+    {
+        if (! empty($entities)) {
+            $model = Config::model('entity');
+            $models = collect($entities)->map(function (Model $entity) use ($model) {
+                return $model::make()->entity()->associate($entity);
+            });
+            $this->voucherEntities()->saveMany($models);
+        }
+    }
+
+    /**
      * Get all associated entities - optionally with a specific type (class).
      *
      * @param  string|null  $type
@@ -75,10 +92,11 @@ class Voucher extends Model
      */
     public function getEntities(string $type = null): Collection
     {
+        $query = $this->voucherEntities()->with('entity');
         if (! empty($type)) {
-            return $this->voucherEntities()->where('entity_type', '=', $type)->get()->map->entity;
+            $query->where('entity_type', '=', $type);
         }
 
-        return $this->voucherEntities->map->entity;
+        return $query->get()->map->entity;
     }
 }

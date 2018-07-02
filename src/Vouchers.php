@@ -62,7 +62,7 @@ class Vouchers
             foreach ($this->batch($amount) as $code) {
                 $voucher = $model::create(compact('code') + $options);
                 if (is_array($entities)) {
-                    //
+                    $voucher->addEntities(...$entities);
                 }
 
                 $vouchers[] = $voucher;
