@@ -137,7 +137,7 @@ class Voucher extends Model
     }
 
     /**
-     * Associated entities.
+     * Associated voucher entities.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */

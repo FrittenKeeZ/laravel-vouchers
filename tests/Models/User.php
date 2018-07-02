@@ -3,11 +3,15 @@
 namespace FrittenKeeZ\Vouchers\Tests\Models;
 
 use Illuminate\Notifications\Notifiable;
+use FrittenKeeZ\Vouchers\Concerns\HasVouchers;
+use FrittenKeeZ\Vouchers\Concerns\HasRedeemers;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
     use Notifiable;
+    use HasVouchers;
+    use HasRedeemers;
 
     /**
      * The attributes that are mass assignable.

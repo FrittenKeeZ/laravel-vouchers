@@ -130,12 +130,17 @@ class VouchersTest extends TestCase
     public function testVoucherRedemption(): void
     {
         $vouchers = new Vouchers();
-        $voucher = $vouchers->create();
         $user = factory(User::class)->create();
+        $voucher = $vouchers->withEntities($user)->create();
 
+        // Check user voucher relation.
+        $this->assertTrue($voucher->is($user->getVouchers()->first()));
+
+        // Check voucher states.
         $this->assertTrue($voucher->isRedeemable());
         $this->assertTrue($vouchers->redeemable($voucher->code));
         $this->assertEmpty($voucher->redeemers);
+        $this->assertNotEmpty($voucher->getEntities());
         $metadata = ['foo' => 'bar', 'baz' => 'boom'];
         $this->assertTrue($vouchers->redeem($voucher->code, $user, $metadata));
         // Refresh instance.
@@ -147,6 +152,8 @@ class VouchersTest extends TestCase
         $this->assertInstanceOf(Redeemer::class, $redeemer);
         $this->assertTrue($user->is($redeemer->redeemer));
         $this->assertSame($metadata, $redeemer->metadata);
+        $this->assertTrue($redeemer->is($user->getRedeemers()->first()));
+        $this->assertTrue($voucher->is($redeemer->voucher));
     }
 
     /**
