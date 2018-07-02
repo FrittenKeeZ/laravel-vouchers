@@ -209,6 +209,18 @@ class VouchersTest extends TestCase
     }
 
     /**
+     * Test invalid magic call (Vouchers::__call()).
+     *
+     * @return void
+     */
+    public function testInvalidMagicCall(): void
+    {
+        $this->expectException('ErrorException');
+        $vouchers = new Vouchers();
+        $vouchers->methodthatdoesnotexist();
+    }
+
+    /**
      * Data provider for Vouchers::wrap().
      *
      * @return array

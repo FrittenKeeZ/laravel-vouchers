@@ -230,7 +230,7 @@ class Vouchers
      * @param  array   $args
      * @return $this
      */
-    public function __call(string $name, array $args)
+    public function __call(string $name, array $args): self
     {
         if (starts_with($name, 'with') && method_exists($this->config, $name)) {
             $this->config->$name(...$args);
@@ -239,7 +239,7 @@ class Vouchers
         }
 
         trigger_error('Call to undefined method ' . static::class . '::' . $name . '()', E_USER_ERROR);
-    }
+    } // @codeCoverageIgnore
 
     /**
      * Convenience method for interacting with Redeemer model.
