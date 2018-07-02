@@ -2,6 +2,7 @@
 
 namespace FrittenKeeZ\Vouchers\Models;
 
+use Illuminate\Support\Carbon;
 use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
@@ -9,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Voucher extends Model
 {
+    use Scopes\Voucher;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -35,6 +38,19 @@ class Voucher extends Model
     ];
 
     /**
+     * User exposed observable events.
+     *
+     * These are extra user-defined events observers may subscribe to.
+     *
+     * @var array
+     */
+    protected $observables = [
+        'redeeming',
+        'redeemed',
+        'shouldMarkRedeemed',
+    ];
+
+    /**
      * Constructor.
      *
      * @param  array  $attributes
@@ -45,6 +61,79 @@ class Voucher extends Model
         $this->table = Config::table('vouchers');
 
         parent::__construct($attributes);
+    }
+
+    /**
+     * Whether voucher is started.
+     *
+     * @return bool
+     */
+    public function isStarted(): bool
+    {
+        return $this->starts_at === null || $this->starts_at->lte(Carbon::now());
+    }
+
+    /**
+     * Whether voucher is expired.
+     *
+     * @return bool
+     */
+    public function isExpired(): bool
+    {
+        return $this->expires_at !== null && $this->expires_at->lte(Carbon::now());
+    }
+
+    /**
+     * Whether voucher is redeemed.
+     *
+     * @return bool
+     */
+    public function isRedeemed(): bool
+    {
+        return $this->redeemed_at !== null;
+    }
+
+    /**
+     * Whether voucher is redeemable.
+     *
+     * @return bool
+     */
+    public function isRedeemable(): bool
+    {
+        return ! $this->isRedeemed() && $this->isStarted() && ! $this->isExpired();
+    }
+
+    /**
+     * Redeem voucher with the provided redeemer.
+     *
+     * @param  \FrittenKeeZ\Vouchers\Models\Redeemer  $redeemer
+     * @return bool
+     */
+    public function redeem(Redeemer $redeemer): bool
+    {
+        // If the "redeeming" event returns false we'll bail out of the redeem and return
+        // false, indicating that the redeem failed. This provides a chance for any
+        // listeners to cancel redeem operations if validations fail or whatever.
+        if ($this->fireModelEvent('redeeming') === false) {
+            return false;
+        }
+
+        // Save related redeemer.
+        $this->redeemers()->save($redeemer);
+
+        // Update redeemed timestamp unless specified otherwise.
+        // This will mark the voucher as redeemed.
+        if ($this->fireModelEvent('shouldMarkRedeemed') !== false) {
+            $this->redeemed_at = Carbon::now();
+        }
+
+        $saved = $this->save();
+        // Perform any actions that are necessary after the voucher is saved.
+        if ($saved) {
+            $this->fireModelEvent('redeemed', false);
+        }
+
+        return $saved;
     }
 
     /**

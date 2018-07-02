@@ -6,7 +6,10 @@ use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use FrittenKeeZ\Vouchers\Vouchers;
 use FrittenKeeZ\Vouchers\Models\Voucher;
+use FrittenKeeZ\Vouchers\Models\Redeemer;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
+use FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException;
+use FrittenKeeZ\Vouchers\Exceptions\VoucherAlreadyRedeemedException;
 
 class VouchersTest extends TestCase
 {
@@ -82,6 +85,7 @@ class VouchersTest extends TestCase
 
         // With metdata, start time and expire time.
         $metadata = ['foo' => 'bar', 'baz' => 'boom'];
+        $now = Carbon::now();
         $startInterval = CarbonInterval::create('P1D');
         $expireInterval = CarbonInterval::create('P30D');
         $users = factory(User::class, 3)->create();
@@ -95,11 +99,11 @@ class VouchersTest extends TestCase
         $this->assertInstanceOf(Voucher::class, $voucher);
         $this->assertSame($metadata, $voucher->metadata);
         $this->assertSame(
-            Carbon::now()->add($startInterval)->toDateTimeString(),
+            $now->copy()->add($startInterval)->toDateTimeString(),
             $voucher->starts_at->toDateTimeString()
         );
         $this->assertSame(
-            Carbon::now()->add($expireInterval)->toDateTimeString(),
+            $now->copy()->add($expireInterval)->toDateTimeString(),
             $voucher->expires_at->toDateTimeString()
         );
         foreach ($voucher->getEntities() as $index => $entity) {
@@ -116,6 +120,63 @@ class VouchersTest extends TestCase
 
         // Test negative amount.
         $this->assertEmpty($vouchers->create(-10));
+    }
+
+    /**
+     * Test voucher redemption.
+     *
+     * @return void
+     */
+    public function testVoucherRedemption(): void
+    {
+        $vouchers = new Vouchers();
+        $voucher = $vouchers->create();
+        $user = factory(User::class)->create();
+
+        $this->assertTrue($voucher->isRedeemable());
+        $this->assertTrue($vouchers->redeemable($voucher->code));
+        $this->assertEmpty($voucher->redeemers);
+        $metadata = ['foo' => 'bar', 'baz' => 'boom'];
+        $this->assertTrue($vouchers->redeem($voucher->code, $user, $metadata));
+        // Refresh instance.
+        $voucher->refresh();
+        $this->assertFalse($voucher->isRedeemable());
+        $this->assertFalse($vouchers->redeemable($voucher->code));
+        $this->assertNotEmpty($voucher->redeemers);
+        $redeemer = $voucher->redeemers->first();
+        $this->assertInstanceOf(Redeemer::class, $redeemer);
+        $this->assertTrue($user->is($redeemer->redeemer));
+        $this->assertSame($metadata, $redeemer->metadata);
+    }
+
+    /**
+     * Test voucher not found exception.
+     *
+     * @return void
+     */
+    public function testVoucherNotFoundException(): void
+    {
+        $vouchers = new Vouchers();
+        $user = factory(User::class)->create();
+
+        $this->expectException(VoucherNotFoundException::class);
+        $vouchers->redeem('idonotexist', $user);
+    }
+
+    /**
+     * Test voucher already redeemed exception.
+     *
+     * @return void
+     */
+    public function testVoucherAlreadyRedeemedException(): void
+    {
+        $vouchers = new Vouchers();
+        $voucher = $vouchers->create();
+        $user = factory(User::class)->create();
+
+        $this->assertTrue($vouchers->redeem($voucher->code, $user));
+        $this->expectException(VoucherAlreadyRedeemedException::class);
+        $vouchers->redeem($voucher->code, $user);
     }
 
     /**

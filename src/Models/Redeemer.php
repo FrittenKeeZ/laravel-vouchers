@@ -4,6 +4,7 @@ namespace FrittenKeeZ\Vouchers\Models;
 
 use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Redeemer extends Model
@@ -37,6 +38,16 @@ class Redeemer extends Model
         $this->table = Config::table('redeemers');
 
         parent::__construct($attributes);
+    }
+
+    /**
+     * Associated redeemer entity.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     */
+    public function redeemer(): MorphTo
+    {
+        return $this->morphTo('redeemer');
     }
 
     /**

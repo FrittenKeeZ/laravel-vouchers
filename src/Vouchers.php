@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace FrittenKeeZ\Vouchers;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
+use FrittenKeeZ\Vouchers\Models\Voucher;
+use FrittenKeeZ\Vouchers\Models\Redeemer;
+use FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException;
+use FrittenKeeZ\Vouchers\Exceptions\VoucherAlreadyRedeemedException;
 
 class Vouchers
 {
@@ -49,7 +54,6 @@ class Vouchers
             return [];
         }
 
-        $model = Config::model('voucher');
         $options = [
             'metadata'   => $this->config->getMetadata(),
             'starts_at'  => $this->config->getStartTime(),
@@ -58,9 +62,9 @@ class Vouchers
         $entities = $this->config->getEntities();
         $vouchers = [];
         // Ensure nothing is committed to the database if anything fails.
-        DB::transaction(function () use ($amount, $model, $options, $entities, &$vouchers) {
+        DB::transaction(function () use ($amount, $options, $entities, &$vouchers) {
             foreach ($this->batch($amount) as $code) {
-                $voucher = $model::create(compact('code') + $options);
+                $voucher = $this->vouchers()->create(compact('code') + $options);
                 if (is_array($entities)) {
                     $voucher->addEntities(...$entities);
                 }
@@ -72,6 +76,55 @@ class Vouchers
         $this->reset();
 
         return $amount === 1 ? reset($vouchers) : $vouchers;
+    }
+
+    /**
+     * Redeem a voucher code.
+     *
+     * Returns whether redemption was successful.
+     *
+     * @param  string                               $code
+     * @param  \Illuminate\Database\Eloquent\Model  $entity    Redeemer entity.
+     * @param  array                                $metadata  Additional metadata for redeemer.
+     * @return bool
+     * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException
+     * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherAlreadyRedeemedException
+     */
+    public function redeem(string $code, Model $entity, array $metadata = []): bool
+    {
+        $voucher = $this->vouchers()->code($code)->first();
+        if ($voucher === null) {
+            throw new VoucherNotFoundException();
+        }
+        if (! $voucher->isRedeemable()) {
+            throw new VoucherAlreadyRedeemedException();
+        }
+
+        $redeemer = $this->redeemers();
+        if (! empty($metadata)) {
+            $redeemer->metadata = $metadata;
+        }
+        $redeemer->redeemer()->associate($entity);
+        $success = false;
+        // Ensure nothing is committed to the database if anything fails.
+        DB::transaction(function () use ($voucher, $redeemer, &$success) {
+            $success = $voucher->redeem($redeemer);
+        });
+
+        return $success;
+    }
+
+    /**
+     * Whether a voucher code is redeemable.
+     *
+     * @param  string  $code
+     * @return bool
+     */
+    public function redeemable(string $code): bool
+    {
+        $voucher = $this->vouchers()->code($code)->first();
+
+        return $voucher !== null && $voucher->isRedeemable();
     }
 
     /**
@@ -155,9 +208,7 @@ class Vouchers
      */
     public function exists(string $code, array $codes = []): bool
     {
-        $model = Config::model('voucher');
-
-        return in_array($code, $codes) || $model::where('code', '=', $code)->exists();
+        return in_array($code, $codes) || $this->vouchers()->code($code)->exists();
     }
 
     /**
@@ -188,5 +239,25 @@ class Vouchers
         }
 
         trigger_error('Call to undefined method ' . static::class . '::' . $name . '()', E_USER_ERROR);
+    }
+
+    /**
+     * Convenience method for interacting with Redeemer model.
+     *
+     * @return \FrittenKeeZ\Vouchers\Models\Redeemer
+     */
+    protected function redeemers(): Redeemer
+    {
+        return Config::model('redeemer')::make();
+    }
+
+    /**
+     * Convenience method for interacting with Voucher model.
+     *
+     * @return \FrittenKeeZ\Vouchers\Models\Voucher
+     */
+    protected function vouchers(): Voucher
+    {
+        return Config::model('voucher')::make();
     }
 }
