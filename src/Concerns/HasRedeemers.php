@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 trait HasRedeemers
 {
     /**
-     * Associated voucher entities.
+     * Associated redeemers.
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */

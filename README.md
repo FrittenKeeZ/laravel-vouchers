@@ -12,6 +12,8 @@
     - [Create Vouchers](#create-vouchers)
     - [Redeem Vouchers](#redeem-vouchers)
     - [Options](#options)
+    - [Events](#events)
+    - [Traits](#traits)
     - [Helpers](#helpers)
 - [Testing](#testing)
 - [License](#license)
@@ -57,7 +59,7 @@ $vouchers = Vouchers::create(10);
 ```
 
 ### Redeem Vouchers
-Redeeming vouchers requires that one provides a redeemer entity.
+Redeeming vouchers requires that one provides a redeemer entity.  
 Additional metadata for the redeemer can be provided.
 ```php
 Vouchers::redeem(string $code, Illuminate\Database\Eloquent\Model $entity, array $metadata = []): bool
@@ -71,7 +73,7 @@ try {
 ```
 
 ### Options
-Besides defaults specified in `config/vouchers.php`, one can override options when generating codes or creating vouchers.
+Besides defaults specified in `config/vouchers.php`, one can override options when generating codes or creating vouchers.  
 Following methods apply to `Vouchers::generate()`, `Vouchers::batch()` and `Vouchers::create()` calls.
 ```php
 // Override characters list.
@@ -118,6 +120,46 @@ All calls are chainable and dynamic options will be reset when calling `Vouchers
 ```php
 $voucher = Vouchers::withMask('***-***-***')->withMetadata(['foo' => 'bar'])->withExpireDateIn(CarbonInterval::create('P30D')->create();
 $voucher = Vouchers::withEntities($user)->withPrefix('USR');
+```
+
+### Events
+By default vouchers will be marked as redeemed after one use, which is not always the desired outcome.  
+To allow a voucher to be redeemed multiple times, subscribe to the `FrittenKeeZ\Vouchers\Models\Voucher::shouldMarkRedeemed()` event.
+```php
+Voucher::shouldMarkRedeemed(function (Voucher $voucher) {
+    // Do some fancy checks here.
+    return false;
+});
+```
+To prevent a voucher from being redeemed altogether, subscribe to the `FrittenKeeZ\Vouchers\Models\Voucher::redeeming()` event.
+```php
+Voucher::redeeming(function (Voucher $voucher) {
+    // Do some fancy checks here.
+    return false;
+});
+```
+To perform additional actions after a vouchers has been redeemed, subscribe to the `FrittenKeeZ\Vouchers\Models\Voucher::redeemed()` event.
+```php
+Voucher::redeemed(function (Voucher $voucher) {
+    // Do some additional stuff here.
+});
+```
+
+### Traits
+For convenience we provide some traits for fetching vouchers and redeemers for related entities, fx. users.
+**FrittenKeeZ\Vouchers\Concerns\HasRedeemers**
+```php
+// Associated redeemers relationship.
+HasRedeemers::redeemers(): MorphMany
+// Get all associated redeemers.
+HasRedeemers::getRedeemers(): Collection
+```
+**FrittenKeeZ\Vouchers\Concerns\HasVouchers**
+```php
+// Associated voucher entities relationship.
+HasVouchers::voucherEntities(): MorphMany
+// Get all associated vouchers.
+HasVouchers::getVouchers(): Collection
 ```
 
 ### Helpers
