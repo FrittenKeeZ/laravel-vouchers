@@ -2,7 +2,8 @@
 
 [![Packagist](https://img.shields.io/packagist/v/frittenkeez/laravel-vouchers.svg?style=flat-square)](https://packagist.org/packages/frittenkeez/laravel-vouchers)
 [![Downloads](https://img.shields.io/packagist/dt/frittenkeez/laravel-vouchers.svg?style=flat-square)](https://packagist.org/packages/frittenkeez/laravel-vouchers)
-[![License](https://img.shields.io/github/license/frittenkeez/laravel-vouchers.svg?style=flat-square)](LICENSE.md)
+[![License](https://img.shields.io/github/license/frittenkeez/laravel-vouchers.svg?style=flat-square)](LICENSE)
+[![Travis](https://img.shields.io/travis/FrittenKeeZ/laravel-vouchers.svg?style=flat-square)](https://travis-ci.org/FrittenKeeZ/laravel-vouchers)
 
 ## Table of Contents
 - [Installation](#installation)
@@ -146,15 +147,15 @@ Voucher::redeemed(function (Voucher $voucher) {
 ```
 
 ### Traits
-For convenience we provide some traits for fetching vouchers and redeemers for related entities, fx. users.
-**FrittenKeeZ\Vouchers\Concerns\HasRedeemers**
+For convenience we provide some traits for fetching vouchers and redeemers for related entities, fx. users.  
+`FrittenKeeZ\Vouchers\Concerns\HasRedeemers`
 ```php
 // Associated redeemers relationship.
 HasRedeemers::redeemers(): MorphMany
 // Get all associated redeemers.
 HasRedeemers::getRedeemers(): Collection
 ```
-**FrittenKeeZ\Vouchers\Concerns\HasVouchers**
+`FrittenKeeZ\Vouchers\Concerns\HasVouchers`
 ```php
 // Associated voucher entities relationship.
 HasVouchers::voucherEntities(): MorphMany
@@ -182,4 +183,4 @@ $ ./vendor/bin/phpunit
 ```
 
 ## License
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+The MIT License (MIT). Please see [License File](LICENSE) for more information.
