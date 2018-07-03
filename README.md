@@ -1,8 +1,8 @@
 # Laravel Vouchers
 
-[![Packagist](https://img.shields.io/packagist/v/frittenkeez/laravel-vouchers.svg?style=flat-square)](https://packagist.org/packages/frittenkeez/laravel-vouchers)
-[![Downloads](https://img.shields.io/packagist/dt/frittenkeez/laravel-vouchers.svg?style=flat-square)](https://packagist.org/packages/frittenkeez/laravel-vouchers)
-[![License](https://img.shields.io/github/license/frittenkeez/laravel-vouchers.svg?style=flat-square)](LICENSE)
+[![Packagist](https://img.shields.io/packagist/v/FrittenKeeZ/laravel-vouchers.svg?style=flat-square)](https://packagist.org/packages/frittenkeez/laravel-vouchers)
+[![Downloads](https://img.shields.io/packagist/dt/FrittenKeeZ/laravel-vouchers.svg?style=flat-square)](https://packagist.org/packages/frittenkeez/laravel-vouchers)
+[![License](https://img.shields.io/github/license/FrittenKeeZ/laravel-vouchers.svg?style=flat-square)](LICENSE)
 [![Travis](https://img.shields.io/travis/FrittenKeeZ/laravel-vouchers.svg?style=flat-square)](https://travis-ci.org/FrittenKeeZ/laravel-vouchers)
 
 ## Table of Contents
