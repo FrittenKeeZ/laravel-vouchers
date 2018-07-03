@@ -192,4 +192,37 @@ class Voucher extends Model
 
         return $query->get()->map->entity;
     }
+
+    /**
+     * Register a redeeming voucher event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function redeeming($callback): void
+    {
+        static::registerModelEvent('redeeming', $callback);
+    }
+
+    /**
+     * Register a redeemed voucher event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function redeemed($callback): void
+    {
+        static::registerModelEvent('redeemed', $callback);
+    }
+
+    /**
+     * Register a shouldMarkRedeemed voucher event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function shouldMarkRedeemed($callback): void
+    {
+        static::registerModelEvent('shouldMarkRedeemed', $callback);
+    }
 }

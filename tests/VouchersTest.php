@@ -141,6 +141,7 @@ class VouchersTest extends TestCase
         $this->assertTrue($vouchers->redeemable($voucher->code));
         $this->assertEmpty($voucher->redeemers);
         $this->assertNotEmpty($voucher->getEntities());
+        $this->assertEmpty($voucher->getEntities('FakeClass'));
         $metadata = ['foo' => 'bar', 'baz' => 'boom'];
         $this->assertTrue($vouchers->redeem($voucher->code, $user, $metadata));
         // Refresh instance.
