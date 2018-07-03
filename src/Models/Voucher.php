@@ -111,6 +111,10 @@ class Voucher extends Model
      */
     public function redeem(Redeemer $redeemer): bool
     {
+        if (! $this->isRedeemable()) {
+            return false;
+        }
+
         // If the "redeeming" event returns false we'll bail out of the redeem and return
         // false, indicating that the redeem failed. This provides a chance for any
         // listeners to cancel redeem operations if validations fail or whatever.

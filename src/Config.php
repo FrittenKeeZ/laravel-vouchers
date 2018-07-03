@@ -190,7 +190,7 @@ class Config
     }
 
     /**
-     * With metdata.
+     * With metadata.
      *
      * @param  array  $metadata
      * @return $this
@@ -325,7 +325,7 @@ class Config
     }
 
     /**
-     * With metdata.
+     * With entities.
      *
      * @param  \Illuminate\Database\Eloquent\Model  ...$entities
      * @return $this
