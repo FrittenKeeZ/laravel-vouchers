@@ -4,8 +4,8 @@ namespace FrittenKeeZ\Vouchers\Models;
 
 use Illuminate\Support\Carbon;
 use FrittenKeeZ\Vouchers\Config;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Voucher extends Model
@@ -181,7 +181,7 @@ class Voucher extends Model
      * Get all associated entities - optionally with a specific type (class).
      *
      * @param  string|null  $type
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Support\Collection
      */
     public function getEntities(string $type = null): Collection
     {
