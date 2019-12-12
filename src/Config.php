@@ -7,6 +7,7 @@ namespace FrittenKeeZ\Vouchers;
 use DateTime;
 use DateInterval;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 
 class Config
@@ -35,7 +36,7 @@ class Config
      */
     public function getCharacters(): string
     {
-        return array_get($this->options, 'characters', config('vouchers.characters'));
+        return Arr::get($this->options, 'characters', config('vouchers.characters'));
     }
 
     /**
@@ -46,7 +47,7 @@ class Config
      */
     public function withCharacters(string $characters): self
     {
-        array_set($this->options, 'characters', $characters);
+        Arr::set($this->options, 'characters', $characters);
 
         return $this;
     }
@@ -58,7 +59,7 @@ class Config
      */
     public function getMask(): string
     {
-        return array_get($this->options, 'mask', config('vouchers.mask'));
+        return Arr::get($this->options, 'mask', config('vouchers.mask'));
     }
 
     /**
@@ -69,7 +70,7 @@ class Config
      */
     public function withMask(string $mask): self
     {
-        array_set($this->options, 'mask', $mask);
+        Arr::set($this->options, 'mask', $mask);
 
         return $this;
     }
@@ -81,7 +82,7 @@ class Config
      */
     public function getPrefix(): ?string
     {
-        return array_get($this->options, 'prefix', config('vouchers.prefix'));
+        return Arr::get($this->options, 'prefix', config('vouchers.prefix'));
     }
 
     /**
@@ -92,7 +93,7 @@ class Config
      */
     public function withPrefix(string $prefix): self
     {
-        array_set($this->options, 'prefix', $prefix);
+        Arr::set($this->options, 'prefix', $prefix);
 
         return $this;
     }
@@ -104,7 +105,7 @@ class Config
      */
     public function withoutPrefix(): self
     {
-        array_set($this->options, 'prefix', '');
+        Arr::set($this->options, 'prefix', '');
 
         return $this;
     }
@@ -116,7 +117,7 @@ class Config
      */
     public function getSuffix(): ?string
     {
-        return array_get($this->options, 'suffix', config('vouchers.suffix'));
+        return Arr::get($this->options, 'suffix', config('vouchers.suffix'));
     }
 
     /**
@@ -127,7 +128,7 @@ class Config
      */
     public function withSuffix(string $suffix): self
     {
-        array_set($this->options, 'suffix', $suffix);
+        Arr::set($this->options, 'suffix', $suffix);
 
         return $this;
     }
@@ -139,7 +140,7 @@ class Config
      */
     public function withoutSuffix(): self
     {
-        array_set($this->options, 'suffix', '');
+        Arr::set($this->options, 'suffix', '');
 
         return $this;
     }
@@ -151,7 +152,7 @@ class Config
      */
     public function getSeparator(): string
     {
-        return array_get($this->options, 'separator', config('vouchers.separator'));
+        return Arr::get($this->options, 'separator', config('vouchers.separator'));
     }
 
     /**
@@ -162,7 +163,7 @@ class Config
      */
     public function withSeparator(string $separator): self
     {
-        array_set($this->options, 'separator', $separator);
+        Arr::set($this->options, 'separator', $separator);
 
         return $this;
     }
@@ -174,7 +175,7 @@ class Config
      */
     public function withoutSeparator(): self
     {
-        array_set($this->options, 'separator', '');
+        Arr::set($this->options, 'separator', '');
 
         return $this;
     }
@@ -186,7 +187,7 @@ class Config
      */
     public function getMetadata(): ?array
     {
-        return array_get($this->options, 'metadata');
+        return Arr::get($this->options, 'metadata');
     }
 
     /**
@@ -197,7 +198,7 @@ class Config
      */
     public function withMetadata(array $metadata): self
     {
-        array_set($this->options, 'metadata', $metadata);
+        Arr::set($this->options, 'metadata', $metadata);
 
         return $this;
     }
@@ -209,7 +210,7 @@ class Config
      */
     public function getStartTime(): ?Carbon
     {
-        return array_get($this->options, 'starts_at');
+        return Arr::get($this->options, 'starts_at');
     }
 
     /**
@@ -220,7 +221,7 @@ class Config
      */
     public function withStartTime(DateTime $timestamp): self
     {
-        array_set($this->options, 'starts_at', Carbon::instance($timestamp));
+        Arr::set($this->options, 'starts_at', Carbon::instance($timestamp));
 
         return $this;
     }
@@ -265,7 +266,7 @@ class Config
      */
     public function getExpireTime(): ?Carbon
     {
-        return array_get($this->options, 'expires_at');
+        return Arr::get($this->options, 'expires_at');
     }
 
     /**
@@ -276,7 +277,7 @@ class Config
      */
     public function withExpireTime(DateTime $timestamp): self
     {
-        array_set($this->options, 'expires_at', Carbon::instance($timestamp));
+        Arr::set($this->options, 'expires_at', Carbon::instance($timestamp));
 
         return $this;
     }
@@ -321,7 +322,7 @@ class Config
      */
     public function getEntities(): ?array
     {
-        return array_get($this->options, 'entities');
+        return Arr::get($this->options, 'entities');
     }
 
     /**
@@ -332,7 +333,7 @@ class Config
      */
     public function withEntities(Model ...$entities): self
     {
-        array_set($this->options, 'entities', $entities);
+        Arr::set($this->options, 'entities', $entities);
 
         return $this;
     }

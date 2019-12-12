@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrittenKeeZ\Vouchers;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use FrittenKeeZ\Vouchers\Models\Voucher;
@@ -232,7 +233,7 @@ class Vouchers
      */
     public function __call(string $name, array $args): self
     {
-        if (starts_with($name, 'with') && method_exists($this->config, $name)) {
+        if (Str::startsWith($name, 'with') && method_exists($this->config, $name)) {
             $this->config->$name(...$args);
 
             return $this;

@@ -141,7 +141,7 @@ class ConfigTest extends TestCase
             $config->$setter($value);
         }
 
-        $this->assertArraySubset($options, $config->getOptions());
+        $this->assertArrayStructure($options, $config->getOptions());
         $this->assertSame($options['characters'], $config->getCharacters());
         $this->assertSame($options['mask'], $config->getMask());
         $this->assertSame($options['prefix'], $config->getPrefix());
@@ -219,5 +219,17 @@ class ConfigTest extends TestCase
         // Test entities.
         $entities = [new Redeemer(), new Redeemer(), new Redeemer()];
         $this->assertSame($entities, $config->withEntities(...$entities)->getEntities());
+    }
+
+    /**
+     * Assert array structure.
+     *
+     * @param  array  $expected
+     * @param  array  $actual
+     * @return void
+     */
+    protected function assertArrayStructure(array $expected, array $actual): void
+    {
+        $this->assertTrue(empty(array_diff_key($expected, $actual)) && empty(array_diff_key($actual, $expected)));
     }
 }
