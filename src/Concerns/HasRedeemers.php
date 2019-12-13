@@ -21,10 +21,12 @@ trait HasRedeemers
     /**
      * Get all associated redeemers.
      *
+     * @deprecated Use redeemers relationship accessor instead.
+     *
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getRedeemers(): Collection
     {
-        return $this->redeemers()->get();
+        return $this->redeemers;
     }
 }

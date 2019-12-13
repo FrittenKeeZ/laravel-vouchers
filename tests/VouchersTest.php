@@ -134,7 +134,7 @@ class VouchersTest extends TestCase
         $voucher = $vouchers->withEntities($user)->create();
 
         // Check user voucher relation.
-        $this->assertTrue($voucher->is($user->getVouchers()->first()));
+        $this->assertTrue($voucher->is($user->vouchers->first()));
 
         // Check voucher states.
         $this->assertTrue($voucher->isRedeemable());
@@ -153,7 +153,7 @@ class VouchersTest extends TestCase
         $this->assertInstanceOf(Redeemer::class, $redeemer);
         $this->assertTrue($user->is($redeemer->redeemer));
         $this->assertSame($metadata, $redeemer->metadata);
-        $this->assertTrue($redeemer->is($user->getRedeemers()->first()));
+        $this->assertTrue($redeemer->is($user->redeemers->first()));
         $this->assertTrue($voucher->is($redeemer->voucher));
     }
 
