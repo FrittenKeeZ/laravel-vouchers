@@ -153,14 +153,18 @@ For convenience we provide some traits for fetching vouchers and redeemers for r
 // Associated redeemers relationship.
 HasRedeemers::redeemers(): MorphMany
 // Get all associated redeemers.
-HasRedeemers::getRedeemers(): Collection
+$redeemers = $user->redeemers;
 ```
 `FrittenKeeZ\Vouchers\Concerns\HasVouchers`
 ```php
+// Associated vouchers relationship.
+HasVouchers::vouchers(): MorphToMany
+// Get all associated vouchers.
+$vouchers = $user->vouchers;
 // Associated voucher entities relationship.
 HasVouchers::voucherEntities(): MorphMany
-// Get all associated vouchers.
-HasVouchers::getVouchers(): Collection
+// Get all associated voucher entities.
+$entities = $user->vouchers_entities;
 ```
 
 ### Helpers
