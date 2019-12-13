@@ -51,6 +51,13 @@ class Voucher extends Model
     ];
 
     /**
+     * Active redeemer during events.
+     *
+     * @var \FrittenKeeZ\Vouchers\Models\Redeemer
+     */
+    public $redeemer;
+
+    /**
      * Constructor.
      *
      * @param  array  $attributes
@@ -115,10 +122,16 @@ class Voucher extends Model
             return false;
         }
 
+        // Set active redeemer.
+        $this->redeemer = $redeemer;
+
         // If the "redeeming" event returns false we'll bail out of the redeem and return
         // false, indicating that the redeem failed. This provides a chance for any
         // listeners to cancel redeem operations if validations fail or whatever.
         if ($this->fireModelEvent('redeeming') === false) {
+            // Unset active redeemer.
+            $this->redeemer = null;
+
             return false;
         }
 
@@ -136,6 +149,9 @@ class Voucher extends Model
         if ($saved) {
             $this->fireModelEvent('redeemed', false);
         }
+
+        // Unset active redeemer.
+        $this->redeemer = null;
 
         return $saved;
     }

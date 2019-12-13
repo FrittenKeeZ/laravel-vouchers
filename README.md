@@ -124,6 +124,8 @@ $voucher = Vouchers::withEntities($user)->withPrefix('USR');
 ```
 
 ### Events
+During events `Voucher::$redeemer` will be set to the active redeemer (`FrittenKeeZ\Vouchers\Models\Redeemer`).
+
 By default vouchers will be marked as redeemed after one use, which is not always the desired outcome.  
 To allow a voucher to be redeemed multiple times, subscribe to the `FrittenKeeZ\Vouchers\Models\Voucher::shouldMarkRedeemed()` event.
 ```php
@@ -138,6 +140,15 @@ Voucher::redeeming(function (Voucher $voucher) {
     // Do some fancy checks here.
     return false;
 });
+```
+To prevent a voucher from being redeemed by anyone but the related user.
+```php
+Voucher::redeeming(function (Voucher $voucher) {
+    return $voucher->redeemer->redeemer->is($voucher->getEntities(User::class)->first());
+});
+/* ... */
+$voucher = Vouchers::withEntities($user)->create();
+Vouchers::redeem($voucher->code, $user);
 ```
 To perform additional actions after a vouchers has been redeemed, subscribe to the `FrittenKeeZ\Vouchers\Models\Voucher::redeemed()` event.
 ```php
@@ -164,7 +175,7 @@ $vouchers = $user->vouchers;
 // Associated voucher entities relationship.
 HasVouchers::voucherEntities(): MorphMany
 // Get all associated voucher entities.
-$entities = $user->vouchers_entities;
+$entities = $user->voucher_entities;
 ```
 
 ### Helpers

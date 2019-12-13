@@ -78,4 +78,32 @@ class VoucherTest extends TestCase
         $this->assertNotEmpty($voucher->redeemers);
         $this->assertTrue($voucher->redeem($voucher->redeemers->first()));
     }
+
+    /**
+     * Test redeeming by related user only event.
+     *
+     * @return void
+     */
+    public function testRedeemingByRelatedUserOnlyEvent(): void
+    {
+        // Allow redeeming only for related user.
+        Voucher::redeeming(function (Voucher $voucher) {
+            return $voucher->redeemer->redeemer->is($voucher->getEntities(User::class)->first());
+        });
+
+        $vouchers = new Vouchers();
+        $user = factory(User::class)->create();
+        $other = factory(User::class)->create();
+        $voucher = $vouchers->withEntities($user)->create();
+        $this->assertTrue($voucher->isRedeemable());
+        $this->assertFalse($vouchers->redeem($voucher->code, $other));
+        $this->assertFalse($voucher->isRedeemed());
+        $this->assertEmpty($voucher->redeemers);
+        $voucher->refresh();
+        $this->assertTrue($voucher->isRedeemable());
+        $this->assertTrue($vouchers->redeem($voucher->code, $user));
+        $voucher->refresh();
+        $this->assertTrue($voucher->isRedeemed());
+        $this->assertNotEmpty($voucher->redeemers);
+    }
 }
