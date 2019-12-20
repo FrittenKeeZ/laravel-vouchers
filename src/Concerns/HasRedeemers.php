@@ -22,6 +22,7 @@ trait HasRedeemers
      * Get all associated redeemers.
      *
      * @deprecated Use redeemers relationship accessor instead.
+     * @codeCoverageIgnore
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */

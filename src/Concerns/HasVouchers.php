@@ -33,6 +33,7 @@ trait HasVouchers
      * Get all associated vouchers.
      *
      * @deprecated Use vouchers relationship accessor instead.
+     * @codeCoverageIgnore
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */

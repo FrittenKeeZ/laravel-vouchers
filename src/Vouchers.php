@@ -66,7 +66,7 @@ class Vouchers
         DB::transaction(function () use ($amount, $options, $entities, &$vouchers) {
             foreach ($this->batch($amount) as $code) {
                 $voucher = $this->vouchers()->create(compact('code') + $options);
-                if (is_array($entities)) {
+                if (!empty($entities)) {
                     $voucher->addEntities(...$entities);
                 }
 

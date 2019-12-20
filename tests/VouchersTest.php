@@ -135,6 +135,7 @@ class VouchersTest extends TestCase
 
         // Check user voucher relation.
         $this->assertTrue($voucher->is($user->vouchers->first()));
+        $this->assertTrue($voucher->is($user->voucherEntities->first()->voucher));
 
         // Check voucher states.
         $this->assertTrue($voucher->isRedeemable());

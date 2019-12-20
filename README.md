@@ -194,7 +194,11 @@ $exists = Vouchers::exists('123-456-789', ['987-654-321']);
 Running tests can be done either through composer, or directly calling the PHPUnit binary.
 ```bash
 $ composer test
-$ ./vendor/bin/phpunit
+```
+To run tests with code coverage, please make sure that `phpdbg` exists and is executable.
+```bash
+$ composer test-coverage
+$ open tests/_reports/index.html
 ```
 
 ## License

@@ -17,7 +17,8 @@ class TestCase extends BaseTestCase
 
         $this->loadLaravelMigrations();
         $this->artisan('migrate', ['--database' => 'testing']);
-        $this->withFactories(__DIR__ . '/factories');
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+        $this->withFactories(__DIR__ . '/database/factories');
     }
 
     /**

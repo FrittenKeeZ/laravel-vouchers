@@ -7,6 +7,7 @@ use Carbon\CarbonInterval;
 use FrittenKeeZ\Vouchers\Config;
 use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Models\Redeemer;
+use FrittenKeeZ\Vouchers\Tests\Models\Color;
 use FrittenKeeZ\Vouchers\Models\VoucherEntity;
 
 class ConfigTest extends TestCase
@@ -217,7 +218,7 @@ class ConfigTest extends TestCase
         );
 
         // Test entities.
-        $entities = [new Redeemer(), new Redeemer(), new Redeemer()];
+        $entities = factory(Color::class, 3)->make()->all();
         $this->assertSame($entities, $config->withEntities(...$entities)->getEntities());
     }
 

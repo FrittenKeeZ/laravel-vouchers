@@ -294,7 +294,7 @@ class Config
     }
 
     /**
-     * With expire date - time component is set to 00:00:00.000000.
+     * With expire date - time component is set to 23:59:59.999999.
      *
      * @param  \DateTime  $timestamp
      * @return $this
@@ -305,7 +305,7 @@ class Config
     }
 
     /**
-     * With expire date in the given interval - time component is set to 00:00:00.000000.
+     * With expire date in the given interval - time component is set to 23:59:59.999999.
      *
      * @param  \DateInterval  $interval
      * @return $this
@@ -318,11 +318,11 @@ class Config
     /**
      * Get entities.
      *
-     * @return \Illuminate\Database\Eloquent\Model[]|array|null
+     * @return \Illuminate\Database\Eloquent\Model[]|array
      */
-    public function getEntities(): ?array
+    public function getEntities(): array
     {
-        return Arr::get($this->options, 'entities');
+        return Arr::get($this->options, 'entities', []);
     }
 
     /**
