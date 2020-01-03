@@ -2,7 +2,9 @@
 
 namespace FrittenKeeZ\Vouchers\Concerns;
 
+use Closure;
 use FrittenKeeZ\Vouchers\Config;
+use FrittenKeeZ\Vouchers\Vouchers;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -40,5 +42,38 @@ trait HasVouchers
     public function getVouchers(): Collection
     {
         return $this->vouchers;
+    }
+
+    /**
+     * Create a single voucher with this entity related.
+     *
+     * @param  \Closure  $callback
+     * @return object
+     */
+    public function createVoucher(Closure $callback = null): object
+    {
+        return $this->createVouchers(1, $callback);
+    }
+
+    /**
+     * Create an amount of vouchers with this entity related.
+     *
+     * @param  int       $amount
+     * @param  \Closure  $callback
+     * @return object|array
+     */
+    public function createVouchers(int $amount, Closure $callback = null)
+    {
+        $vouchers = new Vouchers();
+
+        if ($callback) {
+            $callback($vouchers);
+        }
+
+        // Prepend owner to entities.
+        $entities = $vouchers->getEntities();
+        array_unshift($entities, $this);
+
+        return $vouchers->withEntities(...$entities)->create($amount);
     }
 }

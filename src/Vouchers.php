@@ -223,20 +223,26 @@ class Vouchers
     }
 
     /**
-     * Proxy 'with' and 'without' calls to config.
+     * Proxy 'get', 'with' and 'without' calls to config.
      *
      * Will trigger undefined method error for all invalid calls.
      *
      * @param  string  $name
      * @param  array   $args
-     * @return $this
+     * @return mixed
      */
-    public function __call(string $name, array $args): self
+    public function __call(string $name, array $args)
     {
-        if (Str::startsWith($name, 'with') && method_exists($this->config, $name)) {
-            $this->config->$name(...$args);
+        if (method_exists($this->config, $name)) {
+            if (Str::startsWith($name, 'get')) {
+                return $this->config->$name(...$args);
+            }
 
-            return $this;
+            if (Str::startsWith($name, 'with')) {
+                $this->config->$name(...$args);
+
+                return $this;
+            }
         }
 
         trigger_error('Call to undefined method ' . static::class . '::' . $name . '()', E_USER_ERROR);

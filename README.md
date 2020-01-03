@@ -119,7 +119,10 @@ Vouchers::withEntities(Illuminate\Database\Eloquent\Model ...$entities)
 ```
 All calls are chainable and dynamic options will be reset when calling `Vouchers::create()` or `Vouchers::reset()`.
 ```php
-$voucher = Vouchers::withMask('***-***-***')->withMetadata(['foo' => 'bar'])->withExpireDateIn(CarbonInterval::create('P30D')->create();
+$voucher = Vouchers::withMask('***-***-***')
+    ->withMetadata(['foo' => 'bar'])
+    ->withExpireDateIn(CarbonInterval::create('P30D'))
+    ->create();
 $voucher = Vouchers::withEntities($user)->withPrefix('USR');
 ```
 
@@ -176,6 +179,24 @@ $vouchers = $user->vouchers;
 HasVouchers::voucherEntities(): MorphMany
 // Get all associated voucher entities.
 $entities = $user->voucher_entities;
+```
+You can also create vouchers related to an entity using these convenience methods.
+```php
+HasVouchers::createVoucher(Closure $callback = null): object
+// Without using callback.
+$voucher = $user->createVoucher();
+// With using callback.
+$voucher = $user->createVoucher(function (FrittenKeeZ\Vouchers\Vouchers $vouchers) {
+    $vouchers->withPrefix('USR');
+});
+
+HasVouchers::createVouchers(int $amount, Closure $callback = null): object|array
+// Without using callback.
+$vouchers = $user->createVouchers(3);
+// With using callback.
+$vouchers = $user->createVouchers(3, function (FrittenKeeZ\Vouchers\Vouchers $vouchers) {
+    $vouchers->withPrefix('USR');
+});
 ```
 
 ### Helpers
