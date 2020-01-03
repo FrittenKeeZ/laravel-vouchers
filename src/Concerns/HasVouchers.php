@@ -50,7 +50,7 @@ trait HasVouchers
      * @param  \Closure  $callback
      * @return object
      */
-    public function createVoucher(Closure $callback = null): object
+    public function createVoucher(Closure $callback = null)
     {
         return $this->createVouchers(1, $callback);
     }
