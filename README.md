@@ -16,6 +16,7 @@
     - [Events](#events)
     - [Traits](#traits)
     - [Helpers](#helpers)
+    - [Scopes](#scopes)
 - [Testing](#testing)
 - [License](#license)
 
@@ -209,6 +210,30 @@ Check whether a voucher code exists, optionally also checking a provided list.
 ```php
 Vouchers::exists(string $code, array $codes = []): bool
 $exists = Vouchers::exists('123-456-789', ['987-654-321']);
+```
+Additional helpers methods on Voucher model.
+```php
+// Whether voucher has prefix, optionally specifying a separator different from config.
+Voucher::hasPrefix(string $prefix, string $separator = null): bool
+// Whether voucher has suffix, optionally specifying a separator different from config.
+Voucher::hasSuffix(string $suffix, string $separator = null): bool
+// Whether voucher is started.
+Voucher::isStarted(): bool
+// Whether voucher is expired.
+Voucher::isExpired(): bool
+// Whether voucher is redeemed.
+Voucher::isRedeemed(): bool
+// Whether voucher is redeemable.
+Voucher::isRedeemable(): bool
+```
+
+### Scopes
+For convenience we also provide Voucher scopes matching the helper methods.
+```php
+// Scope voucher query to a specific prefix, optionally specifying a separator different from config.
+Voucher::prefix(string $prefix, string $separator = null)
+// Scope voucher query to a specific suffix, optionally specifying a separator different from config.
+Voucher::suffix(string $suffix, string $separator = null)
 ```
 
 ## Testing

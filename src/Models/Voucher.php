@@ -2,6 +2,7 @@
 
 namespace FrittenKeeZ\Vouchers\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Support\Collection;
@@ -68,6 +69,34 @@ class Voucher extends Model
         $this->table = Config::table('vouchers');
 
         parent::__construct($attributes);
+    }
+
+    /**
+     * Whether voucher has prefix, optionally specifying a separator different from config.
+     *
+     * @param  string       $prefix
+     * @param  string|null  $separator
+     * @return bool
+     */
+    public function hasPrefix(string $prefix, string $separator = null): bool
+    {
+        $clause = sprintf('%s%s', $prefix, is_null($separator) ? config('vouchers.separator') : $separator);
+
+        return Str::startsWith($this->code, $clause);
+    }
+
+    /**
+     * Whether voucher has suffix, optionally specifying a separator different from config.
+     *
+     * @param  string       $suffix
+     * @param  string|null  $separator
+     * @return bool
+     */
+    public function hasSuffix(string $suffix, string $separator = null): bool
+    {
+        $clause = sprintf('%s%s', is_null($separator) ? config('vouchers.separator') : $separator, $suffix);
+
+        return Str::endsWith($this->code, $clause);
     }
 
     /**
