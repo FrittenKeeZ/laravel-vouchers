@@ -2,6 +2,7 @@
 
 namespace FrittenKeeZ\Vouchers\Tests;
 
+use Illuminate\Support\Carbon;
 use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Facades\Vouchers;
 
@@ -21,7 +22,7 @@ class VoucherScopesTest extends TestCase
     }
 
     /**
-     * Test Voucher::scopeCode().
+     * Test Voucher::scopeHasPrefix() and Voucher::scopeHasSuffix().
      *
      * @return void
      */
@@ -37,36 +38,102 @@ class VoucherScopesTest extends TestCase
         Voucher::create(['code' => 'FUU-TEST-BAZ']);
 
         // Test prefix scope with separator.
-        $this->assertSame(2, Voucher::prefix('FOO')->count());
-        $this->assertSame(2, Voucher::prefix('FOO', '-')->count());
-        $this->assertSame(2, Voucher::prefix('FUU')->count());
-        $this->assertSame(2, Voucher::prefix('FUU', '-')->count());
+        $this->assertSame(2, Voucher::withPrefix('FOO')->count());
+        $this->assertSame(2, Voucher::withPrefix('FOO', '-')->count());
+        $this->assertSame(2, Voucher::withPrefix('FUU')->count());
+        $this->assertSame(2, Voucher::withPrefix('FUU', '-')->count());
         // Test prefix scope without separator
-        $this->assertSame(4, Voucher::prefix('FOO', '')->count());
-        $this->assertSame(4, Voucher::prefix('FUU', '')->count());
+        $this->assertSame(4, Voucher::withPrefix('FOO', '')->count());
+        $this->assertSame(4, Voucher::withPrefix('FUU', '')->count());
 
         // Test suffix scope with separator.
-        $this->assertSame(2, Voucher::suffix('BAR')->count());
-        $this->assertSame(2, Voucher::suffix('BAR', '-')->count());
-        $this->assertSame(2, Voucher::suffix('BAZ')->count());
-        $this->assertSame(2, Voucher::suffix('BAZ', '-')->count());
+        $this->assertSame(2, Voucher::withSuffix('BAR')->count());
+        $this->assertSame(2, Voucher::withSuffix('BAR', '-')->count());
+        $this->assertSame(2, Voucher::withSuffix('BAZ')->count());
+        $this->assertSame(2, Voucher::withSuffix('BAZ', '-')->count());
         // Test suffix scope without separator
-        $this->assertSame(4, Voucher::suffix('BAR', '')->count());
-        $this->assertSame(4, Voucher::suffix('BAZ', '')->count());
+        $this->assertSame(4, Voucher::withSuffix('BAR', '')->count());
+        $this->assertSame(4, Voucher::withSuffix('BAZ', '')->count());
 
         // Test prefix and suffix scopes together with separator.
-        $this->assertSame(1, Voucher::prefix('FOO')->suffix('BAR')->count());
-        $this->assertSame(1, Voucher::prefix('FOO', '-')->suffix('BAR', '-')->count());
-        $this->assertSame(1, Voucher::prefix('FUU')->suffix('BAR')->count());
-        $this->assertSame(1, Voucher::prefix('FUU', '-')->suffix('BAR', '-')->count());
-        $this->assertSame(1, Voucher::prefix('FOO')->suffix('BAZ')->count());
-        $this->assertSame(1, Voucher::prefix('FOO', '-')->suffix('BAZ', '-')->count());
-        $this->assertSame(1, Voucher::prefix('FUU')->suffix('BAZ')->count());
-        $this->assertSame(1, Voucher::prefix('FUU', '-')->suffix('BAZ', '-')->count());
+        $this->assertSame(1, Voucher::withPrefix('FOO')->withSuffix('BAR')->count());
+        $this->assertSame(1, Voucher::withPrefix('FOO', '-')->withSuffix('BAR', '-')->count());
+        $this->assertSame(1, Voucher::withPrefix('FUU')->withSuffix('BAR')->count());
+        $this->assertSame(1, Voucher::withPrefix('FUU', '-')->withSuffix('BAR', '-')->count());
+        $this->assertSame(1, Voucher::withPrefix('FOO')->withSuffix('BAZ')->count());
+        $this->assertSame(1, Voucher::withPrefix('FOO', '-')->withSuffix('BAZ', '-')->count());
+        $this->assertSame(1, Voucher::withPrefix('FUU')->withSuffix('BAZ')->count());
+        $this->assertSame(1, Voucher::withPrefix('FUU', '-')->withSuffix('BAZ', '-')->count());
         // Test prefix and suffix scopes together without separator
-        $this->assertSame(2, Voucher::prefix('FOO', '')->suffix('BAR', '')->count());
-        $this->assertSame(2, Voucher::prefix('FUU', '')->suffix('BAR', '')->count());
-        $this->assertSame(2, Voucher::prefix('FOO', '')->suffix('BAZ', '')->count());
-        $this->assertSame(2, Voucher::prefix('FUU', '')->suffix('BAZ', '')->count());
+        $this->assertSame(2, Voucher::withPrefix('FOO', '')->withSuffix('BAR', '')->count());
+        $this->assertSame(2, Voucher::withPrefix('FUU', '')->withSuffix('BAR', '')->count());
+        $this->assertSame(2, Voucher::withPrefix('FOO', '')->withSuffix('BAZ', '')->count());
+        $this->assertSame(2, Voucher::withPrefix('FUU', '')->withSuffix('BAZ', '')->count());
+    }
+
+    /**
+     * Test Voucher::scopeWithStarted().
+     *
+     * @return void
+     */
+    public function testStartedScope(): void
+    {
+        Vouchers::create();
+        Vouchers::withStartTime(Carbon::now()->subDay())->create();
+        Vouchers::withStartTime(Carbon::now()->addDay())->create();
+
+        $this->assertSame(3, Voucher::count());
+        $this->assertSame(2, Voucher::withStarted(true)->count());
+        $this->assertSame(1, Voucher::withStarted(false)->count());
+    }
+
+    /**
+     * Test Voucher::scopeWithExpired().
+     *
+     * @return void
+     */
+    public function testExpiredScope(): void
+    {
+        Vouchers::create();
+        Vouchers::withExpireTime(Carbon::now()->subDay())->create();
+        Vouchers::withExpireTime(Carbon::now()->addDay())->create();
+
+        $this->assertSame(3, Voucher::count());
+        $this->assertSame(1, Voucher::withExpired(true)->count());
+        $this->assertSame(2, Voucher::withExpired(false)->count());
+    }
+
+    /**
+     * Test Voucher::scopeWithRedeemed().
+     *
+     * @return void
+     */
+    public function testRedeemedScope(): void
+    {
+        Vouchers::create();
+        Vouchers::create()->update(['redeemed_at' => Carbon::now()->subDay()]);
+
+        $this->assertSame(2, Voucher::count());
+        $this->assertSame(1, Voucher::withRedeemed(true)->count());
+        $this->assertSame(1, Voucher::withRedeemed(false)->count());
+    }
+
+    /**
+     * Test Voucher::scopeWithRedeemable().
+     *
+     * @return void
+     */
+    public function testRedeemableScope(): void
+    {
+        Vouchers::create();
+        Vouchers::withStartTime(Carbon::now()->subDay())->create();
+        Vouchers::withStartTime(Carbon::now()->addDay())->create();
+        Vouchers::withExpireTime(Carbon::now()->subDay())->create();
+        Vouchers::withExpireTime(Carbon::now()->addDay())->create();
+        Vouchers::create()->update(['redeemed_at' => Carbon::now()->subDay()]);
+
+        $this->assertSame(6, Voucher::count());
+        $this->assertSame(3, Voucher::withRedeemable(true)->count());
+        $this->assertSame(3, Voucher::withRedeemable(false)->count());
     }
 }

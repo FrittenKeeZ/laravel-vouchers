@@ -2,6 +2,7 @@
 
 namespace FrittenKeeZ\Vouchers\Models\Scopes;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
 trait Voucher
@@ -26,7 +27,7 @@ trait Voucher
      * @param  string|null                            $separator
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopePrefix(Builder $query, string $prefix, string $separator = null): Builder
+    public function scopeWithPrefix(Builder $query, string $prefix, string $separator = null): Builder
     {
         $clause = sprintf('%s%s%%', $prefix, is_null($separator) ? config('vouchers.separator') : $separator);
 
@@ -41,10 +42,79 @@ trait Voucher
      * @param  string|null                            $separator
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeSuffix(Builder $query, string $suffix, string $separator = null): Builder
+    public function scopeWithSuffix(Builder $query, string $suffix, string $separator = null): Builder
     {
         $clause = sprintf('%%%s%s', is_null($separator) ? config('vouchers.separator') : $separator, $suffix);
 
         return $query->where('code', 'like', $clause);
+    }
+
+    /**
+     * Scope voucher query to started or unstarted vouchers.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  bool                                   $started
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithStarted(Builder $query, bool $started = true): Builder
+    {
+        if ($started) {
+            return $query->where(function (Builder $query) {
+                return $query->whereNull('starts_at')->orWhere('starts_at', '<=', Carbon::now());
+            });
+        }
+
+        return $query->where('starts_at', '>', Carbon::now());
+    }
+
+    /**
+     * Scope voucher query to expired or unexpired vouchers.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  bool                                   $expired
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithExpired(Builder $query, bool $expired = true): Builder
+    {
+        return $query->where(function (Builder $query) use ($expired) {
+            return $expired
+                ? $query->whereNotNull('expires_at')->where('expires_at', '<=', Carbon::now())
+                : $query->whereNull('expires_at')->orWhere('expires_at', '>', Carbon::now());
+        });
+    }
+
+    /**
+     * Scope voucher query to redeemed or unredeemed vouchers.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  bool                                   $redeemed
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithRedeemed(Builder $query, bool $redeemed = true): Builder
+    {
+        return $redeemed ? $query->whereNotNull('redeemed_at') : $query->whereNull('redeemed_at');
+    }
+
+    /**
+     * Scope voucher query to redeemable or unredeemable vouchers.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  bool                                   $redeemable
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithRedeemable(Builder $query, bool $redeemable = true): Builder
+    {
+        if ($redeemable) {
+            return $query->withRedeemed(false)->withStarted(true)->withExpired(false);
+        }
+
+        return $query
+            ->where(function (Builder $query) {
+                return $query->withRedeemed(true);
+            })->orWhere(function (Builder $query) {
+                return $query->withStarted(false);
+            })->orWhere(function (Builder $query) {
+                return $query->withExpired(true);
+            });
     }
 }

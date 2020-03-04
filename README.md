@@ -231,9 +231,17 @@ Voucher::isRedeemable(): bool
 For convenience we also provide Voucher scopes matching the helper methods.
 ```php
 // Scope voucher query to a specific prefix, optionally specifying a separator different from config.
-Voucher::prefix(string $prefix, string $separator = null)
+Voucher::withPrefix(string $prefix, string $separator = null)
 // Scope voucher query to a specific suffix, optionally specifying a separator different from config.
-Voucher::suffix(string $suffix, string $separator = null)
+Voucher::withSuffix(string $suffix, string $separator = null)
+// Scope voucher query to started or unstarted vouchers.
+Voucher::withStarted(bool $started = true)
+// Scope voucher query to expired or unexpired vouchers.
+Voucher::withExpired(bool $expired = true)
+// Scope voucher query to redeemed or unredeemed vouchers.
+Voucher::withRedeemed(bool $redeemed = true)
+// Scope voucher query to redeemable or unredeemable vouchers.
+Voucher::withRedeemable(bool $redeemable = true)
 ```
 
 ## Testing
