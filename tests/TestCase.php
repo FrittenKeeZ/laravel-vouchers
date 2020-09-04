@@ -3,8 +3,11 @@
 namespace FrittenKeeZ\Vouchers\Tests;
 
 use FrittenKeeZ\Vouchers\Facades\Vouchers;
+use FrittenKeeZ\Vouchers\Tests\Models\User;
+use FrittenKeeZ\Vouchers\Tests\Models\Color;
 use FrittenKeeZ\Vouchers\VouchersServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class TestCase extends BaseTestCase
 {
@@ -19,6 +22,12 @@ class TestCase extends BaseTestCase
         $this->artisan('migrate', ['--database' => 'testing']);
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
         $this->withFactories(__DIR__ . '/database/factories');
+
+        // Ensure everything works with morph map.
+        Relation::morphMap([
+            'Color' => Color::class,
+            'User'  => User::class,
+        ]);
     }
 
     /**

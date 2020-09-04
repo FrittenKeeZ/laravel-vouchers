@@ -8,6 +8,7 @@ use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class Voucher extends Model
 {
@@ -232,7 +233,8 @@ class Voucher extends Model
     {
         $query = $this->voucherEntities()->with('entity');
         if (! empty($type)) {
-            $query->where('entity_type', '=', $type);
+            $alias = \array_flip(Relation::morphMap())[$type] ?? $type;
+            $query->where('entity_type', '=', $alias);
         }
 
         return $query->get()->map->entity;
