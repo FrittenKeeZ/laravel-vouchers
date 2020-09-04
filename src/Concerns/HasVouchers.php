@@ -41,6 +41,12 @@ trait HasVouchers
      */
     public function getVouchers(): Collection
     {
+        trigger_error(
+            'getVouchers() is deprecated and will be removed in 0.2.0. ' .
+            'Refactor your code to use vouchers() relationship accessor instead.',
+            \E_USER_DEPRECATED
+        );
+
         return $this->vouchers;
     }
 
