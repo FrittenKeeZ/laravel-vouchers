@@ -4,6 +4,7 @@ namespace FrittenKeeZ\Vouchers\Tests;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
+use PHPUnit\Runner\Version;
 use FrittenKeeZ\Vouchers\Vouchers;
 use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Models\Redeemer;
@@ -54,12 +55,17 @@ class VouchersTest extends TestCase
         $separator = $config->getSeparator();
         $regex = $this->generateCodeValidationRegex($mask, $characters, $prefix, $suffix, $separator);
 
+        $regexAssertMethod = 'assertRegExp';
+        if ((float) Version::series() >= 9.1) {
+            $regexAssertMethod = 'assertMatchesRegularExpression';
+        }
+
         // Test single generation.
-        $this->assertRegExp($regex, $vouchers->generate($mask, $characters));
+        $this->$regexAssertMethod($regex, $vouchers->generate($mask, $characters));
 
         // Test batch operation.
         foreach ($vouchers->batch(10) as $code) {
-            $this->assertRegExp($regex, $code);
+            $this->$regexAssertMethod($regex, $code);
         }
 
         // Test negative batch amount.
