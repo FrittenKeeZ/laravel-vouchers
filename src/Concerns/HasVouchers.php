@@ -41,7 +41,7 @@ trait HasVouchers
      */
     public function getVouchers(): Collection
     {
-        trigger_error(
+        \trigger_error(
             'getVouchers() is deprecated and will be removed in 0.2.0. ' .
             'Refactor your code to use vouchers() relationship accessor instead.',
             \E_USER_DEPRECATED
@@ -78,7 +78,7 @@ trait HasVouchers
 
         // Prepend owner to entities.
         $entities = $vouchers->getEntities();
-        array_unshift($entities, $this);
+        \array_unshift($entities, $this);
 
         return $vouchers->withEntities(...$entities)->create($amount);
     }

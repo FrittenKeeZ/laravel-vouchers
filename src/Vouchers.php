@@ -65,8 +65,8 @@ class Vouchers
         // Ensure nothing is committed to the database if anything fails.
         DB::transaction(function () use ($amount, $options, $entities, &$vouchers) {
             foreach ($this->batch($amount) as $code) {
-                $voucher = $this->vouchers()->create(compact('code') + $options);
-                if (!empty($entities)) {
+                $voucher = $this->vouchers()->create(\compact('code') + $options);
+                if (! empty($entities)) {
                     $voucher->addEntities(...$entities);
                 }
 
@@ -76,7 +76,7 @@ class Vouchers
 
         $this->reset();
 
-        return $amount === 1 ? reset($vouchers) : $vouchers;
+        return $amount === 1 ? \reset($vouchers) : $vouchers;
     }
 
     /**
@@ -169,8 +169,8 @@ class Vouchers
         $mask = $mask ?: $this->config->getMask();
         $characters = $characters ?: $this->config->getCharacters();
 
-        $code = preg_replace_callback('/\*/', function (array $matches) use ($characters) {
-            return $characters[random_int(0, mb_strlen($characters) - 1)];
+        $code = \preg_replace_callback('/\*/', function (array $matches) use ($characters) {
+            return $characters[\random_int(0, \mb_strlen($characters) - 1)];
         }, $mask);
 
         return $this->wrap(
@@ -209,7 +209,7 @@ class Vouchers
      */
     public function exists(string $code, array $codes = []): bool
     {
-        return in_array($code, $codes) || $this->vouchers()->code($code)->exists();
+        return \in_array($code, $codes) || $this->vouchers()->code($code)->exists();
     }
 
     /**
@@ -233,7 +233,7 @@ class Vouchers
      */
     public function __call(string $name, array $args)
     {
-        if (method_exists($this->config, $name)) {
+        if (\method_exists($this->config, $name)) {
             if (Str::startsWith($name, 'get')) {
                 return $this->config->$name(...$args);
             }
@@ -245,7 +245,7 @@ class Vouchers
             }
         }
 
-        trigger_error('Call to undefined method ' . static::class . '::' . $name . '()', E_USER_ERROR);
+        \trigger_error('Call to undefined method ' . static::class . '::' . $name . '()', \E_USER_ERROR);
     } // @codeCoverageIgnore
 
     /**

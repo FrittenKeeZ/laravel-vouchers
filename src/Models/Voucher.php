@@ -80,7 +80,7 @@ class Voucher extends Model
      */
     public function hasPrefix(string $prefix, string $separator = null): bool
     {
-        $clause = sprintf('%s%s', $prefix, is_null($separator) ? config('vouchers.separator') : $separator);
+        $clause = \sprintf('%s%s', $prefix, \is_null($separator) ? \config('vouchers.separator') : $separator);
 
         return Str::startsWith($this->code, $clause);
     }
@@ -94,7 +94,7 @@ class Voucher extends Model
      */
     public function hasSuffix(string $suffix, string $separator = null): bool
     {
-        $clause = sprintf('%s%s', is_null($separator) ? config('vouchers.separator') : $separator, $suffix);
+        $clause = \sprintf('%s%s', \is_null($separator) ? \config('vouchers.separator') : $separator, $suffix);
 
         return Str::endsWith($this->code, $clause);
     }
@@ -215,7 +215,7 @@ class Voucher extends Model
     {
         if (! empty($entities)) {
             $model = Config::model('entity');
-            $models = collect($entities)->map(function (Model $entity) use ($model) {
+            $models = \collect($entities)->map(function (Model $entity) use ($model) {
                 return $model::make()->entity()->associate($entity);
             });
             $this->voucherEntities()->saveMany($models);

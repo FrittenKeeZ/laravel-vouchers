@@ -105,7 +105,7 @@ class ConfigTest extends TestCase
             'separator'  => '_',
         ];
         foreach ($options as $key => $value) {
-            $getter = 'get' . ucfirst($key);
+            $getter = 'get' . \ucfirst($key);
             $this->assertNotSame($value, $config->$getter());
             $appConfig->set('vouchers.' . $key, $value);
         }
@@ -136,8 +136,8 @@ class ConfigTest extends TestCase
             'separator'  => '_',
         ];
         foreach ($options as $key => $value) {
-            $getter = 'get' . ucfirst($key);
-            $setter = 'with' . ucfirst($key);
+            $getter = 'get' . \ucfirst($key);
+            $setter = 'with' . \ucfirst($key);
             $this->assertNotSame($value, $config->$getter());
             $config->$setter($value);
         }
@@ -218,7 +218,7 @@ class ConfigTest extends TestCase
         );
 
         // Test entities.
-        $entities = factory(Color::class, 3)->make()->all();
+        $entities = \factory(Color::class, 3)->make()->all();
         $this->assertSame($entities, $config->withEntities(...$entities)->getEntities());
     }
 
@@ -231,6 +231,6 @@ class ConfigTest extends TestCase
      */
     protected function assertArrayStructure(array $expected, array $actual): void
     {
-        $this->assertTrue(empty(array_diff_key($expected, $actual)) && empty(array_diff_key($actual, $expected)));
+        $this->assertTrue(empty(\array_diff_key($expected, $actual)) && empty(\array_diff_key($actual, $expected)));
     }
 }
