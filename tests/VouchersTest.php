@@ -92,23 +92,23 @@ class VouchersTest extends TestCase
         // With metdata, start time and expire time.
         $metadata = ['foo' => 'bar', 'baz' => 'boom'];
         $now = Carbon::now();
-        $startInterval = CarbonInterval::create('P1D');
-        $expireInterval = CarbonInterval::create('P30D');
+        $startTime = $now->copy()->add(CarbonInterval::create('P1D'));
+        $expireTime = $now->copy()->add(CarbonInterval::create('P30D'));
         $users = $this->factory(User::class, 3)->create();
         $voucher = $vouchers
             ->withMetadata($metadata)
-            ->withStartTimeIn($startInterval)
-            ->withExpireTimeIn($expireInterval)
+            ->withStartTime($startTime)
+            ->withExpireTime($expireTime)
             ->withEntities(...$users->all())
             ->create();
         $this->assertInstanceOf(Voucher::class, $voucher);
         $this->assertSame($metadata, $voucher->metadata);
         $this->assertSame(
-            $now->copy()->add($startInterval)->toDateTimeString(),
+            $startTime->toDateTimeString(),
             $voucher->starts_at->toDateTimeString()
         );
         $this->assertSame(
-            $now->copy()->add($expireInterval)->toDateTimeString(),
+            $expireTime->toDateTimeString(),
             $voucher->expires_at->toDateTimeString()
         );
         foreach ($voucher->getEntities() as $index => $entity) {
