@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace FrittenKeeZ\Vouchers;
 
-use DateTime;
-use DateInterval;
 use Carbon\Carbon;
-use Illuminate\Support\Arr;
+use DateInterval;
+use DateTime;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 class Config
 {

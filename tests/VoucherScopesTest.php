@@ -2,9 +2,9 @@
 
 namespace FrittenKeeZ\Vouchers\Tests;
 
-use Illuminate\Support\Carbon;
-use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Facades\Vouchers;
+use FrittenKeeZ\Vouchers\Models\Voucher;
+use Illuminate\Support\Carbon;
 
 class VoucherScopesTest extends TestCase
 {

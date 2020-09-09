@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace FrittenKeeZ\Vouchers;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Model;
-use FrittenKeeZ\Vouchers\Models\Voucher;
-use FrittenKeeZ\Vouchers\Models\Redeemer;
-use FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException;
 use FrittenKeeZ\Vouchers\Exceptions\VoucherAlreadyRedeemedException;
+use FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException;
+use FrittenKeeZ\Vouchers\Models\Redeemer;
+use FrittenKeeZ\Vouchers\Models\Voucher;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class Vouchers
 {
@@ -66,7 +66,7 @@ class Vouchers
         DB::transaction(function () use ($amount, $options, $entities, &$vouchers) {
             foreach ($this->batch($amount) as $code) {
                 $voucher = $this->vouchers()->create(compact('code') + $options);
-                if (! empty($entities)) {
+                if (!empty($entities)) {
                     $voucher->addEntities(...$entities);
                 }
 
@@ -97,12 +97,12 @@ class Vouchers
         if ($voucher === null) {
             throw new VoucherNotFoundException();
         }
-        if (! $voucher->isRedeemable()) {
+        if (!$voucher->isRedeemable()) {
             throw new VoucherAlreadyRedeemedException();
         }
 
         $redeemer = $this->redeemers();
-        if (! empty($metadata)) {
+        if (!empty($metadata)) {
             $redeemer->metadata = $metadata;
         }
         $redeemer->redeemer()->associate($entity);

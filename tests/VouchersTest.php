@@ -4,13 +4,13 @@ namespace FrittenKeeZ\Vouchers\Tests;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
-use PHPUnit\Runner\Version;
-use FrittenKeeZ\Vouchers\Vouchers;
-use FrittenKeeZ\Vouchers\Models\Voucher;
-use FrittenKeeZ\Vouchers\Models\Redeemer;
-use FrittenKeeZ\Vouchers\Tests\Models\User;
-use FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException;
 use FrittenKeeZ\Vouchers\Exceptions\VoucherAlreadyRedeemedException;
+use FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException;
+use FrittenKeeZ\Vouchers\Models\Redeemer;
+use FrittenKeeZ\Vouchers\Models\Voucher;
+use FrittenKeeZ\Vouchers\Tests\Models\User;
+use FrittenKeeZ\Vouchers\Vouchers;
+use PHPUnit\Runner\Version;
 
 class VouchersTest extends TestCase
 {
@@ -100,8 +100,7 @@ class VouchersTest extends TestCase
             ->withStartTimeIn($startInterval)
             ->withExpireTimeIn($expireInterval)
             ->withEntities(...$users->all())
-            ->create()
-        ;
+            ->create();
         $this->assertInstanceOf(Voucher::class, $voucher);
         $this->assertSame($metadata, $voucher->metadata);
         $this->assertSame(
@@ -236,10 +235,10 @@ class VouchersTest extends TestCase
     public function wrapProvider(): array
     {
         return [
-            'string only' => ['code', null, null, '-', 'code'],
-            'prefix dash separator' => ['code', 'foo', null, '-', 'foo-code'],
-            'suffix dash separator' => ['code', null, 'bar', '-', 'code-bar'],
-            'prefix suffix dash separator' => ['code', 'foo', 'bar', '-', 'foo-code-bar'],
+            'string only'                        => ['code', null, null, '-', 'code'],
+            'prefix dash separator'              => ['code', 'foo', null, '-', 'foo-code'],
+            'suffix dash separator'              => ['code', null, 'bar', '-', 'code-bar'],
+            'prefix suffix dash separator'       => ['code', 'foo', 'bar', '-', 'foo-code-bar'],
             'prefix suffix underscore separator' => ['code', 'foo', 'bar', '_', 'foo_code_bar'],
         ];
     }

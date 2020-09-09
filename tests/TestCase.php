@@ -2,13 +2,13 @@
 
 namespace FrittenKeeZ\Vouchers\Tests;
 
-use Illuminate\Support\Facades\App;
 use FrittenKeeZ\Vouchers\Facades\Vouchers;
-use FrittenKeeZ\Vouchers\Tests\Models\User;
 use FrittenKeeZ\Vouchers\Tests\Models\Color;
+use FrittenKeeZ\Vouchers\Tests\Models\User;
 use FrittenKeeZ\Vouchers\VouchersServiceProvider;
-use Orchestra\Testbench\TestCase as BaseTestCase;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\App;
+use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
@@ -68,7 +68,7 @@ class TestCase extends BaseTestCase
         if (class_exists('Illuminate\\Database\\Eloquent\\Factory')) {
             $factory = App::make('Illuminate\\Database\\Eloquent\\Factory');
 
-            if (isset($amount) && is_int($amount)) {
+            if (isset($amount) && \is_int($amount)) {
                 return $factory->of($class)->times($amount);
             }
 
@@ -76,7 +76,7 @@ class TestCase extends BaseTestCase
         }
 
         $factory = 'FrittenKeeZ\\Vouchers\\Tests\\Database\\Factories\\' . class_basename($class) . 'Factory';
-        if (isset($amount) && is_int($amount)) {
+        if (isset($amount) && \is_int($amount)) {
             return $factory::new()->count($amount);
         }
 

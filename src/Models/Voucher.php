@@ -2,13 +2,13 @@
 
 namespace FrittenKeeZ\Vouchers\Models;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 use FrittenKeeZ\Vouchers\Config;
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class Voucher extends Model
 {
@@ -137,7 +137,7 @@ class Voucher extends Model
      */
     public function isRedeemable(): bool
     {
-        return ! $this->isRedeemed() && $this->isStarted() && ! $this->isExpired();
+        return !$this->isRedeemed() && $this->isStarted() && !$this->isExpired();
     }
 
     /**
@@ -148,7 +148,7 @@ class Voucher extends Model
      */
     public function redeem(Redeemer $redeemer): bool
     {
-        if (! $this->isRedeemable()) {
+        if (!$this->isRedeemable()) {
             return false;
         }
 
@@ -214,7 +214,7 @@ class Voucher extends Model
      */
     public function addEntities(Model ...$entities): void
     {
-        if (! empty($entities)) {
+        if (!empty($entities)) {
             $model = Config::model('entity');
             $models = collect($entities)->map(function (Model $entity) use ($model) {
                 return $model::make()->entity()->associate($entity);
@@ -232,7 +232,7 @@ class Voucher extends Model
     public function getEntities(string $type = null): Collection
     {
         $query = $this->voucherEntities()->with('entity');
-        if (! empty($type)) {
+        if (!empty($type)) {
             $alias = array_flip(Relation::morphMap())[$type] ?? $type;
             $query->where('entity_type', '=', $alias);
         }

@@ -2,10 +2,10 @@
 
 namespace FrittenKeeZ\Vouchers\Tests\Models;
 
-use Illuminate\Notifications\Notifiable;
-use FrittenKeeZ\Vouchers\Concerns\HasVouchers;
 use FrittenKeeZ\Vouchers\Concerns\HasRedeemers;
+use FrittenKeeZ\Vouchers\Concerns\HasVouchers;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {

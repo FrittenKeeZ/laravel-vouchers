@@ -2,9 +2,9 @@
 
 namespace FrittenKeeZ\Vouchers\Tests;
 
-use FrittenKeeZ\Vouchers\Vouchers;
 use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
+use FrittenKeeZ\Vouchers\Vouchers;
 
 class VoucherTest extends TestCase
 {

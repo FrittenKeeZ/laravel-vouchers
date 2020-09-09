@@ -22,7 +22,7 @@ return [
      */
     'mask' => '****-****',
 
-    /**
+    /*
      * Code prefix.
      * If defined all codes will start with this string.
      *
@@ -30,7 +30,7 @@ return [
      */
     'prefix' => null,
 
-    /**
+    /*
      * Code suffix.
      * If defined all codes will end with this string.
      *

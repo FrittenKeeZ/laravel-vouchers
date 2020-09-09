@@ -2,8 +2,8 @@
 
 namespace FrittenKeeZ\Vouchers\Models\Scopes;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 trait Voucher
 {

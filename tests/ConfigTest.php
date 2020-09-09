@@ -5,10 +5,10 @@ namespace FrittenKeeZ\Vouchers\Tests;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use FrittenKeeZ\Vouchers\Config;
-use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Models\Redeemer;
-use FrittenKeeZ\Vouchers\Tests\Models\Color;
+use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Models\VoucherEntity;
+use FrittenKeeZ\Vouchers\Tests\Models\Color;
 
 class ConfigTest extends TestCase
 {
@@ -153,8 +153,7 @@ class ConfigTest extends TestCase
         $config
             ->withoutPrefix()
             ->withoutSuffix()
-            ->withoutSeparator()
-        ;
+            ->withoutSeparator();
         $this->assertSame('', $config->getPrefix());
         $this->assertSame('', $config->getSuffix());
         $this->assertSame('', $config->getSeparator());
@@ -172,8 +171,8 @@ class ConfigTest extends TestCase
         // Test metadata
         $metadata = [
             'limit' => 42,
-            'foo' => 'bar',
-            'next' => [
+            'foo'   => 'bar',
+            'next'  => [
                 'level' => 'shizzle',
             ],
         ];

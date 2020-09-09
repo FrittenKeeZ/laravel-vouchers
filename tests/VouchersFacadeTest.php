@@ -2,8 +2,8 @@
 
 namespace FrittenKeeZ\Vouchers\Tests;
 
-use ReflectionMethod;
 use FrittenKeeZ\Vouchers\Facades\Vouchers;
+use ReflectionMethod;
 
 class VouchersFacadeTest extends TestCase
 {

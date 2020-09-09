@@ -2,9 +2,9 @@
 
 namespace FrittenKeeZ\Vouchers\Tests;
 
-use FrittenKeeZ\Vouchers\Vouchers;
-use FrittenKeeZ\Vouchers\Tests\Models\User;
 use FrittenKeeZ\Vouchers\Tests\Models\Color;
+use FrittenKeeZ\Vouchers\Tests\Models\User;
+use FrittenKeeZ\Vouchers\Vouchers;
 
 class HasVouchersTest extends TestCase
 {
