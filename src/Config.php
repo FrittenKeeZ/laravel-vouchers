@@ -36,7 +36,7 @@ class Config
      */
     public function getCharacters(): string
     {
-        return Arr::get($this->options, 'characters', \config('vouchers.characters'));
+        return Arr::get($this->options, 'characters', config('vouchers.characters'));
     }
 
     /**
@@ -59,7 +59,7 @@ class Config
      */
     public function getMask(): string
     {
-        return Arr::get($this->options, 'mask', \config('vouchers.mask'));
+        return Arr::get($this->options, 'mask', config('vouchers.mask'));
     }
 
     /**
@@ -82,7 +82,7 @@ class Config
      */
     public function getPrefix(): ?string
     {
-        return Arr::get($this->options, 'prefix', \config('vouchers.prefix'));
+        return Arr::get($this->options, 'prefix', config('vouchers.prefix'));
     }
 
     /**
@@ -117,7 +117,7 @@ class Config
      */
     public function getSuffix(): ?string
     {
-        return Arr::get($this->options, 'suffix', \config('vouchers.suffix'));
+        return Arr::get($this->options, 'suffix', config('vouchers.suffix'));
     }
 
     /**
@@ -152,7 +152,7 @@ class Config
      */
     public function getSeparator(): string
     {
-        return Arr::get($this->options, 'separator', \config('vouchers.separator'));
+        return Arr::get($this->options, 'separator', config('vouchers.separator'));
     }
 
     /**
@@ -346,7 +346,7 @@ class Config
      */
     public static function model(string $name): ?string
     {
-        return \config('vouchers.models.' . $name);
+        return config('vouchers.models.' . $name);
     }
 
     /**
@@ -357,6 +357,6 @@ class Config
      */
     public static function table(string $name): ?string
     {
-        return \config('vouchers.tables.' . $name);
+        return config('vouchers.tables.' . $name);
     }
 }

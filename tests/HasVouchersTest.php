@@ -15,7 +15,7 @@ class HasVouchersTest extends TestCase
      */
     public function testCreateVoucher(): void
     {
-        $user = \factory(User::class)->create();
+        $user = $this->factory(User::class)->create();
         $voucher = $user->createVoucher();
 
         // Check user voucher relation.
@@ -30,8 +30,8 @@ class HasVouchersTest extends TestCase
      */
     public function testCreateVoucherWithCallback(): void
     {
-        $user = \factory(User::class)->create();
-        $color = \factory(Color::class)->create();
+        $user = $this->factory(User::class)->create();
+        $color = $this->factory(Color::class)->create();
         $voucher = $user->createVoucher(function (Vouchers $vouchers) use ($color) {
             $vouchers->withEntities($color);
         });
@@ -49,7 +49,7 @@ class HasVouchersTest extends TestCase
      */
     public function testCreateVouchers(): void
     {
-        $user = \factory(User::class)->create();
+        $user = $this->factory(User::class)->create();
         $vouchers = $user->createVouchers(3);
 
         foreach ($vouchers as $index => $voucher) {
@@ -66,8 +66,8 @@ class HasVouchersTest extends TestCase
      */
     public function testCreateVouchersWithCallback(): void
     {
-        $user = \factory(User::class)->create();
-        $color = \factory(Color::class)->create();
+        $user = $this->factory(User::class)->create();
+        $color = $this->factory(Color::class)->create();
         $vouchers = $user->createVouchers(3, function (Vouchers $vouchers) use ($color) {
             $vouchers->withEntities($color);
         });

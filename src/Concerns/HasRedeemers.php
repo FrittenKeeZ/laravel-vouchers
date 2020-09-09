@@ -28,7 +28,7 @@ trait HasRedeemers
      */
     public function getRedeemers(): Collection
     {
-        \trigger_error(
+        trigger_error(
             'getRedeemers() is deprecated and will be removed in 0.2.0. ' .
             'Refactor your code to use redeemers() relationship accessor instead.',
             \E_USER_DEPRECATED

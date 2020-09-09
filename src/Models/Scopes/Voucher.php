@@ -29,7 +29,7 @@ trait Voucher
      */
     public function scopeWithPrefix(Builder $query, string $prefix, string $separator = null): Builder
     {
-        $clause = \sprintf('%s%s%%', $prefix, \is_null($separator) ? \config('vouchers.separator') : $separator);
+        $clause = sprintf('%s%s%%', $prefix, \is_null($separator) ? config('vouchers.separator') : $separator);
 
         return $query->where('code', 'like', $clause);
     }
@@ -44,7 +44,7 @@ trait Voucher
      */
     public function scopeWithSuffix(Builder $query, string $suffix, string $separator = null): Builder
     {
-        $clause = \sprintf('%%%s%s', \is_null($separator) ? \config('vouchers.separator') : $separator, $suffix);
+        $clause = sprintf('%%%s%s', \is_null($separator) ? config('vouchers.separator') : $separator, $suffix);
 
         return $query->where('code', 'like', $clause);
     }

@@ -94,7 +94,7 @@ class VouchersTest extends TestCase
         $now = Carbon::now();
         $startInterval = CarbonInterval::create('P1D');
         $expireInterval = CarbonInterval::create('P30D');
-        $users = \factory(User::class, 3)->create();
+        $users = $this->factory(User::class, 3)->create();
         $voucher = $vouchers
             ->withMetadata($metadata)
             ->withStartTimeIn($startInterval)
@@ -136,7 +136,7 @@ class VouchersTest extends TestCase
     public function testVoucherRedemption(): void
     {
         $vouchers = new Vouchers();
-        $user = \factory(User::class)->create();
+        $user = $this->factory(User::class)->create();
         $voucher = $vouchers->withEntities($user)->create();
 
         // Check user voucher relation.
@@ -172,7 +172,7 @@ class VouchersTest extends TestCase
     public function testVoucherNotFoundException(): void
     {
         $vouchers = new Vouchers();
-        $user = \factory(User::class)->create();
+        $user = $this->factory(User::class)->create();
 
         $this->expectException(VoucherNotFoundException::class);
         $vouchers->redeem('idonotexist', $user);
@@ -187,7 +187,7 @@ class VouchersTest extends TestCase
     {
         $vouchers = new Vouchers();
         $voucher = $vouchers->create();
-        $user = \factory(User::class)->create();
+        $user = $this->factory(User::class)->create();
 
         $this->assertTrue($vouchers->redeem($voucher->code, $user));
         $this->expectException(VoucherAlreadyRedeemedException::class);
@@ -258,16 +258,16 @@ class VouchersTest extends TestCase
         ?string $suffix,
         string $separator
     ): string {
-        $match = \preg_quote($characters, '/');
-        $inner = \preg_replace_callback('/(?:\\\\\*)+/', function (array $matches) use ($match) {
-            return \sprintf('[%s]{%d}', $match, \mb_strlen($matches[0]) / 2);
-        }, \preg_quote($mask, '/'));
+        $match = preg_quote($characters, '/');
+        $inner = preg_replace_callback('/(?:\\\\\*)+/', function (array $matches) use ($match) {
+            return sprintf('[%s]{%d}', $match, mb_strlen($matches[0]) / 2);
+        }, preg_quote($mask, '/'));
 
-        return \sprintf(
+        return sprintf(
             '/%s%s%s/',
-            empty($prefix) ? '' : \preg_quote($prefix . $separator, '/'),
+            empty($prefix) ? '' : preg_quote($prefix . $separator, '/'),
             $inner,
-            empty($suffix) ? '' : \preg_quote($separator . $suffix, '/')
+            empty($suffix) ? '' : preg_quote($separator . $suffix, '/')
         );
     }
 }
