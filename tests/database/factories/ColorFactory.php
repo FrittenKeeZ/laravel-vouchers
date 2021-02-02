@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FrittenKeeZ\Vouchers\Tests\Database\Factories;
 
 use FrittenKeeZ\Vouchers\Tests\Models\Color;
@@ -19,7 +21,7 @@ class ColorFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'name' => $this->faker->colorName,

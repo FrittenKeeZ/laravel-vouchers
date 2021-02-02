@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FrittenKeeZ\Vouchers\Tests\Models;
 
 use FrittenKeeZ\Vouchers\Concerns\HasRedeemers;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,7 +14,7 @@ class CreateVoucherTables extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create(Config::table('vouchers'), function (Blueprint $table) {
             $table->bigIncrements('id');
@@ -61,7 +63,7 @@ class CreateVoucherTables extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists(Config::table('entities'));
         Schema::dropIfExists(Config::table('redeemers'));
