@@ -117,6 +117,8 @@ Vouchers::withExpireDate(DateTime $timestamp)
 Vouchers::withExpireDateIn(DateInterval $interval)
 // Set related entities to voucher.
 Vouchers::withEntities(Illuminate\Database\Eloquent\Model ...$entities)
+// Set owning entity for voucher.
+Vouchers::withOwner(Illuminate\Database\Eloquent\Model $owner)
 ```
 All calls are chainable and dynamic options will be reset when calling `Vouchers::create()` or `Vouchers::reset()`.
 ```php
@@ -124,7 +126,7 @@ $voucher = Vouchers::withMask('***-***-***')
     ->withMetadata(['foo' => 'bar'])
     ->withExpireDateIn(CarbonInterval::create('P30D'))
     ->create();
-$voucher = Vouchers::withEntities($user)->withPrefix('USR');
+$voucher = Vouchers::withOwner($user)->withPrefix('USR');
 ```
 
 ### Events
@@ -148,10 +150,10 @@ Voucher::redeeming(function (Voucher $voucher) {
 To prevent a voucher from being redeemed by anyone but the related user.
 ```php
 Voucher::redeeming(function (Voucher $voucher) {
-    return $voucher->redeemer->redeemer->is($voucher->getEntities(User::class)->first());
+    return $voucher->redeemer->redeemer->is($voucher->owner);
 });
 /* ... */
-$voucher = Vouchers::withEntities($user)->create();
+$voucher = Vouchers::withOwner($user)->create();
 Vouchers::redeem($voucher->code, $user);
 ```
 To perform additional actions after a vouchers has been redeemed, subscribe to the `FrittenKeeZ\Vouchers\Models\Voucher::redeemed()` event.
@@ -172,16 +174,20 @@ $redeemers = $user->redeemers;
 ```
 `FrittenKeeZ\Vouchers\Concerns\HasVouchers`
 ```php
-// Associated vouchers relationship.
-HasVouchers::vouchers(): MorphToMany
-// Get all associated vouchers.
+// Owned vouchers relationship.
+HasVouchers::vouchers(): MorphMany
+// Get all owned vouchers.
 $vouchers = $user->vouchers;
+// Associated vouchers relationship.
+HasVouchers::associatedVouchers(): MorphToMany
+// Get all associated vouchers.
+$vouchers = $user->associated_vouchers;
 // Associated voucher entities relationship.
 HasVouchers::voucherEntities(): MorphMany
 // Get all associated voucher entities.
 $entities = $user->voucher_entities;
 ```
-You can also create vouchers related to an entity using these convenience methods.
+You can also create vouchers owned by an entity using these convenience methods.
 ```php
 HasVouchers::createVoucher(Closure $callback = null): object
 // Without using callback.
@@ -242,6 +248,8 @@ Voucher::withExpired(bool $expired = true)
 Voucher::withRedeemed(bool $redeemed = true)
 // Scope voucher query to redeemable or unredeemable vouchers.
 Voucher::withRedeemable(bool $redeemable = true)
+// Scope voucher query to specific owner.
+Voucher::withOwner(Illuminate\Database\Eloquent\Model $owner)
 ```
 
 ## Testing
