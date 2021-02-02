@@ -60,12 +60,16 @@ class Vouchers
             'starts_at'  => $this->config->getStartTime(),
             'expires_at' => $this->config->getExpireTime(),
         ];
+        $owner = $this->config->getOwner();
         $entities = $this->config->getEntities();
         $vouchers = [];
         // Ensure nothing is committed to the database if anything fails.
-        DB::transaction(function () use ($amount, $options, $entities, &$vouchers) {
+        DB::transaction(function () use ($amount, $options, $owner, $entities, &$vouchers) {
             foreach ($this->batch($amount) as $code) {
                 $voucher = $this->vouchers()->create(compact('code') + $options);
+                if (!empty($owner)) {
+                    $voucher->owner()->associate($owner)->save();
+                }
                 if (!empty($entities)) {
                     $voucher->addEntities(...$entities);
                 }
@@ -246,7 +250,7 @@ class Vouchers
         }
 
         trigger_error('Call to undefined method ' . static::class . '::' . $name . '()', \E_USER_ERROR);
-    } // @codeCoverageIgnore
+    }
 
     /**
      * Convenience method for interacting with Redeemer model.

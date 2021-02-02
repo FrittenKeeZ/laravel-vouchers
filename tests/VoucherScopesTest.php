@@ -4,6 +4,7 @@ namespace FrittenKeeZ\Vouchers\Tests;
 
 use FrittenKeeZ\Vouchers\Facades\Vouchers;
 use FrittenKeeZ\Vouchers\Models\Voucher;
+use FrittenKeeZ\Vouchers\Tests\Models\User;
 use Illuminate\Support\Carbon;
 
 class VoucherScopesTest extends TestCase
@@ -135,5 +136,28 @@ class VoucherScopesTest extends TestCase
         $this->assertSame(6, Voucher::count());
         $this->assertSame(3, Voucher::withRedeemable(true)->count());
         $this->assertSame(3, Voucher::withRedeemable(false)->count());
+    }
+
+    /**
+     * Test Voucher::scopeWithOwner().
+     *
+     * @return void
+     */
+    public function testOwnerScope(): void
+    {
+        // Create users.
+        $first = $this->factory(User::class)->create();
+        $second = $this->factory(User::class)->create();
+        $third = $this->factory(User::class)->create();
+
+        // Create vouchers.
+        $first->createVoucher();
+        $second->createVouchers(2);
+        $third->createVouchers(3);
+
+        $this->assertSame(6, Voucher::count());
+        $this->assertSame(1, Voucher::withOwner($first)->count());
+        $this->assertSame(2, Voucher::withOwner($second)->count());
+        $this->assertSame(3, Voucher::withOwner($third)->count());
     }
 }

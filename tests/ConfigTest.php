@@ -9,6 +9,7 @@ use FrittenKeeZ\Vouchers\Models\Redeemer;
 use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Models\VoucherEntity;
 use FrittenKeeZ\Vouchers\Tests\Models\Color;
+use FrittenKeeZ\Vouchers\Tests\Models\User;
 
 class ConfigTest extends TestCase
 {
@@ -215,6 +216,10 @@ class ConfigTest extends TestCase
             Carbon::now()->add($interval)->endOfDay()->toDateTimeString(),
             $config->withExpireDateIn($interval)->getExpireTime()->toDateTimeString()
         );
+
+        // Test owner.
+        $owner = $this->factory(User::class)->make();
+        $this->assertSame($owner, $config->withOwner($owner)->getOwner());
 
         // Test entities.
         $entities = $this->factory(Color::class, 3)->make()->all();

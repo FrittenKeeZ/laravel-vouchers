@@ -17,6 +17,7 @@ class CreateVoucherTables extends Migration
         Schema::create(Config::table('vouchers'), function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('code')->unique();
+            $table->nullableMorphs('owner');
             $table->text('metadata')->nullable();
             $table->dateTime('starts_at')->nullable()->index();
             $table->dateTime('expires_at')->nullable()->index();

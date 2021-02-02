@@ -47,12 +47,21 @@ class VouchersTest extends TestCase
         $vouchers = new Vouchers();
         $config = $vouchers->getConfig();
 
-        // Grab mask, characters and validation regex.
+        // Grab mask, characters, prefix, suffix and separator.
         $mask = $config->getMask();
         $characters = $config->getCharacters();
         $prefix = $config->getPrefix();
         $suffix = $config->getSuffix();
         $separator = $config->getSeparator();
+
+        // Check vouchers proxy call to config.
+        $this->assertSame($mask, $vouchers->getMask());
+        $this->assertSame($characters, $vouchers->getCharacters());
+        $this->assertSame($prefix, $vouchers->getPrefix());
+        $this->assertSame($suffix, $vouchers->getSuffix());
+        $this->assertSame($separator, $vouchers->getSeparator());
+
+        // Grab validation regex.
         $regex = $this->generateCodeValidationRegex($mask, $characters, $prefix, $suffix, $separator);
 
         $regexAssertMethod = 'assertRegExp';
@@ -94,11 +103,13 @@ class VouchersTest extends TestCase
         $now = Carbon::now();
         $startTime = $now->copy()->add(CarbonInterval::create('P1D'));
         $expireTime = $now->copy()->add(CarbonInterval::create('P30D'));
+        $user = $this->factory(User::class)->create();
         $users = $this->factory(User::class, 3)->create();
         $voucher = $vouchers
             ->withMetadata($metadata)
             ->withStartTime($startTime)
             ->withExpireTime($expireTime)
+            ->withOwner($user)
             ->withEntities(...$users->all())
             ->create();
         $this->assertInstanceOf(Voucher::class, $voucher);
@@ -111,6 +122,7 @@ class VouchersTest extends TestCase
             $expireTime->toDateTimeString(),
             $voucher->expires_at->toDateTimeString()
         );
+        $this->assertTrue($user->is($voucher->owner));
         foreach ($voucher->getEntities() as $index => $entity) {
             $this->assertTrue($users[$index]->is($entity));
         }
@@ -136,18 +148,17 @@ class VouchersTest extends TestCase
     {
         $vouchers = new Vouchers();
         $user = $this->factory(User::class)->create();
-        $voucher = $vouchers->withEntities($user)->create();
+        $voucher = $vouchers->withOwner($user)->create();
 
         // Check user voucher relation.
+        $this->assertTrue($user->is($voucher->owner));
         $this->assertTrue($voucher->is($user->vouchers->first()));
-        $this->assertTrue($voucher->is($user->voucherEntities->first()->voucher));
 
         // Check voucher states.
         $this->assertTrue($voucher->isRedeemable());
         $this->assertTrue($vouchers->redeemable($voucher->code));
         $this->assertEmpty($voucher->redeemers);
-        $this->assertNotEmpty($voucher->getEntities());
-        $this->assertEmpty($voucher->getEntities('FakeClass'));
+        $this->assertEmpty($voucher->getEntities());
         $metadata = ['foo' => 'bar', 'baz' => 'boom'];
         $this->assertTrue($vouchers->redeem($voucher->code, $user, $metadata));
         // Refresh instance.

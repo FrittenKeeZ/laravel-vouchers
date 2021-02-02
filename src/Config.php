@@ -339,6 +339,29 @@ class Config
     }
 
     /**
+     * Get owner.
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function getOwner(): ?Model
+    {
+        return Arr::get($this->options, 'owner', null);
+    }
+
+    /**
+     * With owner.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
+     * @return $this
+     */
+    public function withOwner(Model $owner): self
+    {
+        Arr::set($this->options, 'owner', $owner);
+
+        return $this;
+    }
+
+    /**
      * Get model class name from config.
      *
      * @param  string  $name

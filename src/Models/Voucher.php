@@ -5,6 +5,7 @@ namespace FrittenKeeZ\Vouchers\Models;
 use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -184,6 +185,16 @@ class Voucher extends Model
         $this->redeemer = null;
 
         return $saved;
+    }
+
+    /**
+     * Associated owner entity.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     */
+    public function owner(): MorphTo
+    {
+        return $this->morphTo();
     }
 
     /**

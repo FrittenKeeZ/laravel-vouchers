@@ -3,6 +3,8 @@
 namespace FrittenKeeZ\Vouchers\Models\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
 
 trait Voucher
@@ -116,5 +118,20 @@ trait Voucher
             })->orWhere(function (Builder $query) {
                 return $query->withExpired(true);
             });
+    }
+
+    /**
+     * Scope voucher query to specific owner.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model    $owner
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithOwner(Builder $query, Model $owner): Builder
+    {
+        $class = \get_class($owner);
+        $alias = array_flip(Relation::morphMap())[$class] ?? $class;
+
+        return $query->where('owner_id', '=', $owner->getKey())->where('owner_type', '=', $alias);
     }
 }

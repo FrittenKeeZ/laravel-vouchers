@@ -19,8 +19,8 @@ class HasVouchersTest extends TestCase
         $voucher = $user->createVoucher();
 
         // Check user voucher relation.
+        $this->assertTrue($user->is($voucher->owner));
         $this->assertTrue($voucher->is($user->vouchers->first()));
-        $this->assertTrue($voucher->is($user->voucherEntities->first()->voucher));
     }
 
     /**
@@ -37,9 +37,31 @@ class HasVouchersTest extends TestCase
         });
 
         // Check user voucher relation.
+        $this->assertTrue($user->is($voucher->owner));
         $this->assertTrue($voucher->is($user->vouchers->first()));
-        $this->assertTrue($voucher->is($user->voucherEntities->first()->voucher));
         $this->assertTrue($color->is($voucher->getEntities(Color::class)->first()));
+    }
+
+    /**
+     * Test HasVouchers::createVoucher() with associated entities.
+     *
+     * @return void
+     */
+    public function testCreateVoucherWithAssociated(): void
+    {
+        $user = $this->factory(User::class)->create();
+        $other = $this->factory(User::class)->create();
+        $voucher = $user->createVoucher(function (Vouchers $vouchers) use ($other) {
+            $vouchers->withEntities($other);
+        });
+
+        // Check user voucher relation.
+        $this->assertTrue($user->is($voucher->owner));
+        $this->assertTrue($voucher->is($user->vouchers->first()));
+        $this->assertFalse($other->is($voucher->owner));
+        $this->assertTrue($other->is($voucher->getEntities(User::class)->first()));
+        $this->assertTrue($voucher->is($other->voucherEntities->first()->voucher));
+        $this->assertTrue($voucher->is($other->associatedVouchers->first()));
     }
 
     /**
@@ -54,8 +76,8 @@ class HasVouchersTest extends TestCase
 
         foreach ($vouchers as $index => $voucher) {
             // Check user voucher relation.
+            $this->assertTrue($user->is($voucher->owner));
             $this->assertTrue($voucher->is($user->vouchers[$index]));
-            $this->assertTrue($voucher->is($user->voucherEntities[$index]->voucher));
         }
     }
 
@@ -74,8 +96,8 @@ class HasVouchersTest extends TestCase
 
         foreach ($vouchers as $index => $voucher) {
             // Check user voucher relation.
+            $this->assertTrue($user->is($voucher->owner));
             $this->assertTrue($voucher->is($user->vouchers[$index]));
-            $this->assertTrue($voucher->is($user->voucherEntities[$index]->voucher));
             $this->assertTrue($color->is($voucher->getEntities(Color::class)->first()));
         }
     }

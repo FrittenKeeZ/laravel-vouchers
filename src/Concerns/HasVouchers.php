@@ -12,11 +12,21 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 trait HasVouchers
 {
     /**
+     * Owned vouchers.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function vouchers(): MorphMany
+    {
+        return $this->morphMany(Config::model('voucher'), 'owner');
+    }
+
+    /**
      * Associated vouchers.
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
-    public function vouchers(): MorphToMany
+    public function associatedVouchers(): MorphToMany
     {
         return $this->morphToMany(Config::model('voucher'), 'entity', Config::table('entities'));
     }
@@ -76,10 +86,6 @@ trait HasVouchers
             $callback($vouchers);
         }
 
-        // Prepend owner to entities.
-        $entities = $vouchers->getEntities();
-        array_unshift($entities, $this);
-
-        return $vouchers->withEntities(...$entities)->create($amount);
+        return $vouchers->withOwner($this)->create($amount);
     }
 }
