@@ -82,7 +82,7 @@ class Voucher extends Model
      * @param  string|null  $separator
      * @return bool
      */
-    public function hasPrefix(string $prefix, string $separator = null): bool
+    public function hasPrefix(string $prefix, ?string $separator = null): bool
     {
         $clause = sprintf('%s%s', $prefix, \is_null($separator) ? config('vouchers.separator') : $separator);
 
@@ -96,7 +96,7 @@ class Voucher extends Model
      * @param  string|null  $separator
      * @return bool
      */
-    public function hasSuffix(string $suffix, string $separator = null): bool
+    public function hasSuffix(string $suffix, ?string $separator = null): bool
     {
         $clause = sprintf('%s%s', \is_null($separator) ? config('vouchers.separator') : $separator, $suffix);
 
@@ -237,17 +237,17 @@ class Voucher extends Model
     }
 
     /**
-     * Get all associated entities - optionally with a specific type (class).
+     * Get all associated entities - optionally with a specific type (class or alias).
      *
      * @param  string|null  $type
      * @return \Illuminate\Support\Collection
      */
-    public function getEntities(string $type = null): Collection
+    public function getEntities(?string $type = null): Collection
     {
         $query = $this->voucherEntities()->with('entity');
         if (!empty($type)) {
-            $alias = array_flip(Relation::morphMap())[$type] ?? $type;
-            $query->where('entity_type', '=', $alias);
+            $class = Relation::getMorphedModel($type) ?? $type;
+            $query->where('entity_type', '=', (new $class)->getMorphClass());
         }
 
         return $query->get()->map->entity;

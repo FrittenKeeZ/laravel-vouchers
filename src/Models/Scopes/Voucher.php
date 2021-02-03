@@ -31,7 +31,7 @@ trait Voucher
      * @param  string|null                            $separator
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeWithPrefix(Builder $query, string $prefix, string $separator = null): Builder
+    public function scopeWithPrefix(Builder $query, string $prefix, ?string $separator = null): Builder
     {
         $clause = sprintf('%s%s%%', $prefix, \is_null($separator) ? config('vouchers.separator') : $separator);
 
@@ -46,7 +46,7 @@ trait Voucher
      * @param  string|null                            $separator
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeWithSuffix(Builder $query, string $suffix, string $separator = null): Builder
+    public function scopeWithSuffix(Builder $query, string $suffix, ?string $separator = null): Builder
     {
         $clause = sprintf('%%%s%s', \is_null($separator) ? config('vouchers.separator') : $separator, $suffix);
 
@@ -131,9 +131,8 @@ trait Voucher
      */
     public function scopeWithOwner(Builder $query, Model $owner): Builder
     {
-        $class = \get_class($owner);
-        $alias = array_flip(Relation::morphMap())[$class] ?? $class;
-
-        return $query->where('owner_id', '=', $owner->getKey())->where('owner_type', '=', $alias);
+        return $query
+            ->where('owner_id', '=', $owner->getKey())
+            ->where('owner_type', '=', $owner->getMorphClass());
     }
 }

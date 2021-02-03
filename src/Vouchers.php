@@ -168,7 +168,7 @@ class Vouchers
      * @param  string|null  $characters
      * @return string
      */
-    public function generate(string $mask = null, string $characters = null): string
+    public function generate(?string $mask = null, ?string $characters = null): string
     {
         $mask = $mask ?: $this->config->getMask();
         $characters = $characters ?: $this->config->getCharacters();
