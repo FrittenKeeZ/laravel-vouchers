@@ -29,7 +29,7 @@ $ composer require frittenkeez/laravel-vouchers
 ## Configuration
 Publish config using Artisan command:
 ```bash
-$ php artisan vendor:publish --provider="FrittenKeeZ\Vouchers\VouchersServiceProvider"
+$ php artisan vendor:publish --tag=config --provider="FrittenKeeZ\Vouchers\VouchersServiceProvider"
 ```
 Don't forget to run migrations:
 ```bash
