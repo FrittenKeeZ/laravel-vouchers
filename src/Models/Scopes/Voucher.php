@@ -123,6 +123,20 @@ trait Voucher
     }
 
     /**
+     * Scope voucher query to specific owner type.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string                                 $type
+     * @return \Illuminate\Database\Eloquent\Buildexr
+     */
+    public function scopeWithOwnerType(Builder $query, string $type): Builder
+    {
+        $class = Relation::getMorphedModel($type) ?? $type;
+
+        return $query->where('owner_type', '=', (new $class)->getMorphClass());
+    }
+
+    /**
      * Scope voucher query to specific owner.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -131,8 +145,6 @@ trait Voucher
      */
     public function scopeWithOwner(Builder $query, Model $owner): Builder
     {
-        return $query
-            ->where('owner_id', '=', $owner->getKey())
-            ->where('owner_type', '=', $owner->getMorphClass());
+        return $query->withOwnerType(\get_class($owner))->where('owner_id', '=', $owner->getKey());
     }
 }

@@ -8,7 +8,6 @@ use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -196,7 +195,7 @@ class Voucher extends Model
      */
     public function owner(): MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo('owner');
     }
 
     /**
@@ -246,8 +245,7 @@ class Voucher extends Model
     {
         $query = $this->voucherEntities()->with('entity');
         if (!empty($type)) {
-            $class = Relation::getMorphedModel($type) ?? $type;
-            $query->where('entity_type', '=', (new $class)->getMorphClass());
+            $query->withEntityType($type);
         }
 
         return $query->get()->map->entity;

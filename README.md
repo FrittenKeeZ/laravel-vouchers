@@ -248,6 +248,8 @@ Voucher::withExpired(bool $expired = true)
 Voucher::withRedeemed(bool $redeemed = true)
 // Scope voucher query to redeemable or unredeemable vouchers.
 Voucher::withRedeemable(bool $redeemable = true)
+// Scope voucher query to specific owner type.
+Voucher::withOwnerType(string $type)
 // Scope voucher query to specific owner.
 Voucher::withOwner(Illuminate\Database\Eloquent\Model $owner)
 ```

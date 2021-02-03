@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class VoucherEntity extends Model
 {
+    use Scopes\VoucherEntity;
+
     /**
      * The primary key for the model.
      *

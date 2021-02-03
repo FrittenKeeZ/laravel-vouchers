@@ -141,11 +141,11 @@ class VoucherScopesTest extends TestCase
     }
 
     /**
-     * Test Voucher::scopeWithOwner().
+     * Test Voucher::scopeWithOwnerType() and Voucher::scopeWithOwner().
      *
      * @return void
      */
-    public function testOwnerScope(): void
+    public function testOwnerScopes(): void
     {
         // Create users.
         $first = $this->factory(User::class)->create();
@@ -158,6 +158,7 @@ class VoucherScopesTest extends TestCase
         $third->createVouchers(3);
 
         $this->assertSame(6, Voucher::count());
+        $this->assertSame(6, Voucher::withOwnerType(User::class)->count());
         $this->assertSame(1, Voucher::withOwner($first)->count());
         $this->assertSame(2, Voucher::withOwner($second)->count());
         $this->assertSame(3, Voucher::withOwner($third)->count());

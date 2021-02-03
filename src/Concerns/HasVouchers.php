@@ -7,7 +7,6 @@ namespace FrittenKeeZ\Vouchers\Concerns;
 use Closure;
 use FrittenKeeZ\Vouchers\Config;
 use FrittenKeeZ\Vouchers\Vouchers;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
