@@ -173,4 +173,15 @@ trait Voucher
             ->withOwnerType(\get_class($owner))
             ->where($this->getTable() . '.owner_id', '=', $owner->getKey());
     }
+
+    /**
+     * Scope voucher query to no owners.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithoutOwner(Builder $query): Builder
+    {
+        return $query->whereNull($this->getTable() . '.owner_type')->whereNull($this->getTable() . '.owner_id');
+    }
 }

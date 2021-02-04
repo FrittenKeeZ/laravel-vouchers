@@ -175,11 +175,13 @@ class VoucherScopesTest extends TestCase
         $third = $this->factory(User::class)->create();
 
         // Create vouchers.
+        Vouchers::create(2);
         $first->createVoucher();
         $second->createVouchers(2);
         $third->createVouchers(3);
 
-        $this->assertSame(6, Voucher::count());
+        $this->assertSame(8, Voucher::count());
+        $this->assertSame(2, Voucher::withoutOwner()->count());
         $this->assertSame(6, Voucher::withOwnerType(User::class)->count());
         $this->assertSame(1, Voucher::withOwner($first)->count());
         $this->assertSame(2, Voucher::withOwner($second)->count());

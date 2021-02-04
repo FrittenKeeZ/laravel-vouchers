@@ -254,6 +254,8 @@ Voucher::withEntities(?string $type = null)
 Voucher::withOwnerType(string $type)
 // Scope voucher query to specific owner.
 Voucher::withOwner(Illuminate\Database\Eloquent\Model $owner)
+// Scope voucher query to no owners.
+Voucher::withoutOwner()
 ```
 
 ## Testing
