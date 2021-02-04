@@ -6,6 +6,7 @@ namespace FrittenKeeZ\Vouchers\Tests;
 
 use FrittenKeeZ\Vouchers\Facades\Vouchers;
 use FrittenKeeZ\Vouchers\Models\Voucher;
+use FrittenKeeZ\Vouchers\Tests\Models\Color;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
 use Illuminate\Support\Carbon;
 
@@ -138,6 +139,27 @@ class VoucherScopesTest extends TestCase
         $this->assertSame(6, Voucher::count());
         $this->assertSame(3, Voucher::withRedeemable(true)->count());
         $this->assertSame(3, Voucher::withRedeemable(false)->count());
+    }
+
+    /**
+     * Test Voucher::scopeWithEntities().
+     *
+     * @return void
+     */
+    public function testEntitiesScope(): void
+    {
+        Vouchers::create();
+        Vouchers::withEntities(...$this->factory(Color::class, 3)->create())->create();
+        Vouchers::withEntities(...$this->factory(User::class, 3)->create())->create();
+        Vouchers::withEntities(
+            ...$this->factory(Color::class, 3)->create(),
+            ...$this->factory(User::class, 3)->create()
+        )->create();
+
+        $this->assertSame(4, Voucher::count());
+        $this->assertSame(3, Voucher::withEntities()->count());
+        $this->assertSame(2, Voucher::withEntities(Color::class)->count());
+        $this->assertSame(2, Voucher::withEntities(User::class)->count());
     }
 
     /**

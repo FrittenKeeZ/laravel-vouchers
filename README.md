@@ -237,9 +237,9 @@ Voucher::isRedeemable(): bool
 For convenience we also provide Voucher scopes matching the helper methods.
 ```php
 // Scope voucher query to a specific prefix, optionally specifying a separator different from config.
-Voucher::withPrefix(string $prefix, string $separator = null)
+Voucher::withPrefix(string $prefix, ?string $separator = null)
 // Scope voucher query to a specific suffix, optionally specifying a separator different from config.
-Voucher::withSuffix(string $suffix, string $separator = null)
+Voucher::withSuffix(string $suffix, ?string $separator = null)
 // Scope voucher query to started or unstarted vouchers.
 Voucher::withStarted(bool $started = true)
 // Scope voucher query to expired or unexpired vouchers.
@@ -248,7 +248,9 @@ Voucher::withExpired(bool $expired = true)
 Voucher::withRedeemed(bool $redeemed = true)
 // Scope voucher query to redeemable or unredeemable vouchers.
 Voucher::withRedeemable(bool $redeemable = true)
-// Scope voucher query to specific owner type.
+// Scope voucher query to have voucher entities, optionally of a specific type (class or alias).
+Voucher::withEntities(?string $type = null)
+// Scope voucher query to specific owner type (class or alias).
 Voucher::withOwnerType(string $type)
 // Scope voucher query to specific owner.
 Voucher::withOwner(Illuminate\Database\Eloquent\Model $owner)

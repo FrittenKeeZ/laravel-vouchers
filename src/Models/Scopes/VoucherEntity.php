@@ -11,17 +11,17 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 trait VoucherEntity
 {
     /**
-     * Scope voucher query to specific entity type.
+     * Scope voucher query to specific entity type (class or alias).
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  string                                 $type
-     * @return \Illuminate\Database\Eloquent\Buildexr
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithEntityType(Builder $query, string $type): Builder
     {
         $class = Relation::getMorphedModel($type) ?? $type;
 
-        return $query->where('entity_type', '=', (new $class)->getMorphClass());
+        return $query->where($this->getTable() . '.entity_type', '=', (new $class)->getMorphClass());
     }
 
     /**
@@ -33,6 +33,8 @@ trait VoucherEntity
      */
     public function scopeWithEntity(Builder $query, Model $entity): Builder
     {
-        return $query->withEntityType(\get_class($entity))->where('entity_id', '=', $entity->getKey());
+        return $query
+            ->withEntityType(\get_class($entity))
+            ->where($this->getTable() . '.entity_id', '=', $entity->getKey());
     }
 }
