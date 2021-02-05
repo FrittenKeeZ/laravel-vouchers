@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrittenKeeZ\Vouchers;
 
+use FrittenKeeZ\Vouchers\Console\Commands\MigrateCommand;
 use Illuminate\Support\ServiceProvider;
 
 class VouchersServiceProvider extends ServiceProvider
@@ -26,6 +27,10 @@ class VouchersServiceProvider extends ServiceProvider
         $this->publishes([$this->getPublishMigrationsPath() => database_path('migrations')], 'migrations');
 
         $this->loadMigrationsFrom(__DIR__ . '/../migrations');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([MigrateCommand::class]);
+        }
     }
 
     /**
