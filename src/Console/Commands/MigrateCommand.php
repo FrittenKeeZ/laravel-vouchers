@@ -97,8 +97,12 @@ class MigrateCommand extends Command
                                     && $entity->entity_id === $owner->entity_id;
                             });
                             // Detach all existing entities.
-                            $voucher->voucherEntities()->detach();
+                            $voucher->voucherEntities()->delete();
                             if ($entities->isNotEmpty()) {
+                                // Mark entities as not existing.
+                                $entities->each(function ($entity) {
+                                    $entity->exists = false;
+                                });
                                 // Re-attach remaining entities.
                                 $voucher->voucherEntities()->saveMany($entities);
                             }
@@ -136,15 +140,22 @@ class MigrateCommand extends Command
             ));
             $models = collect($folders)
                 ->map(function (string $folder) {
-                    return collect(scandir(base_path($folder)))
+                    $path = realpath(Str::startsWith($folder, '/') ? $folder : base_path($folder));
+
+                    return collect(scandir($path))
                         ->filter(function (string $file) {
                             // Remove any non PHP files.
                             return Str::endsWith($file, '.php');
                         })
-                        ->map(function (string $file) use ($folder) {
+                        ->map(function (string $file) use ($path) {
                             $class = basename($file, '.php');
-                            // Format class with proper namespace.
-                            return ucfirst(str_replace('/', '\\', $folder . '/' . $class));
+                            // Read first 200 bytes, should be enough to extract namespace.
+                            $contents = file_get_contents($path . '/' . $file, false, null, 0, 200);
+                            if (preg_match('/namespace\s+([^;]+);/i', $contents, $matches)) {
+                                return $matches[1] . '\\' . $class;
+                            }
+                            // Fallback to the class itself.
+                            return '\\' . $class;
                         })
                         ->values()
                         ->all();
