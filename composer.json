@@ -32,6 +32,9 @@
         }
     },
     "autoload-dev": {
+        "files": [
+            "tests/Models/Fake.php"
+        ],
         "psr-4": {
             "FrittenKeeZ\\Vouchers\\Tests\\": "tests",
             "FrittenKeeZ\\Vouchers\\Tests\\Database\\Factories\\": "tests/database/factories"
