@@ -12,6 +12,19 @@ use FrittenKeeZ\Vouchers\Tests\Models\User;
 class MigrateCommandTest extends TestCase
 {
     /**
+     * Setup the test environment.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Skip command tests on anything below Laravel 8, as key features are missing.
+        if (version_compare($this->app->version(), '8.0', '<')) {
+            $this->markTestSkipped('Requires Laravel 8 to successfully complete these tests.');
+        }
+    }
+
+    /**
      * Test arguments.
      *
      * @return void
@@ -24,8 +37,8 @@ class MigrateCommandTest extends TestCase
             ->expectsOutput('The models field is required.')
             ->assertExitCode(1);
 
-        $this->artisan('vouchers:migrate', ['--mode' => 'fake', '--folder' => ['app/Models']])
-            ->expectsOutput('Searching for models in folders: app/Models')
+        $this->artisan('vouchers:migrate', ['--mode' => 'fake', '--folder' => ['app/Models', 'app/Fakes']])
+            ->expectsOutput('Searching for models in folders: app/Models, app/Fakes')
             ->expectsOutput('Migration could not continue. See error messages below:')
             ->expectsOutput('The selected mode is invalid.')
             ->expectsOutput('The models field is required.')

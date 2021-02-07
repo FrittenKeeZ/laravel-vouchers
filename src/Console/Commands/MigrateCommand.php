@@ -140,7 +140,11 @@ class MigrateCommand extends Command
             ));
             $models = collect($folders)
                 ->map(function (string $folder) {
-                    $path = realpath(Str::startsWith($folder, '/') ? $folder : base_path($folder));
+                    $path = Str::startsWith($folder, '/') ? $folder : base_path($folder);
+                    // Ensure no invalid paths are searched.
+                    if (!is_dir($path)) {
+                        return [];
+                    }
 
                     return collect(scandir($path))
                         ->filter(function (string $file) {
