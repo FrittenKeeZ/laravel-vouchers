@@ -79,6 +79,7 @@ class MigrateCommandTest extends TestCase
         $this->assertSame(4, Voucher::count());
         $this->assertSame(3, Voucher::withoutOwner()->count());
         $this->assertSame(1, Voucher::withOwner($user)->count());
+        $this->assertSame(2, $user->associatedVouchers()->count());
 
         $this->artisan('vouchers:migrate', ['--model' => [User::class]])
             ->expectsOutput('Database operation mode is set to: auto')
@@ -93,6 +94,7 @@ class MigrateCommandTest extends TestCase
         $this->assertSame(0, $v1->voucherEntities->count());
         $this->assertTrue($user->is($v2->owner));
         $this->assertSame(3, $v2->voucherEntities->count());
+        $this->assertSame(1, $user->associatedVouchers()->count());
     }
 
     /**
@@ -113,6 +115,7 @@ class MigrateCommandTest extends TestCase
         $this->assertSame(4, Voucher::count());
         $this->assertSame(3, Voucher::withoutOwner()->count());
         $this->assertSame(1, Voucher::withOwner($user)->count());
+        $this->assertSame(2, $user->associatedVouchers()->count());
 
         $this->artisan('vouchers:migrate', ['--mode' => 'retain', '--model' => [User::class]])
             ->expectsOutput('Database operation mode is set to: retain')
@@ -127,6 +130,7 @@ class MigrateCommandTest extends TestCase
         $this->assertSame(1, $v1->voucherEntities->count());
         $this->assertTrue($user->is($v2->owner));
         $this->assertSame(3, $v2->voucherEntities->count());
+        $this->assertSame(2, $user->associatedVouchers()->count());
     }
 
     /**
@@ -147,6 +151,7 @@ class MigrateCommandTest extends TestCase
         $this->assertSame(4, Voucher::count());
         $this->assertSame(3, Voucher::withoutOwner()->count());
         $this->assertSame(1, Voucher::withOwner($user)->count());
+        $this->assertSame(2, $user->associatedVouchers()->count());
 
         $this->artisan('vouchers:migrate', ['--mode' => 'delete', '--model' => [User::class]])
             ->expectsOutput('Database operation mode is set to: delete')
@@ -161,5 +166,6 @@ class MigrateCommandTest extends TestCase
         $this->assertSame(0, $v1->voucherEntities->count());
         $this->assertTrue($user->is($v2->owner));
         $this->assertSame(2, $v2->voucherEntities->count());
+        $this->assertSame(0, $user->associatedVouchers()->count());
     }
 }
