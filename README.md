@@ -181,11 +181,11 @@ $vouchers = $user->vouchers;
 // Associated vouchers relationship.
 HasVouchers::associatedVouchers(): MorphToMany
 // Get all associated vouchers.
-$vouchers = $user->associated_vouchers;
+$vouchers = $user->associatedVouchers;
 // Associated voucher entities relationship.
 HasVouchers::voucherEntities(): MorphMany
 // Get all associated voucher entities.
-$entities = $user->voucher_entities;
+$entities = $user->voucherEntities;
 ```
 You can also create vouchers owned by an entity using these convenience methods.
 ```php
