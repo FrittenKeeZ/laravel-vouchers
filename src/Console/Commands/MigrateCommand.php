@@ -73,7 +73,7 @@ class MigrateCommand extends Command
                 $bar->setFormat("%message%\n %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%");
 
                 $query = Voucher::withoutOwner()->withEntities($class);
-                $alias = (new $class)->getMorphClass();
+                $alias = (new $class())->getMorphClass();
                 foreach ($query->cursor() as $voucher) {
                     $bar->setMessage(sprintf(
                         'Migrating model <fg=yellow>%s</> - Voucher #%d',
@@ -136,7 +136,8 @@ class MigrateCommand extends Command
                 $folders = ['app', 'app/Models'];
             }
             $this->info(sprintf(
-                'Searching for models in folders: <fg=yellow>%s</>', implode('</>, <fg=yellow>', $folders)
+                'Searching for models in folders: <fg=yellow>%s</>',
+                implode('</>, <fg=yellow>', $folders)
             ));
             $models = collect($folders)
                 ->map(function (string $folder) {
@@ -162,7 +163,8 @@ class MigrateCommand extends Command
                             return '\\' . $class;
                         })
                         ->values()
-                        ->all();
+                        ->all()
+                    ;
                 })
                 ->flatten()
                 ->filter(function (string $class) {
@@ -171,7 +173,8 @@ class MigrateCommand extends Command
                     return !empty($traits) && \in_array(HasVouchers::class, $traits);
                 })
                 ->values()
-                ->all();
+                ->all()
+            ;
         }
 
         return $models;

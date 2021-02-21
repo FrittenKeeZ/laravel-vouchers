@@ -17,6 +17,13 @@ class Voucher extends Model
     use Scopes\Voucher;
 
     /**
+     * Active redeemer during events.
+     *
+     * @var \FrittenKeeZ\Vouchers\Models\Redeemer
+     */
+    public $redeemer;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -55,16 +62,10 @@ class Voucher extends Model
     ];
 
     /**
-     * Active redeemer during events.
-     *
-     * @var \FrittenKeeZ\Vouchers\Models\Redeemer
-     */
-    public $redeemer;
-
-    /**
      * Constructor.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return void
      */
     public function __construct(array $attributes = [])
@@ -77,13 +78,14 @@ class Voucher extends Model
     /**
      * Whether voucher has prefix, optionally specifying a separator different from config.
      *
-     * @param  string       $prefix
-     * @param  string|null  $separator
+     * @param string      $prefix
+     * @param string|null $separator
+     *
      * @return bool
      */
     public function hasPrefix(string $prefix, ?string $separator = null): bool
     {
-        $clause = sprintf('%s%s', $prefix, \is_null($separator) ? config('vouchers.separator') : $separator);
+        $clause = sprintf('%s%s', $prefix, $separator === null ? config('vouchers.separator') : $separator);
 
         return Str::startsWith($this->code, $clause);
     }
@@ -91,13 +93,14 @@ class Voucher extends Model
     /**
      * Whether voucher has suffix, optionally specifying a separator different from config.
      *
-     * @param  string       $suffix
-     * @param  string|null  $separator
+     * @param string      $suffix
+     * @param string|null $separator
+     *
      * @return bool
      */
     public function hasSuffix(string $suffix, ?string $separator = null): bool
     {
-        $clause = sprintf('%s%s', \is_null($separator) ? config('vouchers.separator') : $separator, $suffix);
+        $clause = sprintf('%s%s', $separator === null ? config('vouchers.separator') : $separator, $suffix);
 
         return Str::endsWith($this->code, $clause);
     }
@@ -145,7 +148,8 @@ class Voucher extends Model
     /**
      * Redeem voucher with the provided redeemer.
      *
-     * @param  \FrittenKeeZ\Vouchers\Models\Redeemer  $redeemer
+     * @param \FrittenKeeZ\Vouchers\Models\Redeemer $redeemer
+     *
      * @return bool
      */
     public function redeem(Redeemer $redeemer): bool
@@ -221,7 +225,8 @@ class Voucher extends Model
     /**
      * Add related entities.
      *
-     * @param  \Illuminate\Database\Eloquent\Model ...$entities
+     * @param \Illuminate\Database\Eloquent\Model ...$entities
+     *
      * @return void
      */
     public function addEntities(Model ...$entities): void
@@ -238,7 +243,8 @@ class Voucher extends Model
     /**
      * Get all associated entities - optionally with a specific type (class or alias).
      *
-     * @param  string|null  $type
+     * @param string|null $type
+     *
      * @return \Illuminate\Support\Collection
      */
     public function getEntities(?string $type = null): Collection
@@ -254,7 +260,8 @@ class Voucher extends Model
     /**
      * Register a redeeming voucher event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function redeeming($callback): void
@@ -265,7 +272,8 @@ class Voucher extends Model
     /**
      * Register a redeemed voucher event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function redeemed($callback): void
@@ -276,7 +284,8 @@ class Voucher extends Model
     /**
      * Register a shouldMarkRedeemed voucher event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function shouldMarkRedeemed($callback): void

@@ -14,13 +14,6 @@ class VoucherEntity extends Model
     use Scopes\VoucherEntity;
 
     /**
-     * The primary key for the model.
-     *
-     * @var string
-     */
-    protected $primaryKey = null;
-
-    /**
      * Indicates if the IDs are auto-incrementing.
      *
      * @var bool
@@ -35,9 +28,17 @@ class VoucherEntity extends Model
     public $timestamps = false;
 
     /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected $primaryKey;
+
+    /**
      * Constructor.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return void
      */
     public function __construct(array $attributes = [])

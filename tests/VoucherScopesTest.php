@@ -10,6 +10,9 @@ use FrittenKeeZ\Vouchers\Tests\Models\Color;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
 use Illuminate\Support\Carbon;
 
+/**
+ * @internal
+ */
 class VoucherScopesTest extends TestCase
 {
     /**

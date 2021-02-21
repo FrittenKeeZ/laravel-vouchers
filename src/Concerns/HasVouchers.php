@@ -45,10 +45,11 @@ trait HasVouchers
     /**
      * Create a single voucher with this entity related.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return object
      */
-    public function createVoucher(Closure $callback = null)
+    public function createVoucher(?Closure $callback = null)
     {
         return $this->createVouchers(1, $callback);
     }
@@ -56,11 +57,12 @@ trait HasVouchers
     /**
      * Create an amount of vouchers with this entity related.
      *
-     * @param  int       $amount
-     * @param  \Closure  $callback
+     * @param int      $amount
+     * @param \Closure $callback
+     *
      * @return object|array
      */
-    public function createVouchers(int $amount, Closure $callback = null)
+    public function createVouchers(int $amount, ?Closure $callback = null)
     {
         $vouchers = new Vouchers();
 

@@ -14,6 +14,9 @@ use FrittenKeeZ\Vouchers\Tests\Models\User;
 use FrittenKeeZ\Vouchers\Vouchers;
 use PHPUnit\Runner\Version;
 
+/**
+ * @internal
+ */
 class VouchersTest extends TestCase
 {
     /**
@@ -72,11 +75,11 @@ class VouchersTest extends TestCase
         }
 
         // Test single generation.
-        $this->$regexAssertMethod($regex, $vouchers->generate($mask, $characters));
+        $this->{$regexAssertMethod}($regex, $vouchers->generate($mask, $characters));
 
         // Test batch operation.
         foreach ($vouchers->batch(10) as $code) {
-            $this->$regexAssertMethod($regex, $code);
+            $this->{$regexAssertMethod}($regex, $code);
         }
 
         // Test negative batch amount.
@@ -113,7 +116,8 @@ class VouchersTest extends TestCase
             ->withExpireTime($expireTime)
             ->withOwner($user)
             ->withEntities(...$users->all())
-            ->create();
+            ->create()
+        ;
         $this->assertInstanceOf(Voucher::class, $voucher);
         $this->assertSame($metadata, $voucher->metadata);
         $this->assertSame(
@@ -211,11 +215,12 @@ class VouchersTest extends TestCase
      *
      * @dataProvider wrapProvider
      *
-     * @param  string       $str
-     * @param  string|null  $prefix
-     * @param  string|null  $suffix
-     * @param  string       $separator
-     * @param  string       $expected
+     * @param string      $str
+     * @param string|null $prefix
+     * @param string|null $suffix
+     * @param string      $separator
+     * @param string      $expected
+     *
      * @return void
      */
     public function testStringWrapping(
@@ -225,7 +230,7 @@ class VouchersTest extends TestCase
         string $separator,
         string $expected
     ): void {
-        $this->assertSame($expected, (new Vouchers)->wrap($str, $prefix, $suffix, $separator));
+        $this->assertSame($expected, (new Vouchers())->wrap($str, $prefix, $suffix, $separator));
     }
 
     /**
@@ -259,8 +264,9 @@ class VouchersTest extends TestCase
     /**
      * Generate regex to validate a code generated with a specific mask, character list, prefix, suffix and separator.
      *
-     * @param  string  $mask
-     * @param  string  $characters
+     * @param string $mask
+     * @param string $characters
+     *
      * @return string
      */
     protected function generateCodeValidationRegex(

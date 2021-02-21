@@ -24,7 +24,8 @@
     },
     "require-dev": {
         "orchestra/testbench": "~3.6.0|~3.7.0|~3.8.0|^4.0|^5.0|^6.0",
-        "phpunit/phpunit": "~7.0|^8.0|^9.0"
+        "phpunit/phpunit": "~7.0|^8.0|^9.0",
+        "friendsofphp/php-cs-fixer": "^2.18"
     },
     "autoload": {
         "psr-4": {
@@ -42,7 +43,9 @@
     },
     "scripts": {
         "test": "phpunit",
-        "test-coverage": "phpdbg -qrr vendor/bin/phpunit --coverage-html tests/_reports"
+        "test-coverage": "phpdbg -qrr vendor/bin/phpunit --coverage-html tests/_reports",
+        "fixer-check": "php-cs-fixer fix --verbose --dry-run",
+        "fixer-fix": "php-cs-fixer fix"
     },
     "extra": {
         "laravel": {

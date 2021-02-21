@@ -9,6 +9,9 @@ use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Tests\Models\Color;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
 
+/**
+ * @internal
+ */
 class MigrateCommandTest extends TestCase
 {
     /**
@@ -35,30 +38,35 @@ class MigrateCommandTest extends TestCase
             ->expectsOutput('Searching for models in folders: app, app/Models')
             ->expectsOutput('Migration could not continue. See error messages below:')
             ->expectsOutput('The models field is required.')
-            ->assertExitCode(1);
+            ->assertExitCode(1)
+        ;
 
         $this->artisan('vouchers:migrate', ['--mode' => 'fake', '--folder' => ['app/Models', 'app/Fakes']])
             ->expectsOutput('Searching for models in folders: app/Models, app/Fakes')
             ->expectsOutput('Migration could not continue. See error messages below:')
             ->expectsOutput('The selected mode is invalid.')
             ->expectsOutput('The models field is required.')
-            ->assertExitCode(1);
+            ->assertExitCode(1)
+        ;
 
         $this->artisan('vouchers:migrate', ['--folder' => [__DIR__ . '/Models']])
             ->expectsOutput('Searching for models in folders: ' . __DIR__ . '/Models')
             ->expectsOutput('Database operation mode is set to: auto')
             ->expectsTable(['Model', 'Vouchers Count'], [[User::class, 0]])
-            ->assertExitCode(0);
+            ->assertExitCode(0)
+        ;
 
         $this->artisan('vouchers:migrate', ['--mode' => 'retain', '--model' => [Color::class]])
             ->expectsOutput('Database operation mode is set to: retain')
             ->expectsTable(['Model', 'Vouchers Count'], [[Color::class, 0]])
-            ->assertExitCode(0);
+            ->assertExitCode(0)
+        ;
 
         $this->artisan('vouchers:migrate', ['--mode' => 'delete', '--model' => [User::class]])
             ->expectsOutput('Database operation mode is set to: delete')
             ->expectsTable(['Model', 'Vouchers Count'], [[User::class, 0]])
-            ->assertExitCode(0);
+            ->assertExitCode(0)
+        ;
     }
 
     /**
@@ -85,7 +93,8 @@ class MigrateCommandTest extends TestCase
             ->expectsOutput('Database operation mode is set to: auto')
             ->expectsTable(['Model', 'Vouchers Count'], [[User::class, 2]])
             ->expectsConfirmation('Do you wish to continue?', 'yes')
-            ->assertExitCode(0);
+            ->assertExitCode(0)
+        ;
 
         // Refresh and check owners.
         $v1->refresh();
@@ -121,7 +130,8 @@ class MigrateCommandTest extends TestCase
             ->expectsOutput('Database operation mode is set to: retain')
             ->expectsTable(['Model', 'Vouchers Count'], [[User::class, 2]])
             ->expectsConfirmation('Do you wish to continue?', 'yes')
-            ->assertExitCode(0);
+            ->assertExitCode(0)
+        ;
 
         // Refresh and check owners.
         $v1->refresh();
@@ -157,7 +167,8 @@ class MigrateCommandTest extends TestCase
             ->expectsOutput('Database operation mode is set to: delete')
             ->expectsTable(['Model', 'Vouchers Count'], [[User::class, 2]])
             ->expectsConfirmation('Do you wish to continue?', 'yes')
-            ->assertExitCode(0);
+            ->assertExitCode(0)
+        ;
 
         // Refresh and check owners.
         $v1->refresh();

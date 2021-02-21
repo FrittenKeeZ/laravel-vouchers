@@ -6,6 +6,9 @@ namespace FrittenKeeZ\Vouchers\Tests;
 
 use FrittenKeeZ\Vouchers\Models\Voucher;
 
+/**
+ * @internal
+ */
 class VoucherHelpersTest extends TestCase
 {
     /**

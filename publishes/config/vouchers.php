@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Code Generation
@@ -60,5 +59,4 @@ return [
         'redeemers' => 'redeemers',
         'vouchers'  => 'vouchers',
     ],
-
 ];

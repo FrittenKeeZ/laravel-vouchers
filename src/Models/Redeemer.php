@@ -32,7 +32,8 @@ class Redeemer extends Model
     /**
      * Constructor.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return void
      */
     public function __construct(array $attributes = [])

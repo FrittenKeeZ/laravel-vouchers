@@ -10,6 +10,9 @@ use FrittenKeeZ\Vouchers\Tests\Models\Color;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
 use FrittenKeeZ\Vouchers\Vouchers;
 
+/**
+ * @internal
+ */
 class VoucherEntityScopesTest extends TestCase
 {
     /**

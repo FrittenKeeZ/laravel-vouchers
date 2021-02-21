@@ -8,6 +8,9 @@ use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
 use FrittenKeeZ\Vouchers\Vouchers;
 
+/**
+ * @internal
+ */
 class VoucherTest extends TestCase
 {
     /**

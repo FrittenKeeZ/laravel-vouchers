@@ -42,7 +42,8 @@ class Config
     /**
      * With code character list.
      *
-     * @param  string  $characters
+     * @param string $characters
+     *
      * @return $this
      */
     public function withCharacters(string $characters): self
@@ -65,7 +66,8 @@ class Config
     /**
      * With code mask.
      *
-     * @param  string  $mask
+     * @param string $mask
+     *
      * @return $this
      */
     public function withMask(string $mask): self
@@ -88,7 +90,8 @@ class Config
     /**
      * With code prefix.
      *
-     * @param  string  $prefix
+     * @param string $prefix
+     *
      * @return $this
      */
     public function withPrefix(string $prefix): self
@@ -123,7 +126,8 @@ class Config
     /**
      * With code suffix.
      *
-     * @param  string  $suffix
+     * @param string $suffix
+     *
      * @return $this
      */
     public function withSuffix(string $suffix): self
@@ -158,7 +162,8 @@ class Config
     /**
      * With prefix and suffix separator.
      *
-     * @param  string  $separator
+     * @param string $separator
+     *
      * @return $this
      */
     public function withSeparator(string $separator): self
@@ -193,7 +198,8 @@ class Config
     /**
      * With metadata.
      *
-     * @param  array  $metadata
+     * @param array $metadata
+     *
      * @return $this
      */
     public function withMetadata(array $metadata): self
@@ -216,7 +222,8 @@ class Config
     /**
      * With start time.
      *
-     * @param  \DateTime  $timestamp
+     * @param \DateTime $timestamp
+     *
      * @return $this
      */
     public function withStartTime(DateTime $timestamp): self
@@ -229,7 +236,8 @@ class Config
     /**
      * With start time in the given interval.
      *
-     * @param  \DateInterval  $interval
+     * @param \DateInterval $interval
+     *
      * @return $this
      */
     public function withStartTimeIn(DateInterval $interval): self
@@ -240,7 +248,8 @@ class Config
     /**
      * With start date - time component is set to 00:00:00.000000.
      *
-     * @param  \DateTime  $timestamp
+     * @param \DateTime $timestamp
+     *
      * @return $this
      */
     public function withStartDate(DateTime $timestamp): self
@@ -251,7 +260,8 @@ class Config
     /**
      * With start date in the given interval - time component is set to 00:00:00.000000.
      *
-     * @param  \DateInterval  $interval
+     * @param \DateInterval $interval
+     *
      * @return $this
      */
     public function withStartDateIn(DateInterval $interval): self
@@ -272,7 +282,8 @@ class Config
     /**
      * With expire time.
      *
-     * @param  \DateTime  $timestamp
+     * @param \DateTime $timestamp
+     *
      * @return $this
      */
     public function withExpireTime(DateTime $timestamp): self
@@ -285,7 +296,8 @@ class Config
     /**
      * With expire time in the given interval.
      *
-     * @param  \DateInterval  $interval
+     * @param \DateInterval $interval
+     *
      * @return $this
      */
     public function withExpireTimeIn(DateInterval $interval): self
@@ -296,7 +308,8 @@ class Config
     /**
      * With expire date - time component is set to 23:59:59.999999.
      *
-     * @param  \DateTime  $timestamp
+     * @param \DateTime $timestamp
+     *
      * @return $this
      */
     public function withExpireDate(DateTime $timestamp): self
@@ -307,7 +320,8 @@ class Config
     /**
      * With expire date in the given interval - time component is set to 23:59:59.999999.
      *
-     * @param  \DateInterval  $interval
+     * @param \DateInterval $interval
+     *
      * @return $this
      */
     public function withExpireDateIn(DateInterval $interval): self
@@ -328,7 +342,8 @@ class Config
     /**
      * With entities.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  ...$entities
+     * @param \Illuminate\Database\Eloquent\Model ...$entities
+     *
      * @return $this
      */
     public function withEntities(Model ...$entities): self
@@ -351,7 +366,8 @@ class Config
     /**
      * With owner.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
+     * @param \Illuminate\Database\Eloquent\Model $owner
+     *
      * @return $this
      */
     public function withOwner(Model $owner): self
@@ -364,7 +380,8 @@ class Config
     /**
      * Get model class name from config.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string|null
      */
     public static function model(string $name): ?string
@@ -375,7 +392,8 @@ class Config
     /**
      * Get database table name for a model from config.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string|null
      */
     public static function table(string $name): ?string
