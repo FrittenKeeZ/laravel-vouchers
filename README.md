@@ -7,6 +7,7 @@
 
 ## Table of Contents
 - [Installation](#installation)
+- [Upgrading](#upgrading)
 - [Configuration](#configuration)
 - [Usage](#usage)
     - [Generate Codes](#generate-codes)
@@ -25,6 +26,9 @@ Install this package via Composer:
 ```bash
 $ composer require frittenkeez/laravel-vouchers
 ```
+
+## Upgrading
+Please read the [upgrade guide](UPGRADING.md).
 
 ## Configuration
 Publish config using Artisan command:
