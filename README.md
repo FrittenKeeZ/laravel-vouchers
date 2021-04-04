@@ -7,6 +7,8 @@
 
 ## Table of Contents
 - [Installation](#installation)
+- [Upgrading](#upgrading)
+- [Changelog](#changelog)
 - [Configuration](#configuration)
 - [Usage](#usage)
     - [Generate Codes](#generate-codes)
@@ -26,10 +28,16 @@ Install this package via Composer:
 $ composer require frittenkeez/laravel-vouchers
 ```
 
+## Upgrading
+Please read the [upgrade guide](UPGRADING.md).
+
+## Changelog
+Please read the [release notes](CHANGELOG.md).
+
 ## Configuration
 Publish config using Artisan command:
 ```bash
-$ php artisan vendor:publish --provider="FrittenKeeZ\Vouchers\VouchersServiceProvider"
+$ php artisan vendor:publish --tag=config --provider="FrittenKeeZ\Vouchers\VouchersServiceProvider"
 ```
 Don't forget to run migrations:
 ```bash
@@ -117,6 +125,8 @@ Vouchers::withExpireDate(DateTime $timestamp)
 Vouchers::withExpireDateIn(DateInterval $interval)
 // Set related entities to voucher.
 Vouchers::withEntities(Illuminate\Database\Eloquent\Model ...$entities)
+// Set owning entity for voucher.
+Vouchers::withOwner(Illuminate\Database\Eloquent\Model $owner)
 ```
 All calls are chainable and dynamic options will be reset when calling `Vouchers::create()` or `Vouchers::reset()`.
 ```php
@@ -124,7 +134,7 @@ $voucher = Vouchers::withMask('***-***-***')
     ->withMetadata(['foo' => 'bar'])
     ->withExpireDateIn(CarbonInterval::create('P30D'))
     ->create();
-$voucher = Vouchers::withEntities($user)->withPrefix('USR');
+$voucher = Vouchers::withOwner($user)->withPrefix('USR');
 ```
 
 ### Events
@@ -148,10 +158,10 @@ Voucher::redeeming(function (Voucher $voucher) {
 To prevent a voucher from being redeemed by anyone but the related user.
 ```php
 Voucher::redeeming(function (Voucher $voucher) {
-    return $voucher->redeemer->redeemer->is($voucher->getEntities(User::class)->first());
+    return $voucher->redeemer->redeemer->is($voucher->owner);
 });
 /* ... */
-$voucher = Vouchers::withEntities($user)->create();
+$voucher = Vouchers::withOwner($user)->create();
 Vouchers::redeem($voucher->code, $user);
 ```
 To perform additional actions after a vouchers has been redeemed, subscribe to the `FrittenKeeZ\Vouchers\Models\Voucher::redeemed()` event.
@@ -172,16 +182,20 @@ $redeemers = $user->redeemers;
 ```
 `FrittenKeeZ\Vouchers\Concerns\HasVouchers`
 ```php
-// Associated vouchers relationship.
-HasVouchers::vouchers(): MorphToMany
-// Get all associated vouchers.
+// Owned vouchers relationship.
+HasVouchers::vouchers(): MorphMany
+// Get all owned vouchers.
 $vouchers = $user->vouchers;
+// Associated vouchers relationship.
+HasVouchers::associatedVouchers(): MorphToMany
+// Get all associated vouchers.
+$vouchers = $user->associatedVouchers;
 // Associated voucher entities relationship.
 HasVouchers::voucherEntities(): MorphMany
 // Get all associated voucher entities.
-$entities = $user->voucher_entities;
+$entities = $user->voucherEntities;
 ```
-You can also create vouchers related to an entity using these convenience methods.
+You can also create vouchers owned by an entity using these convenience methods.
 ```php
 HasVouchers::createVoucher(Closure $callback = null): object
 // Without using callback.
@@ -231,9 +245,9 @@ Voucher::isRedeemable(): bool
 For convenience we also provide Voucher scopes matching the helper methods.
 ```php
 // Scope voucher query to a specific prefix, optionally specifying a separator different from config.
-Voucher::withPrefix(string $prefix, string $separator = null)
+Voucher::withPrefix(string $prefix, ?string $separator = null)
 // Scope voucher query to a specific suffix, optionally specifying a separator different from config.
-Voucher::withSuffix(string $suffix, string $separator = null)
+Voucher::withSuffix(string $suffix, ?string $separator = null)
 // Scope voucher query to started or unstarted vouchers.
 Voucher::withStarted(bool $started = true)
 // Scope voucher query to expired or unexpired vouchers.
@@ -242,6 +256,14 @@ Voucher::withExpired(bool $expired = true)
 Voucher::withRedeemed(bool $redeemed = true)
 // Scope voucher query to redeemable or unredeemable vouchers.
 Voucher::withRedeemable(bool $redeemable = true)
+// Scope voucher query to have voucher entities, optionally of a specific type (class or alias).
+Voucher::withEntities(?string $type = null)
+// Scope voucher query to specific owner type (class or alias).
+Voucher::withOwnerType(string $type)
+// Scope voucher query to specific owner.
+Voucher::withOwner(Illuminate\Database\Eloquent\Model $owner)
+// Scope voucher query to no owners.
+Voucher::withoutOwner()
 ```
 
 ## Testing

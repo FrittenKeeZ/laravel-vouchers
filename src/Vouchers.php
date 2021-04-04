@@ -32,6 +32,33 @@ class Vouchers
     }
 
     /**
+     * Proxy 'get', 'with' and 'without' calls to config.
+     *
+     * Will trigger undefined method error for all invalid calls.
+     *
+     * @param string $name
+     * @param array  $args
+     *
+     * @return mixed
+     */
+    public function __call(string $name, array $args)
+    {
+        if (method_exists($this->config, $name)) {
+            if (Str::startsWith($name, 'get')) {
+                return $this->config->{$name}(...$args);
+            }
+
+            if (Str::startsWith($name, 'with')) {
+                $this->config->{$name}(...$args);
+
+                return $this;
+            }
+        }
+
+        trigger_error('Call to undefined method ' . static::class . '::' . $name . '()', \E_USER_ERROR);
+    }
+
+    /**
      * Get current voucher config.
      *
      * @return \FrittenKeeZ\Vouchers\Config
@@ -46,7 +73,8 @@ class Vouchers
      *
      * Defaults to a single voucher if amount is absent.
      *
-     * @param  int  $amount
+     * @param int $amount
+     *
      * @return object|array
      */
     public function create(int $amount = 1)
@@ -60,12 +88,16 @@ class Vouchers
             'starts_at'  => $this->config->getStartTime(),
             'expires_at' => $this->config->getExpireTime(),
         ];
+        $owner = $this->config->getOwner();
         $entities = $this->config->getEntities();
         $vouchers = [];
         // Ensure nothing is committed to the database if anything fails.
-        DB::transaction(function () use ($amount, $options, $entities, &$vouchers) {
+        DB::transaction(function () use ($amount, $options, $owner, $entities, &$vouchers) {
             foreach ($this->batch($amount) as $code) {
                 $voucher = $this->vouchers()->create(compact('code') + $options);
+                if (!empty($owner)) {
+                    $voucher->owner()->associate($owner)->save();
+                }
                 if (!empty($entities)) {
                     $voucher->addEntities(...$entities);
                 }
@@ -84,12 +116,14 @@ class Vouchers
      *
      * Returns whether redemption was successful.
      *
-     * @param  string                               $code
-     * @param  \Illuminate\Database\Eloquent\Model  $entity    Redeemer entity.
-     * @param  array                                $metadata  Additional metadata for redeemer.
-     * @return bool
+     * @param string                              $code
+     * @param \Illuminate\Database\Eloquent\Model $entity   Redeemer entity.
+     * @param array                               $metadata Additional metadata for redeemer.
+     *
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherAlreadyRedeemedException
+     *
+     * @return bool
      */
     public function redeem(string $code, Model $entity, array $metadata = []): bool
     {
@@ -118,7 +152,8 @@ class Vouchers
     /**
      * Whether a voucher code is redeemable.
      *
-     * @param  string  $code
+     * @param string $code
+     *
      * @return bool
      */
     public function redeemable(string $code): bool
@@ -133,7 +168,8 @@ class Vouchers
      *
      * Codes are checked against the database to ensure uniqueness.
      *
-     * @param  int  $amount
+     * @param int $amount
+     *
      * @return string[]|array
      */
     public function batch(int $amount): array
@@ -160,11 +196,12 @@ class Vouchers
      * All asterisks (*) in the mask will be replaced by a random character.
      * If no mask or character list is provided, defaults will be used from config.
      *
-     * @param  string|null  $mask
-     * @param  string|null  $characters
+     * @param string|null $mask
+     * @param string|null $characters
+     *
      * @return string
      */
-    public function generate(string $mask = null, string $characters = null): string
+    public function generate(?string $mask = null, ?string $characters = null): string
     {
         $mask = $mask ?: $this->config->getMask();
         $characters = $characters ?: $this->config->getCharacters();
@@ -184,10 +221,11 @@ class Vouchers
     /**
      * Wrap string in prefix and suffix with separator.
      *
-     * @param  string       $str
-     * @param  string|null  $prefix
-     * @param  string|null  $suffix
-     * @param  string       $separator
+     * @param string      $str
+     * @param string|null $prefix
+     * @param string|null $suffix
+     * @param string      $separator
+     *
      * @return string
      */
     public function wrap(string $str, ?string $prefix, ?string $suffix, string $separator): string
@@ -203,8 +241,9 @@ class Vouchers
      *
      * Optionally check a given list of codes, before checking the database.
      *
-     * @param  string  $code
-     * @param  array   $codes
+     * @param string $code
+     * @param array  $codes
+     *
      * @return bool
      */
     public function exists(string $code, array $codes = []): bool
@@ -221,32 +260,6 @@ class Vouchers
     {
         $this->config = new Config();
     }
-
-    /**
-     * Proxy 'get', 'with' and 'without' calls to config.
-     *
-     * Will trigger undefined method error for all invalid calls.
-     *
-     * @param  string  $name
-     * @param  array   $args
-     * @return mixed
-     */
-    public function __call(string $name, array $args)
-    {
-        if (method_exists($this->config, $name)) {
-            if (Str::startsWith($name, 'get')) {
-                return $this->config->$name(...$args);
-            }
-
-            if (Str::startsWith($name, 'with')) {
-                $this->config->$name(...$args);
-
-                return $this;
-            }
-        }
-
-        trigger_error('Call to undefined method ' . static::class . '::' . $name . '()', \E_USER_ERROR);
-    } // @codeCoverageIgnore
 
     /**
      * Convenience method for interacting with Redeemer model.

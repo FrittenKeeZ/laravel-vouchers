@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FrittenKeeZ\Vouchers\Tests;
 
 use Carbon\Carbon;
@@ -12,6 +14,9 @@ use FrittenKeeZ\Vouchers\Tests\Models\User;
 use FrittenKeeZ\Vouchers\Vouchers;
 use PHPUnit\Runner\Version;
 
+/**
+ * @internal
+ */
 class VouchersTest extends TestCase
 {
     /**
@@ -47,12 +52,21 @@ class VouchersTest extends TestCase
         $vouchers = new Vouchers();
         $config = $vouchers->getConfig();
 
-        // Grab mask, characters and validation regex.
+        // Grab mask, characters, prefix, suffix and separator.
         $mask = $config->getMask();
         $characters = $config->getCharacters();
         $prefix = $config->getPrefix();
         $suffix = $config->getSuffix();
         $separator = $config->getSeparator();
+
+        // Check vouchers proxy call to config.
+        $this->assertSame($mask, $vouchers->getMask());
+        $this->assertSame($characters, $vouchers->getCharacters());
+        $this->assertSame($prefix, $vouchers->getPrefix());
+        $this->assertSame($suffix, $vouchers->getSuffix());
+        $this->assertSame($separator, $vouchers->getSeparator());
+
+        // Grab validation regex.
         $regex = $this->generateCodeValidationRegex($mask, $characters, $prefix, $suffix, $separator);
 
         $regexAssertMethod = 'assertRegExp';
@@ -61,11 +75,11 @@ class VouchersTest extends TestCase
         }
 
         // Test single generation.
-        $this->$regexAssertMethod($regex, $vouchers->generate($mask, $characters));
+        $this->{$regexAssertMethod}($regex, $vouchers->generate($mask, $characters));
 
         // Test batch operation.
         foreach ($vouchers->batch(10) as $code) {
-            $this->$regexAssertMethod($regex, $code);
+            $this->{$regexAssertMethod}($regex, $code);
         }
 
         // Test negative batch amount.
@@ -94,13 +108,16 @@ class VouchersTest extends TestCase
         $now = Carbon::now();
         $startTime = $now->copy()->add(CarbonInterval::create('P1D'));
         $expireTime = $now->copy()->add(CarbonInterval::create('P30D'));
+        $user = $this->factory(User::class)->create();
         $users = $this->factory(User::class, 3)->create();
         $voucher = $vouchers
             ->withMetadata($metadata)
             ->withStartTime($startTime)
             ->withExpireTime($expireTime)
+            ->withOwner($user)
             ->withEntities(...$users->all())
-            ->create();
+            ->create()
+        ;
         $this->assertInstanceOf(Voucher::class, $voucher);
         $this->assertSame($metadata, $voucher->metadata);
         $this->assertSame(
@@ -111,6 +128,7 @@ class VouchersTest extends TestCase
             $expireTime->toDateTimeString(),
             $voucher->expires_at->toDateTimeString()
         );
+        $this->assertTrue($user->is($voucher->owner));
         foreach ($voucher->getEntities() as $index => $entity) {
             $this->assertTrue($users[$index]->is($entity));
         }
@@ -136,18 +154,17 @@ class VouchersTest extends TestCase
     {
         $vouchers = new Vouchers();
         $user = $this->factory(User::class)->create();
-        $voucher = $vouchers->withEntities($user)->create();
+        $voucher = $vouchers->withOwner($user)->create();
 
         // Check user voucher relation.
+        $this->assertTrue($user->is($voucher->owner));
         $this->assertTrue($voucher->is($user->vouchers->first()));
-        $this->assertTrue($voucher->is($user->voucherEntities->first()->voucher));
 
         // Check voucher states.
         $this->assertTrue($voucher->isRedeemable());
         $this->assertTrue($vouchers->redeemable($voucher->code));
         $this->assertEmpty($voucher->redeemers);
-        $this->assertNotEmpty($voucher->getEntities());
-        $this->assertEmpty($voucher->getEntities('FakeClass'));
+        $this->assertEmpty($voucher->getEntities());
         $metadata = ['foo' => 'bar', 'baz' => 'boom'];
         $this->assertTrue($vouchers->redeem($voucher->code, $user, $metadata));
         // Refresh instance.
@@ -198,11 +215,12 @@ class VouchersTest extends TestCase
      *
      * @dataProvider wrapProvider
      *
-     * @param  string       $str
-     * @param  string|null  $prefix
-     * @param  string|null  $suffix
-     * @param  string       $separator
-     * @param  string       $expected
+     * @param string      $str
+     * @param string|null $prefix
+     * @param string|null $suffix
+     * @param string      $separator
+     * @param string      $expected
+     *
      * @return void
      */
     public function testStringWrapping(
@@ -212,7 +230,7 @@ class VouchersTest extends TestCase
         string $separator,
         string $expected
     ): void {
-        $this->assertSame($expected, (new Vouchers)->wrap($str, $prefix, $suffix, $separator));
+        $this->assertSame($expected, (new Vouchers())->wrap($str, $prefix, $suffix, $separator));
     }
 
     /**
@@ -246,8 +264,9 @@ class VouchersTest extends TestCase
     /**
      * Generate regex to validate a code generated with a specific mask, character list, prefix, suffix and separator.
      *
-     * @param  string  $mask
-     * @param  string  $characters
+     * @param string $mask
+     * @param string $characters
+     *
      * @return string
      */
     protected function generateCodeValidationRegex(

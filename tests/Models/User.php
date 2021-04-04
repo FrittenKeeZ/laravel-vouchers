@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FrittenKeeZ\Vouchers\Tests\Models;
 
 use FrittenKeeZ\Vouchers\Concerns\HasRedeemers;
@@ -9,9 +11,9 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use Notifiable;
-    use HasVouchers;
     use HasRedeemers;
+    use HasVouchers;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.

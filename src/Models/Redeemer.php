@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FrittenKeeZ\Vouchers\Models;
 
 use FrittenKeeZ\Vouchers\Config;
@@ -30,7 +32,8 @@ class Redeemer extends Model
     /**
      * Constructor.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return void
      */
     public function __construct(array $attributes = [])

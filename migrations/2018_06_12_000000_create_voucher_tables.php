@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,11 +14,12 @@ class CreateVoucherTables extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create(Config::table('vouchers'), function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('code')->unique();
+            $table->nullableMorphs('owner');
             $table->text('metadata')->nullable();
             $table->dateTime('starts_at')->nullable()->index();
             $table->dateTime('expires_at')->nullable()->index();
@@ -36,7 +39,8 @@ class CreateVoucherTables extends Migration
                 ->foreign('voucher_id')
                 ->references('id')
                 ->on(Config::table('vouchers'))
-                ->onDelete('cascade');
+                ->onDelete('cascade')
+            ;
         });
 
         Schema::create(Config::table('entities'), function (Blueprint $table) {
@@ -51,7 +55,8 @@ class CreateVoucherTables extends Migration
                 ->foreign('voucher_id')
                 ->references('id')
                 ->on(Config::table('vouchers'))
-                ->onDelete('cascade');
+                ->onDelete('cascade')
+            ;
         });
     }
 
@@ -60,7 +65,7 @@ class CreateVoucherTables extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists(Config::table('entities'));
         Schema::dropIfExists(Config::table('redeemers'));

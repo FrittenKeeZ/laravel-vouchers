@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FrittenKeeZ\Vouchers\Tests;
 
 use FrittenKeeZ\Vouchers\Facades\Vouchers;
@@ -10,6 +12,9 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
+/**
+ * @internal
+ */
 class TestCase extends BaseTestCase
 {
     /**
@@ -36,7 +41,8 @@ class TestCase extends BaseTestCase
     /**
      * Get package aliases.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Foundation\Application $app
+     *
      * @return array
      */
     protected function getPackageAliases($app): array
@@ -47,7 +53,8 @@ class TestCase extends BaseTestCase
     /**
      * Get package providers.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Foundation\Application $app
+     *
      * @return array
      */
     protected function getPackageProviders($app): array

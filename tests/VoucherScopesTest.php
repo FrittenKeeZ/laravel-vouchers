@@ -1,11 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FrittenKeeZ\Vouchers\Tests;
 
 use FrittenKeeZ\Vouchers\Facades\Vouchers;
 use FrittenKeeZ\Vouchers\Models\Voucher;
+use FrittenKeeZ\Vouchers\Tests\Models\Color;
+use FrittenKeeZ\Vouchers\Tests\Models\User;
 use Illuminate\Support\Carbon;
 
+/**
+ * @internal
+ */
 class VoucherScopesTest extends TestCase
 {
     /**
@@ -135,5 +142,52 @@ class VoucherScopesTest extends TestCase
         $this->assertSame(6, Voucher::count());
         $this->assertSame(3, Voucher::withRedeemable(true)->count());
         $this->assertSame(3, Voucher::withRedeemable(false)->count());
+    }
+
+    /**
+     * Test Voucher::scopeWithEntities().
+     *
+     * @return void
+     */
+    public function testEntitiesScope(): void
+    {
+        Vouchers::create();
+        Vouchers::withEntities(...$this->factory(Color::class, 3)->create())->create();
+        Vouchers::withEntities(...$this->factory(User::class, 3)->create())->create();
+        Vouchers::withEntities(
+            ...$this->factory(Color::class, 3)->create(),
+            ...$this->factory(User::class, 3)->create()
+        )->create();
+
+        $this->assertSame(4, Voucher::count());
+        $this->assertSame(3, Voucher::withEntities()->count());
+        $this->assertSame(2, Voucher::withEntities(Color::class)->count());
+        $this->assertSame(2, Voucher::withEntities(User::class)->count());
+    }
+
+    /**
+     * Test Voucher::scopeWithOwnerType() and Voucher::scopeWithOwner().
+     *
+     * @return void
+     */
+    public function testOwnerScopes(): void
+    {
+        // Create users.
+        $first = $this->factory(User::class)->create();
+        $second = $this->factory(User::class)->create();
+        $third = $this->factory(User::class)->create();
+
+        // Create vouchers.
+        Vouchers::create(2);
+        $first->createVoucher();
+        $second->createVouchers(2);
+        $third->createVouchers(3);
+
+        $this->assertSame(8, Voucher::count());
+        $this->assertSame(2, Voucher::withoutOwner()->count());
+        $this->assertSame(6, Voucher::withOwnerType(User::class)->count());
+        $this->assertSame(1, Voucher::withOwner($first)->count());
+        $this->assertSame(2, Voucher::withOwner($second)->count());
+        $this->assertSame(3, Voucher::withOwner($third)->count());
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FrittenKeeZ\Vouchers\Tests;
 
 use Carbon\Carbon;
@@ -9,7 +11,11 @@ use FrittenKeeZ\Vouchers\Models\Redeemer;
 use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Models\VoucherEntity;
 use FrittenKeeZ\Vouchers\Tests\Models\Color;
+use FrittenKeeZ\Vouchers\Tests\Models\User;
 
+/**
+ * @internal
+ */
 class ConfigTest extends TestCase
 {
     /**
@@ -106,7 +112,7 @@ class ConfigTest extends TestCase
         ];
         foreach ($options as $key => $value) {
             $getter = 'get' . ucfirst($key);
-            $this->assertNotSame($value, $config->$getter());
+            $this->assertNotSame($value, $config->{$getter}());
             $appConfig->set('vouchers.' . $key, $value);
         }
 
@@ -138,8 +144,8 @@ class ConfigTest extends TestCase
         foreach ($options as $key => $value) {
             $getter = 'get' . ucfirst($key);
             $setter = 'with' . ucfirst($key);
-            $this->assertNotSame($value, $config->$getter());
-            $config->$setter($value);
+            $this->assertNotSame($value, $config->{$getter}());
+            $config->{$setter}($value);
         }
 
         $this->assertArrayStructure($options, $config->getOptions());
@@ -153,7 +159,8 @@ class ConfigTest extends TestCase
         $config
             ->withoutPrefix()
             ->withoutSuffix()
-            ->withoutSeparator();
+            ->withoutSeparator()
+        ;
         $this->assertSame('', $config->getPrefix());
         $this->assertSame('', $config->getSuffix());
         $this->assertSame('', $config->getSeparator());
@@ -216,6 +223,10 @@ class ConfigTest extends TestCase
             $config->withExpireDateIn($interval)->getExpireTime()->toDateTimeString()
         );
 
+        // Test owner.
+        $owner = $this->factory(User::class)->make();
+        $this->assertSame($owner, $config->withOwner($owner)->getOwner());
+
         // Test entities.
         $entities = $this->factory(Color::class, 3)->make()->all();
         $this->assertSame($entities, $config->withEntities(...$entities)->getEntities());
@@ -224,8 +235,9 @@ class ConfigTest extends TestCase
     /**
      * Assert array structure.
      *
-     * @param  array  $expected
-     * @param  array  $actual
+     * @param array $expected
+     * @param array $actual
+     *
      * @return void
      */
     protected function assertArrayStructure(array $expected, array $actual): void

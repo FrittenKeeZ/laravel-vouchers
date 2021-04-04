@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FrittenKeeZ\Vouchers\Models\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
 
 trait Voucher
@@ -10,96 +14,109 @@ trait Voucher
     /**
      * Scope voucher query to a specific code.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string                                 $code
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string                                $code
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeCode(Builder $query, string $code): Builder
     {
-        return $query->where('code', '=', $code);
+        return $query->where($this->getTable() . '.code', '=', $code);
     }
 
     /**
      * Scope voucher query to a specific prefix, optionally specifying a separator different from config.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string                                 $prefix
-     * @param  string|null                            $separator
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string                                $prefix
+     * @param string|null                           $separator
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeWithPrefix(Builder $query, string $prefix, string $separator = null): Builder
+    public function scopeWithPrefix(Builder $query, string $prefix, ?string $separator = null): Builder
     {
-        $clause = sprintf('%s%s%%', $prefix, \is_null($separator) ? config('vouchers.separator') : $separator);
+        $clause = sprintf('%s%s%%', $prefix, $separator === null ? config('vouchers.separator') : $separator);
 
-        return $query->where('code', 'like', $clause);
+        return $query->where($this->getTable() . '.code', 'like', $clause);
     }
 
     /**
      * Scope voucher query to a specific suffix, optionally specifying a separator different from config.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string                                 $suffix
-     * @param  string|null                            $separator
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string                                $suffix
+     * @param string|null                           $separator
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeWithSuffix(Builder $query, string $suffix, string $separator = null): Builder
+    public function scopeWithSuffix(Builder $query, string $suffix, ?string $separator = null): Builder
     {
-        $clause = sprintf('%%%s%s', \is_null($separator) ? config('vouchers.separator') : $separator, $suffix);
+        $clause = sprintf('%%%s%s', $separator === null ? config('vouchers.separator') : $separator, $suffix);
 
-        return $query->where('code', 'like', $clause);
+        return $query->where($this->getTable() . '.code', 'like', $clause);
     }
 
     /**
      * Scope voucher query to started or unstarted vouchers.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  bool                                   $started
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param bool                                  $started
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithStarted(Builder $query, bool $started = true): Builder
     {
+        $column = $this->getTable() . '.starts_at';
+
         if ($started) {
-            return $query->where(function (Builder $query) {
-                return $query->whereNull('starts_at')->orWhere('starts_at', '<=', Carbon::now());
+            return $query->where(function (Builder $query) use ($column) {
+                return $query->whereNull($column)->orWhere($column, '<=', Carbon::now());
             });
         }
 
-        return $query->where('starts_at', '>', Carbon::now());
+        return $query->where($column, '>', Carbon::now());
     }
 
     /**
      * Scope voucher query to expired or unexpired vouchers.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  bool                                   $expired
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param bool                                  $expired
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithExpired(Builder $query, bool $expired = true): Builder
     {
-        return $query->where(function (Builder $query) use ($expired) {
+        $column = $this->getTable() . '.expires_at';
+
+        return $query->where(function (Builder $query) use ($expired, $column) {
             return $expired
-                ? $query->whereNotNull('expires_at')->where('expires_at', '<=', Carbon::now())
-                : $query->whereNull('expires_at')->orWhere('expires_at', '>', Carbon::now());
+                ? $query->whereNotNull($column)->where($column, '<=', Carbon::now())
+                : $query->whereNull($column)->orWhere($column, '>', Carbon::now());
         });
     }
 
     /**
      * Scope voucher query to redeemed or unredeemed vouchers.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  bool                                   $redeemed
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param bool                                  $redeemed
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithRedeemed(Builder $query, bool $redeemed = true): Builder
     {
-        return $redeemed ? $query->whereNotNull('redeemed_at') : $query->whereNull('redeemed_at');
+        $column = $this->getTable() . '.redeemed_at';
+
+        return $redeemed ? $query->whereNotNull($column) : $query->whereNull($column);
     }
 
     /**
      * Scope voucher query to redeemable or unredeemable vouchers.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  bool                                   $redeemable
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param bool                                  $redeemable
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithRedeemable(Builder $query, bool $redeemable = true): Builder
@@ -116,5 +133,67 @@ trait Voucher
             })->orWhere(function (Builder $query) {
                 return $query->withExpired(true);
             });
+    }
+
+    /**
+     * Scope voucher query to have voucher entities, optionally of a specific type (class or alias).
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string|null                           $type
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithEntities(Builder $query, ?string $type = null): Builder
+    {
+        if (empty($type)) {
+            return $query->has('voucherEntities');
+        }
+
+        return $query->whereHas('voucherEntities', function (Builder $query) use ($type) {
+            $query->withEntityType($type);
+        });
+    }
+
+    /**
+     * Scope voucher query to specific owner type (class or alias).
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string                                $type
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithOwnerType(Builder $query, string $type): Builder
+    {
+        $class = Relation::getMorphedModel($type) ?? $type;
+
+        return $query->where($this->getTable() . '.owner_type', '=', (new $class())->getMorphClass());
+    }
+
+    /**
+     * Scope voucher query to specific owner.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param \Illuminate\Database\Eloquent\Model   $owner
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithOwner(Builder $query, Model $owner): Builder
+    {
+        return $query
+            ->withOwnerType(\get_class($owner))
+            ->where($this->getTable() . '.owner_id', '=', $owner->getKey())
+        ;
+    }
+
+    /**
+     * Scope voucher query to no owners.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithoutOwner(Builder $query): Builder
+    {
+        return $query->whereNull($this->getTable() . '.owner_type')->whereNull($this->getTable() . '.owner_id');
     }
 }

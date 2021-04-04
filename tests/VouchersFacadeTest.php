@@ -1,10 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FrittenKeeZ\Vouchers\Tests;
 
 use FrittenKeeZ\Vouchers\Facades\Vouchers;
 use ReflectionMethod;
 
+/**
+ * @internal
+ */
 class VouchersFacadeTest extends TestCase
 {
     /**
