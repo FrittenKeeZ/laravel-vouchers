@@ -2,16 +2,16 @@
 
 ## [v0.2.0 (Unreleased)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.1.13...0.2.0)
 
-This release adds an owner field to vouchers, changing a lot of the handling around related entities.
+This release adds an owner field to vouchers, changing a lot of the handling around related entities.  
 Please read the [upgrade guide](UPGRADING.md) for implications of this change.
 
 ### Added
 - Added strict types declaration to all files
 - Added owner field to vouchers
-- Added query scopes for Voucher owner:
-  `Voucher::withEntities()`
-  `Voucher::withOwnerType()`
-  `Voucher::withOwner()`
+- Added query scopes for Voucher owner:  
+  `Voucher::withEntities()`  
+  `Voucher::withOwnerType()`  
+  `Voucher::withOwner()`  
   `Voucher::withoutOwner()`
 - Added migration command `vouchers:migrate` for converting owning related entities to proper owners
 
@@ -60,12 +60,12 @@ Please read the [upgrade guide](UPGRADING.md) for implications of this change.
 ### Added
 - Added PHP 7.4 to Travis
 - Added Voucher model helpers: `Voucher::hasPrefix()` and `Voucher::hasSuffix()`
-- Added query scopes for all Voucher helpers:
-  `Voucher::withPrefix()`
-  `Voucher::withSuffix()`
-  `Voucher::withStarted()`
-  `Voucher::withExpired()`
-  `Voucher::withRedeemed()`
+- Added query scopes for all Voucher helpers:  
+  `Voucher::withPrefix()`  
+  `Voucher::withSuffix()`  
+  `Voucher::withStarted()`  
+  `Voucher::withExpired()`  
+  `Voucher::withRedeemed()`  
   `Voucher::withRedeemable()`
 
 ## [v0.1.8 (2020-01-03)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.1.7...0.1.8)
@@ -82,7 +82,7 @@ Please read the [upgrade guide](UPGRADING.md) for implications of this change.
 ## [v0.1.6 (2019-12-13)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.1.5...0.1.6)
 
 ### Added
-- Added `Voucher::$redeemer` which will hold the active redeemer during events
+- Added `Voucher::$redeemer` which will hold the active redeemer during events  
   Enables vouchers to only be redeemed by related redeemer ([#1](https://github.com/FrittenKeeZ/laravel-vouchers/issues/1), [#2](https://github.com/FrittenKeeZ/laravel-vouchers/issues/2))
 
 ## [v0.1.5 (2019-12-13)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.1.4...0.1.5)

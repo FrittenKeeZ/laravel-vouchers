@@ -10,7 +10,7 @@
 ### Installation
 Start by installing version `0.2.x`:
 ```bash
-$ composer require frittenkeez/laravel-vouchers:0.2.x
+$ composer require frittenkeez/laravel-vouchers:^0.2.0
 ```
 
 Publish migration adding the new owner field using Artisan command:
