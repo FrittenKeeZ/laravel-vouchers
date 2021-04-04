@@ -1,6 +1,6 @@
 # Release Notes
 
-## [v0.2.0 (Unreleased)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.1.13...0.2.0)
+## [v0.2.0 (2021-04-04)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.1.13...0.2.0)
 
 This release adds an owner field to vouchers, changing a lot of the handling around related entities.  
 Please read the [upgrade guide](UPGRADING.md) for implications of this change.
@@ -97,10 +97,10 @@ Please read the [upgrade guide](UPGRADING.md) for implications of this change.
 ## [v0.1.4 (2019-12-12)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.1.3...0.1.4)
 
 ### Added
-- Added support for Laravel 6
+- Added support for Laravel 6 ([#3](https://github.com/FrittenKeeZ/laravel-vouchers/issues/3))
 
 ### Changed
-- Replaced array and string helpers with facade calls.
+- Replaced array and string helpers with facade calls
 
 ## [v0.1.3 (2019-07-01)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.1.2...0.1.3)
 
