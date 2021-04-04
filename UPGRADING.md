@@ -1,7 +1,7 @@
 # Upgrade Guide
 
 ## Table of Contents
-- [0.1.x to 0.2.x](#0.1.x-to-0.2.x)
+- [0.1.x to 0.2.x](#01x-to-02x)
     - [Installation](#installation)
     - [Migrating](#migrating)
     - [Backward Incompatible Changes](#backward-incompatible-changes)

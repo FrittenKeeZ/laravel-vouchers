@@ -8,6 +8,7 @@
 ## Table of Contents
 - [Installation](#installation)
 - [Upgrading](#upgrading)
+- [Changelog](#changelog)
 - [Configuration](#configuration)
 - [Usage](#usage)
     - [Generate Codes](#generate-codes)
@@ -29,6 +30,9 @@ $ composer require frittenkeez/laravel-vouchers
 
 ## Upgrading
 Please read the [upgrade guide](UPGRADING.md).
+
+## Changelog
+Please read the [release notes](CHANGELOG.md).
 
 ## Configuration
 Publish config using Artisan command:
