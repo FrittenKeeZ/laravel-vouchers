@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrittenKeeZ\Vouchers;
 
+use Closure;
 use FrittenKeeZ\Vouchers\Exceptions\VoucherAlreadyRedeemedException;
 use FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException;
 use FrittenKeeZ\Vouchers\Models\Redeemer;
@@ -152,15 +153,16 @@ class Vouchers
     /**
      * Whether a voucher code is redeemable.
      *
-     * @param string $code
+     * @param string        $code
+     * @param \Closure|null $callback
      *
      * @return bool
      */
-    public function redeemable(string $code): bool
+    public function redeemable(string $code, ?Closure $callback = null): bool
     {
         $voucher = $this->vouchers()->code($code)->first();
 
-        return $voucher !== null && $voucher->isRedeemable();
+        return $voucher !== null && $voucher->isRedeemable() && ($callback === null || $callback($voucher));
     }
 
     /**

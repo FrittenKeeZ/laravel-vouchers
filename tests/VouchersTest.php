@@ -163,6 +163,9 @@ class VouchersTest extends TestCase
         // Check voucher states.
         $this->assertTrue($voucher->isRedeemable());
         $this->assertTrue($vouchers->redeemable($voucher->code));
+        $this->assertFalse($vouchers->redeemable($voucher->code, function (Voucher $voucher) {
+            return $voucher->hasPrefix('thisprefixdoesnotexist');
+        }));
         $this->assertEmpty($voucher->redeemers);
         $this->assertEmpty($voucher->getEntities());
         $metadata = ['foo' => 'bar', 'baz' => 'boom'];

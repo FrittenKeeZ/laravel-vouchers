@@ -51,7 +51,7 @@ This package comes with an ease-of-use facade `Vouchers` with FQN `FrittenKeeZ\V
 ### Generate Codes
 Generating codes without checking if they exist; defaults from config will be used if not specified.
 ```php
-Vouchers::generate(string $mask = null, string $characters = null): string
+Vouchers::generate(?string $mask = null, ?string $characters = null): string
 $code = Vouchers::generate('***-***-***', '1234567890');
 ```
 Batch generation of codes is also possible; these will be checked against existing codes.
@@ -197,7 +197,7 @@ $entities = $user->voucherEntities;
 ```
 You can also create vouchers owned by an entity using these convenience methods.
 ```php
-HasVouchers::createVoucher(Closure $callback = null): object
+HasVouchers::createVoucher(?Closure $callback = null): object
 // Without using callback.
 $voucher = $user->createVoucher();
 // With using callback.
@@ -205,7 +205,7 @@ $voucher = $user->createVoucher(function (FrittenKeeZ\Vouchers\Vouchers $voucher
     $vouchers->withPrefix('USR');
 });
 
-HasVouchers::createVouchers(int $amount, Closure $callback = null): object|array
+HasVouchers::createVouchers(int $amount, ?Closure $callback = null): object|array
 // Without using callback.
 $vouchers = $user->createVouchers(3);
 // With using callback.
@@ -217,8 +217,13 @@ $vouchers = $user->createVouchers(3, function (FrittenKeeZ\Vouchers\Vouchers $vo
 ### Helpers
 Check whether a voucher code is redeemable without throwing any errors.
 ```php
-Vouchers::redeemable(string $code): bool
+Vouchers::redeemable(string $code, ?Closure $callback = null): bool
+// Without using callback.
 $valid = Vouchers::redeemable('123-456-789');
+// With using callback.
+$valid = Vouchers::redeemable('123-456-789', function (FrittenKeeZ\Vouchers\Models\Voucher $voucher) {
+    return $voucher->hasPrefix('foo');
+});
 ```
 Check whether a voucher code exists, optionally also checking a provided list.
 ```php
@@ -228,9 +233,9 @@ $exists = Vouchers::exists('123-456-789', ['987-654-321']);
 Additional helpers methods on Voucher model.
 ```php
 // Whether voucher has prefix, optionally specifying a separator different from config.
-Voucher::hasPrefix(string $prefix, string $separator = null): bool
+Voucher::hasPrefix(string $prefix, ?string $separator = null): bool
 // Whether voucher has suffix, optionally specifying a separator different from config.
-Voucher::hasSuffix(string $suffix, string $separator = null): bool
+Voucher::hasSuffix(string $suffix, ?string $separator = null): bool
 // Whether voucher is started.
 Voucher::isStarted(): bool
 // Whether voucher is expired.

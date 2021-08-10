@@ -45,7 +45,7 @@ trait HasVouchers
     /**
      * Create a single voucher with this entity related.
      *
-     * @param \Closure $callback
+     * @param \Closure|null $callback
      *
      * @return object
      */
@@ -57,8 +57,8 @@ trait HasVouchers
     /**
      * Create an amount of vouchers with this entity related.
      *
-     * @param int      $amount
-     * @param \Closure $callback
+     * @param int           $amount
+     * @param \Closure|null $callback
      *
      * @return object|array
      */
