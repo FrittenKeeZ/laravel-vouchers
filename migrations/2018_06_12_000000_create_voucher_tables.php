@@ -44,6 +44,7 @@ class CreateVoucherTables extends Migration
         });
 
         Schema::create(Config::table('entities'), function (Blueprint $table) {
+            $table->bigIncrements('id');
             $table->bigInteger('voucher_id')->unsigned();
             $table->morphs('entity');
 
