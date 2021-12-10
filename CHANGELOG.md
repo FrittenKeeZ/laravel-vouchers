@@ -1,5 +1,21 @@
 # Release Notes
 
+## [uneleased](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.2.1...master)
+
+### Added
+- Added primary key to entities relation table
+
+### Changed
+- Replaced Travis with Github Actions
+
+### Deprecated
+- Dropped support for PHP 7.1 - 7.3
+
+## [v0.2.1 (2021-08-10)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.2.0...0.2.1)
+
+### Added
+- Added callback to `Vouchers::redeemable()` for conditional checks
+
 ## [v0.2.0 (2021-04-04)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.1.13...0.2.0)
 
 This release adds an owner field to vouchers, changing a lot of the handling around related entities.  

@@ -3,7 +3,7 @@
 [![Packagist](https://img.shields.io/packagist/v/FrittenKeeZ/laravel-vouchers.svg?style=flat-square)](https://packagist.org/packages/frittenkeez/laravel-vouchers)
 [![Downloads](https://img.shields.io/packagist/dt/FrittenKeeZ/laravel-vouchers.svg?style=flat-square)](https://packagist.org/packages/frittenkeez/laravel-vouchers)
 [![License](https://img.shields.io/github/license/FrittenKeeZ/laravel-vouchers.svg?style=flat-square)](LICENSE)
-[![Travis](https://img.shields.io/travis/FrittenKeeZ/laravel-vouchers.svg?style=flat-square)](https://travis-ci.org/FrittenKeeZ/laravel-vouchers)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/FrittenKeeZ/laravel-vouchers/Tests)](https://github.com/FrittenKeeZ/laravel-vouchers/actions)
 
 ## Table of Contents
 - [Installation](#installation)
