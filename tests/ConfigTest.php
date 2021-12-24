@@ -82,14 +82,14 @@ class ConfigTest extends TestCase
     public function testDefaultOptions(): void
     {
         $config = new Config();
-        $appConfig = $this->app['config'];
+        $app_config = $this->app['config'];
 
         $this->assertEmpty($config->getOptions());
-        $this->assertSame($appConfig->get('vouchers.characters'), $config->getCharacters());
-        $this->assertSame($appConfig->get('vouchers.mask'), $config->getMask());
-        $this->assertSame($appConfig->get('vouchers.prefix'), $config->getPrefix());
-        $this->assertSame($appConfig->get('vouchers.suffix'), $config->getSuffix());
-        $this->assertSame($appConfig->get('vouchers.separator'), $config->getSeparator());
+        $this->assertSame($app_config->get('vouchers.characters'), $config->getCharacters());
+        $this->assertSame($app_config->get('vouchers.mask'), $config->getMask());
+        $this->assertSame($app_config->get('vouchers.prefix'), $config->getPrefix());
+        $this->assertSame($app_config->get('vouchers.suffix'), $config->getSuffix());
+        $this->assertSame($app_config->get('vouchers.separator'), $config->getSeparator());
     }
 
     /**
@@ -100,7 +100,7 @@ class ConfigTest extends TestCase
     public function testConfigOverriddenOptions(): void
     {
         $config = new Config();
-        $appConfig = $this->app['config'];
+        $app_config = $this->app['config'];
 
         // Override config.
         $options = [
@@ -113,7 +113,7 @@ class ConfigTest extends TestCase
         foreach ($options as $key => $value) {
             $getter = 'get' . ucfirst($key);
             $this->assertNotSame($value, $config->{$getter}());
-            $appConfig->set('vouchers.' . $key, $value);
+            $app_config->set('vouchers.' . $key, $value);
         }
 
         $this->assertEmpty($config->getOptions());

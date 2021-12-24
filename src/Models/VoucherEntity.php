@@ -28,13 +28,6 @@ class VoucherEntity extends Model
     public $timestamps = false;
 
     /**
-     * The primary key for the model.
-     *
-     * @var string
-     */
-    protected $primaryKey;
-
-    /**
      * Constructor.
      *
      * @param array $attributes

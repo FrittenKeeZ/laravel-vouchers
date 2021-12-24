@@ -69,17 +69,17 @@ class VouchersTest extends TestCase
         // Grab validation regex.
         $regex = $this->generateCodeValidationRegex($mask, $characters, $prefix, $suffix, $separator);
 
-        $regexAssertMethod = 'assertRegExp';
+        $regex_assert_method = 'assertRegExp';
         if ((float) Version::series() >= 9.1) {
-            $regexAssertMethod = 'assertMatchesRegularExpression';
+            $regex_assert_method = 'assertMatchesRegularExpression';
         }
 
         // Test single generation.
-        $this->{$regexAssertMethod}($regex, $vouchers->generate($mask, $characters));
+        $this->{$regex_assert_method}($regex, $vouchers->generate($mask, $characters));
 
         // Test batch operation.
         foreach ($vouchers->batch(10) as $code) {
-            $this->{$regexAssertMethod}($regex, $code);
+            $this->{$regex_assert_method}($regex, $code);
         }
 
         // Test negative batch amount.
@@ -106,14 +106,14 @@ class VouchersTest extends TestCase
         // With metdata, start time and expire time.
         $metadata = ['foo' => 'bar', 'baz' => 'boom'];
         $now = Carbon::now();
-        $startTime = $now->copy()->add(CarbonInterval::create('P1D'));
-        $expireTime = $now->copy()->add(CarbonInterval::create('P30D'));
+        $start_time = $now->copy()->add(CarbonInterval::create('P1D'));
+        $expire_time = $now->copy()->add(CarbonInterval::create('P30D'));
         $user = $this->factory(User::class)->create();
         $users = $this->factory(User::class, 3)->create();
         $voucher = $vouchers
             ->withMetadata($metadata)
-            ->withStartTime($startTime)
-            ->withExpireTime($expireTime)
+            ->withStartTime($start_time)
+            ->withExpireTime($expire_time)
             ->withOwner($user)
             ->withEntities(...$users->all())
             ->create()
@@ -121,11 +121,11 @@ class VouchersTest extends TestCase
         $this->assertInstanceOf(Voucher::class, $voucher);
         $this->assertSame($metadata, $voucher->metadata);
         $this->assertSame(
-            $startTime->toDateTimeString(),
+            $start_time->toDateTimeString(),
             $voucher->starts_at->toDateTimeString()
         );
         $this->assertSame(
-            $expireTime->toDateTimeString(),
+            $expire_time->toDateTimeString(),
             $voucher->expires_at->toDateTimeString()
         );
         $this->assertTrue($user->is($voucher->owner));
