@@ -7,16 +7,13 @@ $rules = [
     '@PhpCsFixer'            => true,
     'binary_operator_spaces' => [
         'operators' => [
-            '=>' => 'align',
+            '=>' => 'align_single_space_minimal',
         ],
     ],
     'concat_space' => [
         'spacing' => 'one',
     ],
     'increment_style'            => ['style' => 'post'],
-    'is_null'                    => [
-        'use_yoda_style' => false,
-    ],
     'native_constant_invocation' => [
         'fix_built_in' => true,
         'include'      => [
@@ -56,9 +53,6 @@ $rules = [
     'single_line_comment_style' => [
         'comment_types' => ['hash'],
     ],
-    'visibility_required' => [
-        'elements' => ['const', 'method', 'property'],
-    ],
     'yoda_style' => false,
 ];
 
@@ -70,7 +64,7 @@ $finder = Finder::create()
     ->ignoreVCS(true)
 ;
 
-return Config::create()
+return (new Config())
     ->setFinder($finder)
     ->setRules($rules)
     ->setIndent('    ')
