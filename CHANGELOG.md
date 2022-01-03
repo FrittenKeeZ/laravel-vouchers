@@ -4,6 +4,13 @@
 
 ### Added
 - Added primary key to entities relation table
+- Added extra query scopes for Vouchers:  
+  `Voucher::withoutPrefix()`  
+  `Voucher::withoutSuffix()`  
+  `Voucher::withoutStarted()`  
+  `Voucher::withoutExpired()`  
+  `Voucher::withoutRedeemed()`  
+  `Voucher::withoutRedeemable()`
 
 ### Changed
 - Replaced Travis with Github Actions

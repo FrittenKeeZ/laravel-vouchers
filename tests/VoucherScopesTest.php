@@ -49,18 +49,30 @@ class VoucherScopesTest extends TestCase
         $this->assertSame(2, Voucher::withPrefix('FOO', '-')->count());
         $this->assertSame(2, Voucher::withPrefix('FUU')->count());
         $this->assertSame(2, Voucher::withPrefix('FUU', '-')->count());
+        $this->assertSame(6, Voucher::withoutPrefix('FOO')->count());
+        $this->assertSame(6, Voucher::withoutPrefix('FOO', '-')->count());
+        $this->assertSame(6, Voucher::withoutPrefix('FUU')->count());
+        $this->assertSame(6, Voucher::withoutPrefix('FUU', '-')->count());
         // Test prefix scope without separator
         $this->assertSame(4, Voucher::withPrefix('FOO', '')->count());
         $this->assertSame(4, Voucher::withPrefix('FUU', '')->count());
+        $this->assertSame(4, Voucher::withoutPrefix('FOO', '')->count());
+        $this->assertSame(4, Voucher::withoutPrefix('FUU', '')->count());
 
         // Test suffix scope with separator.
         $this->assertSame(2, Voucher::withSuffix('BAR')->count());
         $this->assertSame(2, Voucher::withSuffix('BAR', '-')->count());
         $this->assertSame(2, Voucher::withSuffix('BAZ')->count());
         $this->assertSame(2, Voucher::withSuffix('BAZ', '-')->count());
+        $this->assertSame(6, Voucher::withoutSuffix('BAR')->count());
+        $this->assertSame(6, Voucher::withoutSuffix('BAR', '-')->count());
+        $this->assertSame(6, Voucher::withoutSuffix('BAZ')->count());
+        $this->assertSame(6, Voucher::withoutSuffix('BAZ', '-')->count());
         // Test suffix scope without separator
         $this->assertSame(4, Voucher::withSuffix('BAR', '')->count());
         $this->assertSame(4, Voucher::withSuffix('BAZ', '')->count());
+        $this->assertSame(4, Voucher::withoutSuffix('BAR', '')->count());
+        $this->assertSame(4, Voucher::withoutSuffix('BAZ', '')->count());
 
         // Test prefix and suffix scopes together with separator.
         $this->assertSame(1, Voucher::withPrefix('FOO')->withSuffix('BAR')->count());
@@ -71,11 +83,47 @@ class VoucherScopesTest extends TestCase
         $this->assertSame(1, Voucher::withPrefix('FOO', '-')->withSuffix('BAZ', '-')->count());
         $this->assertSame(1, Voucher::withPrefix('FUU')->withSuffix('BAZ')->count());
         $this->assertSame(1, Voucher::withPrefix('FUU', '-')->withSuffix('BAZ', '-')->count());
+        $this->assertSame(1, Voucher::withoutPrefix('FOO')->withSuffix('BAR')->count());
+        $this->assertSame(1, Voucher::withoutPrefix('FOO', '-')->withSuffix('BAR', '-')->count());
+        $this->assertSame(1, Voucher::withoutPrefix('FUU')->withSuffix('BAR')->count());
+        $this->assertSame(1, Voucher::withoutPrefix('FUU', '-')->withSuffix('BAR', '-')->count());
+        $this->assertSame(1, Voucher::withoutPrefix('FOO')->withSuffix('BAZ')->count());
+        $this->assertSame(1, Voucher::withoutPrefix('FOO', '-')->withSuffix('BAZ', '-')->count());
+        $this->assertSame(1, Voucher::withoutPrefix('FUU')->withSuffix('BAZ')->count());
+        $this->assertSame(1, Voucher::withoutPrefix('FUU', '-')->withSuffix('BAZ', '-')->count());
+        $this->assertSame(1, Voucher::withPrefix('FOO')->withoutSuffix('BAR')->count());
+        $this->assertSame(1, Voucher::withPrefix('FOO', '-')->withoutSuffix('BAR', '-')->count());
+        $this->assertSame(1, Voucher::withPrefix('FUU')->withoutSuffix('BAR')->count());
+        $this->assertSame(1, Voucher::withPrefix('FUU', '-')->withoutSuffix('BAR', '-')->count());
+        $this->assertSame(1, Voucher::withPrefix('FOO')->withoutSuffix('BAZ')->count());
+        $this->assertSame(1, Voucher::withPrefix('FOO', '-')->withoutSuffix('BAZ', '-')->count());
+        $this->assertSame(1, Voucher::withPrefix('FUU')->withoutSuffix('BAZ')->count());
+        $this->assertSame(1, Voucher::withPrefix('FUU', '-')->withoutSuffix('BAZ', '-')->count());
+        $this->assertSame(5, Voucher::withoutPrefix('FOO')->withoutSuffix('BAR')->count());
+        $this->assertSame(5, Voucher::withoutPrefix('FOO', '-')->withoutSuffix('BAR', '-')->count());
+        $this->assertSame(5, Voucher::withoutPrefix('FUU')->withoutSuffix('BAR')->count());
+        $this->assertSame(5, Voucher::withoutPrefix('FUU', '-')->withoutSuffix('BAR', '-')->count());
+        $this->assertSame(5, Voucher::withoutPrefix('FOO')->withoutSuffix('BAZ')->count());
+        $this->assertSame(5, Voucher::withoutPrefix('FOO', '-')->withoutSuffix('BAZ', '-')->count());
+        $this->assertSame(5, Voucher::withoutPrefix('FUU')->withoutSuffix('BAZ')->count());
+        $this->assertSame(5, Voucher::withoutPrefix('FUU', '-')->withoutSuffix('BAZ', '-')->count());
         // Test prefix and suffix scopes together without separator
         $this->assertSame(2, Voucher::withPrefix('FOO', '')->withSuffix('BAR', '')->count());
         $this->assertSame(2, Voucher::withPrefix('FUU', '')->withSuffix('BAR', '')->count());
         $this->assertSame(2, Voucher::withPrefix('FOO', '')->withSuffix('BAZ', '')->count());
         $this->assertSame(2, Voucher::withPrefix('FUU', '')->withSuffix('BAZ', '')->count());
+        $this->assertSame(2, Voucher::withoutPrefix('FOO', '')->withSuffix('BAR', '')->count());
+        $this->assertSame(2, Voucher::withoutPrefix('FUU', '')->withSuffix('BAR', '')->count());
+        $this->assertSame(2, Voucher::withoutPrefix('FOO', '')->withSuffix('BAZ', '')->count());
+        $this->assertSame(2, Voucher::withoutPrefix('FUU', '')->withSuffix('BAZ', '')->count());
+        $this->assertSame(2, Voucher::withPrefix('FOO', '')->withoutSuffix('BAR', '')->count());
+        $this->assertSame(2, Voucher::withPrefix('FUU', '')->withoutSuffix('BAR', '')->count());
+        $this->assertSame(2, Voucher::withPrefix('FOO', '')->withoutSuffix('BAZ', '')->count());
+        $this->assertSame(2, Voucher::withPrefix('FUU', '')->withoutSuffix('BAZ', '')->count());
+        $this->assertSame(2, Voucher::withoutPrefix('FOO', '')->withoutSuffix('BAR', '')->count());
+        $this->assertSame(2, Voucher::withoutPrefix('FUU', '')->withoutSuffix('BAR', '')->count());
+        $this->assertSame(2, Voucher::withoutPrefix('FOO', '')->withoutSuffix('BAZ', '')->count());
+        $this->assertSame(2, Voucher::withoutPrefix('FUU', '')->withoutSuffix('BAZ', '')->count());
     }
 
     /**
@@ -90,8 +138,8 @@ class VoucherScopesTest extends TestCase
         Vouchers::withStartTime(Carbon::now()->addDay())->create();
 
         $this->assertSame(3, Voucher::count());
-        $this->assertSame(2, Voucher::withStarted(true)->count());
-        $this->assertSame(1, Voucher::withStarted(false)->count());
+        $this->assertSame(2, Voucher::withStarted()->count());
+        $this->assertSame(1, Voucher::withoutStarted()->count());
     }
 
     /**
@@ -106,8 +154,8 @@ class VoucherScopesTest extends TestCase
         Vouchers::withExpireTime(Carbon::now()->addDay())->create();
 
         $this->assertSame(3, Voucher::count());
-        $this->assertSame(1, Voucher::withExpired(true)->count());
-        $this->assertSame(2, Voucher::withExpired(false)->count());
+        $this->assertSame(1, Voucher::withExpired()->count());
+        $this->assertSame(2, Voucher::withoutExpired()->count());
     }
 
     /**
@@ -121,8 +169,8 @@ class VoucherScopesTest extends TestCase
         Vouchers::create()->update(['redeemed_at' => Carbon::now()->subDay()]);
 
         $this->assertSame(2, Voucher::count());
-        $this->assertSame(1, Voucher::withRedeemed(true)->count());
-        $this->assertSame(1, Voucher::withRedeemed(false)->count());
+        $this->assertSame(1, Voucher::withRedeemed()->count());
+        $this->assertSame(1, Voucher::withoutRedeemed()->count());
     }
 
     /**
@@ -140,8 +188,8 @@ class VoucherScopesTest extends TestCase
         Vouchers::create()->update(['redeemed_at' => Carbon::now()->subDay()]);
 
         $this->assertSame(6, Voucher::count());
-        $this->assertSame(3, Voucher::withRedeemable(true)->count());
-        $this->assertSame(3, Voucher::withRedeemable(false)->count());
+        $this->assertSame(3, Voucher::withRedeemable()->count());
+        $this->assertSame(3, Voucher::withoutRedeemable()->count());
     }
 
     /**

@@ -51,19 +51,22 @@ This package comes with an ease-of-use facade `Vouchers` with FQN `FrittenKeeZ\V
 ### Generate Codes
 Generating codes without checking if they exist; defaults from config will be used if not specified.
 ```php
-Vouchers::generate(?string $mask = null, ?string $characters = null): string
+Vouchers::generate(string|null $mask = null, string|null $characters = null): string;
+
 $code = Vouchers::generate('***-***-***', '1234567890');
 ```
 Batch generation of codes is also possible; these will be checked against existing codes.
 ```php
-Vouchers::batch(int amount): array
+Vouchers::batch(int amount): array;
+
 $codes = Vouchers::batch(10);
 ```
 
 ### Create Vouchers
 Generating one or more vouchers is just as simple.
 ```php
-Vouchers::create(int $amount = 1): object|array
+Vouchers::create(int $amount = 1): object|array;
+
 $voucher = Vouchers::create();
 $vouchers = Vouchers::create(10);
 ```
@@ -72,7 +75,8 @@ $vouchers = Vouchers::create(10);
 Redeeming vouchers requires that one provides a redeemer entity.  
 Additional metadata for the redeemer can be provided.
 ```php
-Vouchers::redeem(string $code, Illuminate\Database\Eloquent\Model $entity, array $metadata = []): bool
+Vouchers::redeem(string $code, Illuminate\Database\Eloquent\Model $entity, array $metadata = []): bool;
+
 try {
     $success = Vouchers::redeem('123-456-789', $user, ['foo' => 'bar']);
 } catch (FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException $e) {
@@ -87,46 +91,46 @@ Besides defaults specified in `config/vouchers.php`, one can override options wh
 Following methods apply to `Vouchers::generate()`, `Vouchers::batch()` and `Vouchers::create()` calls.
 ```php
 // Override characters list.
-Vouchers::withCharacters(string $characters)
+Vouchers::withCharacters(string $characters);
 // Override code mask.
-Vouchers::withMask(string $mask)
+Vouchers::withMask(string $mask);
 // Override code prefix.
-Vouchers::withPrefix(string $prefix)
+Vouchers::withPrefix(string $prefix);
 // Disable code prefix.
-Vouchers::withoutPrefix()
+Vouchers::withoutPrefix();
 // Override code suffix.
-Vouchers::withSuffix(string $suffix)
+Vouchers::withSuffix(string $suffix);
 // Disable code suffix.
-Vouchers::withoutSuffix()
+Vouchers::withoutSuffix();
 // Override prefix and suffix separator.
-Vouchers::withSeparator(string $separator)
+Vouchers::withSeparator(string $separator);
 // Disable prefix and suffix separator.
-Vouchers::withoutSeparator()
+Vouchers::withoutSeparator();
 ```
 Following methods only apply to `Vouchers::create()` call.
 ```php
 // Add metadata to voucher.
-Vouchers::withMetadata(array $metadata)
+Vouchers::withMetadata(array $metadata);
 // Set voucher start time.
-Vouchers::withStartTime(DateTime $timestamp)
+Vouchers::withStartTime(DateTime $timestamp);
 // Set voucher start time using interval.
-Vouchers::withStartTimeIn(DateInterval $interval)
+Vouchers::withStartTimeIn(DateInterval $interval);
 // Set voucher start date - time component is zeroed.
-Vouchers::withStartDate(DateTime $timestamp)
+Vouchers::withStartDate(DateTime $timestamp);
 // Set voucher start date using interval - time component is zeroed.
-Vouchers::withStartDateIn(DateInterval $interval)
+Vouchers::withStartDateIn(DateInterval $interval);
 // Set voucher expire time.
-Vouchers::withExpireTime(DateTime $timestamp)
+Vouchers::withExpireTime(DateTime $timestamp);
 // Set voucher expire time using interval.
-Vouchers::withExpireTimeIn(DateInterval $interval)
+Vouchers::withExpireTimeIn(DateInterval $interval);
 // Set voucher expire date - time component is set to end of day (23:59:59).
-Vouchers::withExpireDate(DateTime $timestamp)
+Vouchers::withExpireDate(DateTime $timestamp);
 // Set voucher expire date using interval - time component is set to end of day (23:59:59).
-Vouchers::withExpireDateIn(DateInterval $interval)
+Vouchers::withExpireDateIn(DateInterval $interval);
 // Set related entities to voucher.
-Vouchers::withEntities(Illuminate\Database\Eloquent\Model ...$entities)
+Vouchers::withEntities(Illuminate\Database\Eloquent\Model ...$entities);
 // Set owning entity for voucher.
-Vouchers::withOwner(Illuminate\Database\Eloquent\Model $owner)
+Vouchers::withOwner(Illuminate\Database\Eloquent\Model $owner);
 ```
 All calls are chainable and dynamic options will be reset when calling `Vouchers::create()` or `Vouchers::reset()`.
 ```php
@@ -176,28 +180,31 @@ For convenience we provide some traits for fetching vouchers and redeemers for r
 `FrittenKeeZ\Vouchers\Concerns\HasRedeemers`
 ```php
 // Associated redeemers relationship.
-HasRedeemers::redeemers(): MorphMany
+HasRedeemers::redeemers(): MorphMany;
 // Get all associated redeemers.
 $redeemers = $user->redeemers;
 ```
 `FrittenKeeZ\Vouchers\Concerns\HasVouchers`
 ```php
 // Owned vouchers relationship.
-HasVouchers::vouchers(): MorphMany
+HasVouchers::vouchers(): MorphMany;
 // Get all owned vouchers.
 $vouchers = $user->vouchers;
+
 // Associated vouchers relationship.
-HasVouchers::associatedVouchers(): MorphToMany
+HasVouchers::associatedVouchers(): MorphToMany;
 // Get all associated vouchers.
 $vouchers = $user->associatedVouchers;
+
 // Associated voucher entities relationship.
-HasVouchers::voucherEntities(): MorphMany
+HasVouchers::voucherEntities(): MorphMany;
 // Get all associated voucher entities.
 $entities = $user->voucherEntities;
 ```
 You can also create vouchers owned by an entity using these convenience methods.
 ```php
-HasVouchers::createVoucher(?Closure $callback = null): object
+HasVouchers::createVoucher(Closure|null $callback = null): object;
+
 // Without using callback.
 $voucher = $user->createVoucher();
 // With using callback.
@@ -205,7 +212,8 @@ $voucher = $user->createVoucher(function (FrittenKeeZ\Vouchers\Vouchers $voucher
     $vouchers->withPrefix('USR');
 });
 
-HasVouchers::createVouchers(int $amount, ?Closure $callback = null): object|array
+HasVouchers::createVouchers(int $amount, Closure|null $callback = null): object|array;
+
 // Without using callback.
 $vouchers = $user->createVouchers(3);
 // With using callback.
@@ -217,7 +225,8 @@ $vouchers = $user->createVouchers(3, function (FrittenKeeZ\Vouchers\Vouchers $vo
 ### Helpers
 Check whether a voucher code is redeemable without throwing any errors.
 ```php
-Vouchers::redeemable(string $code, ?Closure $callback = null): bool
+Vouchers::redeemable(string $code, Closure|null $callback = null): bool;
+
 // Without using callback.
 $valid = Vouchers::redeemable('123-456-789');
 // With using callback.
@@ -227,48 +236,61 @@ $valid = Vouchers::redeemable('123-456-789', function (FrittenKeeZ\Vouchers\Mode
 ```
 Check whether a voucher code exists, optionally also checking a provided list.
 ```php
-Vouchers::exists(string $code, array $codes = []): bool
+Vouchers::exists(string $code, array $codes = []): bool;
+
 $exists = Vouchers::exists('123-456-789', ['987-654-321']);
 ```
 Additional helpers methods on Voucher model.
 ```php
 // Whether voucher has prefix, optionally specifying a separator different from config.
-Voucher::hasPrefix(string $prefix, ?string $separator = null): bool
+Voucher::hasPrefix(string $prefix, string|null $separator = null): bool;
 // Whether voucher has suffix, optionally specifying a separator different from config.
-Voucher::hasSuffix(string $suffix, ?string $separator = null): bool
+Voucher::hasSuffix(string $suffix, string|null $separator = null): bool;
 // Whether voucher is started.
-Voucher::isStarted(): bool
+Voucher::isStarted(): bool;
 // Whether voucher is expired.
-Voucher::isExpired(): bool
+Voucher::isExpired(): bool;
 // Whether voucher is redeemed.
-Voucher::isRedeemed(): bool
+Voucher::isRedeemed(): bool;
 // Whether voucher is redeemable.
-Voucher::isRedeemable(): bool
+Voucher::isRedeemable(): bool;
 ```
 
 ### Scopes
 For convenience we also provide Voucher scopes matching the helper methods.
 ```php
 // Scope voucher query to a specific prefix, optionally specifying a separator different from config.
-Voucher::withPrefix(string $prefix, ?string $separator = null)
+Voucher::withPrefix(string $prefix, string|null $separator = null);
+// Scope voucher query to exclude a specific prefix, optionally specifying a separator different from config.
+Voucher::withoutPrefix(string $prefix, string|null $separator = null);
 // Scope voucher query to a specific suffix, optionally specifying a separator different from config.
-Voucher::withSuffix(string $suffix, ?string $separator = null)
-// Scope voucher query to started or unstarted vouchers.
-Voucher::withStarted(bool $started = true)
-// Scope voucher query to expired or unexpired vouchers.
-Voucher::withExpired(bool $expired = true)
-// Scope voucher query to redeemed or unredeemed vouchers.
-Voucher::withRedeemed(bool $redeemed = true)
-// Scope voucher query to redeemable or unredeemable vouchers.
-Voucher::withRedeemable(bool $redeemable = true)
+Voucher::withSuffix(string $suffix, string|null $separator = null);
+// Scope voucher query to exclude a specific suffix, optionally specifying a separator different from config.
+Voucher::withoutSuffix(string $suffix, string|null $separator = null);
+// Scope voucher query to started vouchers.
+Voucher::withStarted();
+// Scope voucher query to unstarted vouchers.
+Voucher::withoutStarted();
+// Scope voucher query to expired vouchers.
+Voucher::withExpired();
+// Scope voucher query to unexpired vouchers.
+Voucher::withoutExpired();
+// Scope voucher query to redeemed vouchers.
+Voucher::withRedeemed();
+// Scope voucher query to unredeemed vouchers.
+Voucher::withoutRedeemed();
+// Scope voucher query to redeemable vouchers.
+Voucher::withRedeemable();
+// Scope voucher query to unredeemable vouchers.
+Voucher::withoutRedeemable();
 // Scope voucher query to have voucher entities, optionally of a specific type (class or alias).
-Voucher::withEntities(?string $type = null)
+Voucher::withEntities(string|null $type = null);
 // Scope voucher query to specific owner type (class or alias).
-Voucher::withOwnerType(string $type)
+Voucher::withOwnerType(string $type);
 // Scope voucher query to specific owner.
-Voucher::withOwner(Illuminate\Database\Eloquent\Model $owner)
+Voucher::withOwner(Illuminate\Database\Eloquent\Model $owner);
 // Scope voucher query to no owners.
-Voucher::withoutOwner()
+Voucher::withoutOwner();
 ```
 
 ## Testing

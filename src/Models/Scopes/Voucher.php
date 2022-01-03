@@ -25,7 +25,28 @@ trait Voucher
     }
 
     /**
-     * Scope voucher query to a specific prefix, optionally specifying a separator different from config.
+     * Scope voucher query to (or exclude) a specific prefix, optionally specifying a separator different from config.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string                                $prefix
+     * @param string|null                           $separator
+     * @param bool                                  $not
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithPrefix(
+        Builder $query,
+        string $prefix,
+        ?string $separator = null,
+        bool $not = false
+    ): Builder {
+        $clause = sprintf('%s%s%%', $prefix, $separator === null ? config('vouchers.separator') : $separator);
+
+        return $query->where($this->getTable() . '.code', $not ? 'not like' : 'like', $clause);
+    }
+
+    /**
+     * Scope voucher query to exclude a specific prefix, optionally specifying a separator different from config.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param string                                $prefix
@@ -33,15 +54,34 @@ trait Voucher
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeWithPrefix(Builder $query, string $prefix, ?string $separator = null): Builder
+    public function scopeWithoutPrefix(Builder $query, string $prefix, ?string $separator = null): Builder
     {
-        $clause = sprintf('%s%s%%', $prefix, $separator === null ? config('vouchers.separator') : $separator);
-
-        return $query->where($this->getTable() . '.code', 'like', $clause);
+        return $this->scopeWithPrefix($query, $prefix, $separator, true);
     }
 
     /**
-     * Scope voucher query to a specific suffix, optionally specifying a separator different from config.
+     * Scope voucher query to (or exclude) a specific suffix, optionally specifying a separator different from config.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string                                $suffix
+     * @param string|null                           $separator
+     * @param bool                                  $not
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithSuffix(
+        Builder $query,
+        string $suffix,
+        ?string $separator = null,
+        bool $not = false
+    ): Builder {
+        $clause = sprintf('%%%s%s', $separator === null ? config('vouchers.separator') : $separator, $suffix);
+
+        return $query->where($this->getTable() . '.code', $not ? 'not like' : 'like', $clause);
+    }
+
+    /**
+     * Scope voucher query to exclude a specific suffix, optionally specifying a separator different from config.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param string                                $suffix
@@ -49,11 +89,9 @@ trait Voucher
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeWithSuffix(Builder $query, string $suffix, ?string $separator = null): Builder
+    public function scopeWithoutSuffix(Builder $query, string $suffix, ?string $separator = null): Builder
     {
-        $clause = sprintf('%%%s%s', $separator === null ? config('vouchers.separator') : $separator, $suffix);
-
-        return $query->where($this->getTable() . '.code', 'like', $clause);
+        return $this->scopeWithSuffix($query, $suffix, $separator, true);
     }
 
     /**
@@ -78,6 +116,18 @@ trait Voucher
     }
 
     /**
+     * Scope voucher query to unstarted vouchers.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithoutStarted(Builder $query): Builder
+    {
+        return $this->scopeWithStarted($query, false);
+    }
+
+    /**
      * Scope voucher query to expired or unexpired vouchers.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
@@ -97,6 +147,18 @@ trait Voucher
     }
 
     /**
+     * Scope voucher query to unexpired vouchers.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithoutExpired(Builder $query): Builder
+    {
+        return $this->scopeWithExpired($query, false);
+    }
+
+    /**
      * Scope voucher query to redeemed or unredeemed vouchers.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
@@ -109,6 +171,18 @@ trait Voucher
         $column = $this->getTable() . '.redeemed_at';
 
         return $redeemed ? $query->whereNotNull($column) : $query->whereNull($column);
+    }
+
+    /**
+     * Scope voucher query to unredeemed vouchers.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithoutRedeemed(Builder $query): Builder
+    {
+        return $this->scopeWithRedeemed($query, false);
     }
 
     /**
@@ -133,6 +207,18 @@ trait Voucher
             })->orWhere(function (Builder $query) {
                 return $query->withExpired(true);
             });
+    }
+
+    /**
+     * Scope voucher query to unredeemable vouchers.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithoutRedeemable(Builder $query): Builder
+    {
+        return $this->scopeWithRedeemable($query, false);
     }
 
     /**
