@@ -11,6 +11,7 @@
   `Voucher::withoutExpired()`  
   `Voucher::withoutRedeemed()`  
   `Voucher::withoutRedeemable()`
+- Added missing type hints where possible
 
 ### Changed
 - Replaced Travis with Github Actions

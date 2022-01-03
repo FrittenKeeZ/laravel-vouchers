@@ -21,7 +21,7 @@ class Voucher extends Model
      *
      * @var \FrittenKeeZ\Vouchers\Models\Redeemer
      */
-    public $redeemer;
+    public ?Redeemer $redeemer;
 
     /**
      * The attributes that are mass assignable.

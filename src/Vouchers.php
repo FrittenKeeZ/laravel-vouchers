@@ -20,7 +20,7 @@ class Vouchers
      *
      * @var \FrittenKeeZ\Vouchers\Config
      */
-    protected $config;
+    protected Config $config;
 
     /**
      * Constructor.

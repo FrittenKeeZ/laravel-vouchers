@@ -17,7 +17,7 @@ class Config
      *
      * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * Get dynamically set options.
