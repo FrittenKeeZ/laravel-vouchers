@@ -1,6 +1,6 @@
 # Release Notes
 
-## [uneleased](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.2.1...master)
+## [v0.3.0 (2022-01-03)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.2.1...0.3.0)
 
 ### Added
 - Added primary key to entities relation table
