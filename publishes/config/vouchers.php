@@ -59,4 +59,6 @@ return [
         'redeemers' => 'redeemers',
         'vouchers'  => 'vouchers',
     ],
+
+    'db_connection' => env('FREBS_VOUCHERS_DB_CONNECTION'),
 ];

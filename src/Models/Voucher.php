@@ -72,6 +72,11 @@ class Voucher extends Model
     {
         $this->table = Config::table('vouchers');
 
+        if (! isset($this->connection)) {
+            $this->setConnection(config('vouchers.db_connection'));
+        }
+
+
         parent::__construct($attributes);
     }
 

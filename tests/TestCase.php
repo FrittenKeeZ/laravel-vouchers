@@ -24,6 +24,8 @@ class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        config()->set('vouchers.db_connection', 'testing');
+
         $this->loadLaravelMigrations();
         $this->artisan('migrate', ['--database' => 'testing']);
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
