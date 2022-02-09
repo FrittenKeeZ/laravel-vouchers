@@ -1,5 +1,11 @@
 # Release Notes
 
+## [v0.3.1 (2022-02-09)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.3.0...0.3.1)
+
+### Added
+- Added support for Laravel 9
+- Added PHP 8.1 tests for Laravel 8 + 9
+
 ## [v0.3.0 (2022-01-03)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.2.1...0.3.0)
 
 ### Added
