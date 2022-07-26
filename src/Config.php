@@ -76,6 +76,20 @@ class Config
 
         return $this;
     }
+    
+    /**
+     * With code value.
+     *
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withValue(string $value): self
+    {
+        Arr::set($this->options, 'value', $value);
+
+        return $this;
+    }
 
     /**
      * Get code prefix.
