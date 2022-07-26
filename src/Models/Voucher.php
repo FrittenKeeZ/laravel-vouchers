@@ -30,6 +30,7 @@ class Voucher extends Model
      */
     protected $fillable = [
         'code',
+        'value',
         'metadata',
         'starts_at',
         'expires_at',
