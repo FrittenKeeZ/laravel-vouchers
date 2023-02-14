@@ -25,7 +25,7 @@
 ## Installation
 Install this package via Composer:
 ```bash
-$ composer require frittenkeez/laravel-vouchers
+composer require frittenkeez/laravel-vouchers
 ```
 
 ## Upgrading
@@ -37,11 +37,11 @@ Please read the [release notes](CHANGELOG.md).
 ## Configuration
 Publish config using Artisan command:
 ```bash
-$ php artisan vendor:publish --tag=config --provider="FrittenKeeZ\Vouchers\VouchersServiceProvider"
+php artisan vendor:publish --tag=config --provider="FrittenKeeZ\Vouchers\VouchersServiceProvider"
 ```
 Don't forget to run migrations:
 ```bash
-$ php artisan migrate
+php artisan migrate
 ```
 Change basic configuration through `config/vouchers.php` - it should be well documented, so no need to describe all options here.
 
@@ -296,12 +296,12 @@ Voucher::withoutOwner();
 ## Testing
 Running tests can be done either through composer, or directly calling the PHPUnit binary.
 ```bash
-$ composer test
+composer test
 ```
 To run tests with code coverage, please make sure that `phpdbg` exists and is executable.
 ```bash
-$ composer test-coverage
-$ open tests/_reports/index.html
+composer test-coverage
+open tests/_reports/index.html
 ```
 
 ## License
