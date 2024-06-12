@@ -298,11 +298,6 @@ Running tests can be done either through composer, or directly calling the PHPUn
 ```bash
 composer test
 ```
-To run tests with code coverage, please make sure that `phpdbg` exists and is executable.
-```bash
-composer test-coverage
-open tests/_reports/index.html
-```
 
 ## License
 The MIT License (MIT). Please see [License File](LICENSE) for more information.

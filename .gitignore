@@ -1,6 +1,5 @@
 /vendor
-/tests/_reports
 /.idea
 /composer.lock
-/.phpunit.result.cache
+/.phpunit.cache
 /.php-cs-fixer.cache
