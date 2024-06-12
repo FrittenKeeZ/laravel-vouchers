@@ -4,7 +4,6 @@
          backupGlobals="false"
          backupStaticAttributes="false"
          bootstrap="vendor/autoload.php"
-         cacheResultFile=".phpunit.cache"
          colors="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
