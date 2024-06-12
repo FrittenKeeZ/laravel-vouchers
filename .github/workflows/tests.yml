@@ -25,6 +25,9 @@ jobs:
         php: [8.3, 8.2, 8.1]
         testbench: [9.0, 8.0, 7.0] # Laravel 11.x, 10.x, 9.x
         version: [prefer-stable, prefer-lowest]
+        include:
+          - testbench: 7.0
+            phpunit: "-c phpunit-9.xml"
         exclude:
           - php: 8.1
             testbench: 9.0
@@ -51,4 +54,4 @@ jobs:
           composer update --${{ matrix.version }} --prefer-dist --no-interaction
 
       - name: Execute tests
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit ${{ matrix.phpunit }}
