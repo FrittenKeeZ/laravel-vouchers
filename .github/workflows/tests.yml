@@ -22,32 +22,19 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.3, 8.2, 8.1, 8.0]
+        php: [8.3, 8.2, 8.1]
         testbench: [9.0, 8.0, 7.0] # Laravel 11.x, 10.x, 9.x
         version: [prefer-stable, prefer-lowest]
-        include:
-          - php: 8.3
-            runner: "8.3"
-          - php: 8.2
-            runner: "8.2"
-          - php: 8.1
-            runner: "8.1"
-          - php: 8.0
-            runner: "8.0"
         exclude:
           - php: 8.1
             testbench: 9.0
-          - php: 8.0
-            testbench: 9.0
-          - php: 8.0
-            testbench: 8.0
 
     name: P${{ matrix.php }} - T${{ matrix.testbench }} - ${{ matrix.version }}
 
     runs-on: ubuntu-latest
 
     container:
-      image: kirschbaumdevelopment/laravel-test-runner:${{ matrix.runner }}
+      image: kirschbaumdevelopment/laravel-test-runner:${{ matrix.php }}
       options: "--user=root"
 
     steps:
