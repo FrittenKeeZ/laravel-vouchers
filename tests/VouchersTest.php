@@ -253,7 +253,7 @@ class VouchersTest extends TestCase
      *
      * @return array
      */
-    public function wrapProvider(): array
+    public static function wrapProvider(): array
     {
         return [
             'string only'                        => ['code', null, null, '-', 'code'],

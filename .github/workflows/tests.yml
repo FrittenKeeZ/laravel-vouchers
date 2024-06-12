@@ -1,94 +1,57 @@
 name: Tests
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - "**.json"
+      - "**.php"
+      - "**.yml"
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "**.json"
+      - "**.php"
+      - "**.yml"
 
 jobs:
   tests:
-    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest]
-        php: [8.1, 8.0, 7.4]
-        laravel: [10.*, 9.*, 8.*, 7.*, 6.*, 5.8.*, 5.7.*, 5.6.*]
-        dependency-version: [prefer-lowest, prefer-stable]
+        php: [8.3, 8.2, 8.1]
+        testbench: [9.0, 8.0, 7.0] # Laravel 11.x, 10.x, 9.x
+        version: [prefer-stable, prefer-lowest]
         include:
-          - laravel: 10.*
-            testbench: ^8.0
-          - laravel: 9.*
-            testbench: ^7.0
-          - laravel: 8.*
-            testbench: ^6.23
-          - laravel: 7.*
-            testbench: ^5.20
-          - laravel: 6.*
-            testbench: ^4.18
-          - laravel: 5.8.*
-            testbench: 3.8.*
-          - laravel: 5.7.*
-            testbench: 3.7.*
-          - laravel: 5.6.*
-            testbench: 3.6.*
+          - testbench: 7.0
+            phpunit: "-c phpunit-9.xml"
         exclude:
-          - laravel: 10.*
-            php: 8.0
-          - laravel: 10.*
-            php: 7.4
-          - laravel: 9.*
-            php: 7.4
-          - laravel: 7.*
-            php: 8.1
-          - laravel: 6.*
-            php: 8.1
-          - laravel: 5.8.*
-            php: 8.1
-          - laravel: 5.8.*
-            php: 8.0
-          - laravel: 5.8.*
-            php: 7.4
-            dependency-version: prefer-lowest
-          - laravel: 5.7.*
-            php: 8.1
-          - laravel: 5.7.*
-            php: 8.0
-          - laravel: 5.7.*
-            php: 7.4
-            dependency-version: prefer-lowest
-          - laravel: 5.6.*
-            php: 8.1
-          - laravel: 5.6.*
-            php: 8.0
-          - laravel: 5.6.*
-            php: 7.4
-            dependency-version: prefer-lowest
+          - php: 8.1
+            testbench: 9.0
 
-    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
+    name: P${{ matrix.php }} - T${{ matrix.testbench }} - ${{ matrix.version }}
+
+    runs-on: ubuntu-latest
+
+    container:
+      image: kirschbaumdevelopment/laravel-test-runner:${{ matrix.php }}
+      options: "--user=root"
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Install SQLite 3
-        run: |
-          sudo apt-get update
-          sudo apt-get install sqlite3
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: actions/checkout@v4
         with:
-          php-version: ${{ matrix.php }}
-          extensions: curl, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, iconv
-          coverage: none
+          # Make sure the actual branch is checked out when running on pull requests.
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
-
-      - name: Setup Problem Matches
-        run: |
-          echo "::add-matcher::${{ runner.tool_cache }}/php.json"
-          echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+          composer require "orchestra/testbench:^${{ matrix.testbench }}" --no-interaction --no-update
+          composer update --${{ matrix.version }} --prefer-dist --no-interaction
 
       - name: Execute tests
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit ${{ matrix.phpunit }}
