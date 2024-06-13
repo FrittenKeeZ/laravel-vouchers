@@ -21,8 +21,6 @@ class VouchersTest extends TestCase
 {
     /**
      * Test vouchers instance through app::make().
-     *
-     * @return void
      */
     public function testInstance(): void
     {
@@ -31,8 +29,6 @@ class VouchersTest extends TestCase
 
     /**
      * Test that Vouchers::getConfig() returns clone and not same instance.
-     *
-     * @return void
      */
     public function testConfigClone(): void
     {
@@ -44,8 +40,6 @@ class VouchersTest extends TestCase
 
     /**
      * Test code generation.
-     *
-     * @return void
      */
     public function testCodeGeneration(): void
     {
@@ -88,8 +82,6 @@ class VouchersTest extends TestCase
 
     /**
      * Test voucher creation.
-     *
-     * @return void
      */
     public function testVoucherCreation(): void
     {
@@ -147,8 +139,6 @@ class VouchersTest extends TestCase
 
     /**
      * Test voucher redemption.
-     *
-     * @return void
      */
     public function testVoucherRedemption(): void
     {
@@ -185,8 +175,6 @@ class VouchersTest extends TestCase
 
     /**
      * Test voucher not found exception.
-     *
-     * @return void
      */
     public function testVoucherNotFoundException(): void
     {
@@ -199,8 +187,6 @@ class VouchersTest extends TestCase
 
     /**
      * Test voucher already redeemed exception.
-     *
-     * @return void
      */
     public function testVoucherAlreadyRedeemedException(): void
     {
@@ -217,14 +203,6 @@ class VouchersTest extends TestCase
      * Test Vouchers::wrap() method.
      *
      * @dataProvider wrapProvider
-     *
-     * @param string      $str
-     * @param string|null $prefix
-     * @param string|null $suffix
-     * @param string      $separator
-     * @param string      $expected
-     *
-     * @return void
      */
     public function testStringWrapping(
         string $str,
@@ -238,8 +216,6 @@ class VouchersTest extends TestCase
 
     /**
      * Test invalid magic call (Vouchers::__call()).
-     *
-     * @return void
      */
     public function testInvalidMagicCall(): void
     {
@@ -250,8 +226,6 @@ class VouchersTest extends TestCase
 
     /**
      * Data provider for Vouchers::wrap().
-     *
-     * @return array
      */
     public static function wrapProvider(): array
     {
@@ -266,11 +240,6 @@ class VouchersTest extends TestCase
 
     /**
      * Generate regex to validate a code generated with a specific mask, character list, prefix, suffix and separator.
-     *
-     * @param string $mask
-     * @param string $characters
-     *
-     * @return string
      */
     protected function generateCodeValidationRegex(
         string $mask,

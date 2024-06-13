@@ -42,8 +42,6 @@ class TestCase extends BaseTestCase
      * Get package aliases.
      *
      * @param \Illuminate\Foundation\Application $app
-     *
-     * @return array
      */
     protected function getPackageAliases($app): array
     {
@@ -54,8 +52,6 @@ class TestCase extends BaseTestCase
      * Get package providers.
      *
      * @param \Illuminate\Foundation\Application $app
-     *
-     * @return array
      */
     protected function getPackageProviders($app): array
     {
@@ -65,10 +61,7 @@ class TestCase extends BaseTestCase
     /**
      * Factory helper to handle both Laravel 8 and earlier versions.
      *
-     * @param string   $class
-     * @param int|null $amount
-     *
-     * @return \Illuminate\Database\Eloquent\FactoryBuilder|Illuminate\Database\Eloquent\Factories\Factory
+     * @return \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Database\Eloquent\FactoryBuilder
      */
     protected function factory(string $class, ?int $amount = null)
     {

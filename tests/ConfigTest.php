@@ -20,8 +20,6 @@ class ConfigTest extends TestCase
 {
     /**
      * Test Config::model() method.
-     *
-     * @return void
      */
     public function testModelResolving(): void
     {
@@ -48,8 +46,6 @@ class ConfigTest extends TestCase
 
     /**
      * Test Config::table() method.
-     *
-     * @return void
      */
     public function testTableResolving(): void
     {
@@ -76,8 +72,6 @@ class ConfigTest extends TestCase
 
     /**
      * Test default options from config.
-     *
-     * @return void
      */
     public function testDefaultOptions(): void
     {
@@ -94,8 +88,6 @@ class ConfigTest extends TestCase
 
     /**
      * Test options overridden in config.
-     *
-     * @return void
      */
     public function testConfigOverriddenOptions(): void
     {
@@ -126,8 +118,6 @@ class ConfigTest extends TestCase
 
     /**
      * Test dynamically overridden options using 'with' methods.
-     *
-     * @return void
      */
     public function testDynamicallyOverriddenOptions(): void
     {
@@ -168,8 +158,6 @@ class ConfigTest extends TestCase
 
     /**
      * Test additional options using 'with' methods.
-     *
-     * @return void
      */
     public function testAdditionalOptions(): void
     {
@@ -234,11 +222,6 @@ class ConfigTest extends TestCase
 
     /**
      * Assert array structure.
-     *
-     * @param array $expected
-     * @param array $actual
-     *
-     * @return void
      */
     protected function assertArrayStructure(array $expected, array $actual): void
     {

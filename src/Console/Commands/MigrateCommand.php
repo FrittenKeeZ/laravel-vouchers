@@ -32,8 +32,6 @@ class MigrateCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(): int
     {
@@ -122,8 +120,6 @@ class MigrateCommand extends Command
 
     /**
      * Get model classes.
-     *
-     * @return array
      */
     protected function getModels(): array
     {
@@ -159,6 +155,7 @@ class MigrateCommand extends Command
                             if (preg_match('/namespace\s+([^;]+);/i', $contents, $matches)) {
                                 return $matches[1] . '\\' . $class;
                             }
+
                             // Fallback to the class itself.
                             return '\\' . $class;
                         })
@@ -169,6 +166,7 @@ class MigrateCommand extends Command
                 ->flatten()
                 ->filter(function (string $class) {
                     $traits = class_uses_recursive($class);
+
                     // Ensure only models using the `HasVouchers` trait are included.
                     return !empty($traits) && \in_array(HasVouchers::class, $traits);
                 })

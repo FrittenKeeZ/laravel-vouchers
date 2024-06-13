@@ -29,10 +29,6 @@ class VoucherEntity extends Model
 
     /**
      * Constructor.
-     *
-     * @param array $attributes
-     *
-     * @return void
      */
     public function __construct(array $attributes = [])
     {
@@ -43,8 +39,6 @@ class VoucherEntity extends Model
 
     /**
      * Associated entity.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function entity(): MorphTo
     {
@@ -53,8 +47,6 @@ class VoucherEntity extends Model
 
     /**
      * Associated voucher.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function voucher(): BelongsTo
     {

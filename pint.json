@@ -1,0 +1,31 @@
+{
+    "preset": "laravel",
+    "cache-file": ".pint.json",
+    "rules": {
+        "binary_operator_spaces": {
+            "operators": {
+                "=>": "align_single_space_minimal"
+            }
+        },
+        "concat_space": {
+            "spacing": "one"
+        },
+        "multiline_whitespace_before_semicolons": {
+            "strategy": "new_line_for_chained_calls"
+        },
+        "not_operator_with_successor_space": false,
+        "ordered_types": {
+            "null_adjustment": "always_last",
+            "sort_algorithm": "alpha"
+        },
+        "phpdoc_align": true,
+        "phpdoc_annotation_without_dot": false,
+        "phpdoc_order": true,
+        "phpdoc_separation": true,
+        "phpdoc_types_order": {
+            "null_adjustment": "always_last"
+        },
+        "simplified_null_return": true,
+        "single_trait_insert_per_statement": true
+    }
+}

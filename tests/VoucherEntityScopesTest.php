@@ -17,8 +17,6 @@ class VoucherEntityScopesTest extends TestCase
 {
     /**
      * Test Voucher::scopeWithEntityType() and Voucher::scopeWithEntity().
-     *
-     * @return void
      */
     public function testEntityScopes(): void
     {

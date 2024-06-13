@@ -11,8 +11,6 @@ trait HasRedeemers
 {
     /**
      * Associated redeemers.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function redeemers(): MorphMany
     {

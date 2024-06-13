@@ -13,11 +13,6 @@ trait Voucher
 {
     /**
      * Scope voucher query to a specific code.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string                                $code
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeCode(Builder $query, string $code): Builder
     {
@@ -26,13 +21,6 @@ trait Voucher
 
     /**
      * Scope voucher query to (or exclude) a specific prefix, optionally specifying a separator different from config.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string                                $prefix
-     * @param string|null                           $separator
-     * @param bool                                  $not
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithPrefix(
         Builder $query,
@@ -47,12 +35,6 @@ trait Voucher
 
     /**
      * Scope voucher query to exclude a specific prefix, optionally specifying a separator different from config.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string                                $prefix
-     * @param string|null                           $separator
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithoutPrefix(Builder $query, string $prefix, ?string $separator = null): Builder
     {
@@ -61,13 +43,6 @@ trait Voucher
 
     /**
      * Scope voucher query to (or exclude) a specific suffix, optionally specifying a separator different from config.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string                                $suffix
-     * @param string|null                           $separator
-     * @param bool                                  $not
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithSuffix(
         Builder $query,
@@ -82,12 +57,6 @@ trait Voucher
 
     /**
      * Scope voucher query to exclude a specific suffix, optionally specifying a separator different from config.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string                                $suffix
-     * @param string|null                           $separator
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithoutSuffix(Builder $query, string $suffix, ?string $separator = null): Builder
     {
@@ -96,11 +65,6 @@ trait Voucher
 
     /**
      * Scope voucher query to started or unstarted vouchers.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param bool                                  $started
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithStarted(Builder $query, bool $started = true): Builder
     {
@@ -117,10 +81,6 @@ trait Voucher
 
     /**
      * Scope voucher query to unstarted vouchers.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithoutStarted(Builder $query): Builder
     {
@@ -129,11 +89,6 @@ trait Voucher
 
     /**
      * Scope voucher query to expired or unexpired vouchers.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param bool                                  $expired
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithExpired(Builder $query, bool $expired = true): Builder
     {
@@ -148,10 +103,6 @@ trait Voucher
 
     /**
      * Scope voucher query to unexpired vouchers.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithoutExpired(Builder $query): Builder
     {
@@ -160,11 +111,6 @@ trait Voucher
 
     /**
      * Scope voucher query to redeemed or unredeemed vouchers.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param bool                                  $redeemed
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithRedeemed(Builder $query, bool $redeemed = true): Builder
     {
@@ -175,10 +121,6 @@ trait Voucher
 
     /**
      * Scope voucher query to unredeemed vouchers.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithoutRedeemed(Builder $query): Builder
     {
@@ -187,11 +129,6 @@ trait Voucher
 
     /**
      * Scope voucher query to redeemable or unredeemable vouchers.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param bool                                  $redeemable
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithRedeemable(Builder $query, bool $redeemable = true): Builder
     {
@@ -206,15 +143,12 @@ trait Voucher
                 return $query->withStarted(false);
             })->orWhere(function (Builder $query) {
                 return $query->withExpired(true);
-            });
+            })
+        ;
     }
 
     /**
      * Scope voucher query to unredeemable vouchers.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithoutRedeemable(Builder $query): Builder
     {
@@ -223,11 +157,6 @@ trait Voucher
 
     /**
      * Scope voucher query to have voucher entities, optionally of a specific type (class or alias).
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|null                           $type
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithEntities(Builder $query, ?string $type = null): Builder
     {
@@ -242,11 +171,6 @@ trait Voucher
 
     /**
      * Scope voucher query to specific owner type (class or alias).
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string                                $type
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithOwnerType(Builder $query, string $type): Builder
     {
@@ -257,11 +181,6 @@ trait Voucher
 
     /**
      * Scope voucher query to specific owner.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Database\Eloquent\Model   $owner
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithOwner(Builder $query, Model $owner): Builder
     {
@@ -273,10 +192,6 @@ trait Voucher
 
     /**
      * Scope voucher query to no owners.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithoutOwner(Builder $query): Builder
     {

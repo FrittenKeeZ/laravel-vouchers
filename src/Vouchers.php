@@ -17,15 +17,11 @@ class Vouchers
 {
     /**
      * Voucher config.
-     *
-     * @var \FrittenKeeZ\Vouchers\Config
      */
     protected Config $config;
 
     /**
      * Constructor.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -36,13 +32,8 @@ class Vouchers
      * Proxy 'get', 'with' and 'without' calls to config.
      *
      * Will trigger undefined method error for all invalid calls.
-     *
-     * @param string $name
-     * @param array  $args
-     *
-     * @return mixed
      */
-    public function __call(string $name, array $args)
+    public function __call(string $name, array $args): mixed
     {
         if (method_exists($this->config, $name)) {
             if (Str::startsWith($name, 'get')) {
@@ -61,8 +52,6 @@ class Vouchers
 
     /**
      * Get current voucher config.
-     *
-     * @return \FrittenKeeZ\Vouchers\Config
      */
     public function getConfig(): Config
     {
@@ -73,12 +62,8 @@ class Vouchers
      * Create an amount of vouchers.
      *
      * Defaults to a single voucher if amount is absent.
-     *
-     * @param int $amount
-     *
-     * @return object|array
      */
-    public function create(int $amount = 1)
+    public function create(int $amount = 1): array|object
     {
         if ($amount < 1) {
             return [];
@@ -117,14 +102,11 @@ class Vouchers
      *
      * Returns whether redemption was successful.
      *
-     * @param string                              $code
      * @param \Illuminate\Database\Eloquent\Model $entity   Redeemer entity.
      * @param array                               $metadata Additional metadata for redeemer.
      *
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherAlreadyRedeemedException
-     *
-     * @return bool
      */
     public function redeem(string $code, Model $entity, array $metadata = []): bool
     {
@@ -152,11 +134,6 @@ class Vouchers
 
     /**
      * Whether a voucher code is redeemable.
-     *
-     * @param string        $code
-     * @param \Closure|null $callback
-     *
-     * @return bool
      */
     public function redeemable(string $code, ?Closure $callback = null): bool
     {
@@ -170,9 +147,7 @@ class Vouchers
      *
      * Codes are checked against the database to ensure uniqueness.
      *
-     * @param int $amount
-     *
-     * @return string[]|array
+     * @return array|string[]
      */
     public function batch(int $amount): array
     {
@@ -197,11 +172,6 @@ class Vouchers
      *
      * All asterisks (*) in the mask will be replaced by a random character.
      * If no mask or character list is provided, defaults will be used from config.
-     *
-     * @param string|null $mask
-     * @param string|null $characters
-     *
-     * @return string
      */
     public function generate(?string $mask = null, ?string $characters = null): string
     {
@@ -222,13 +192,6 @@ class Vouchers
 
     /**
      * Wrap string in prefix and suffix with separator.
-     *
-     * @param string      $str
-     * @param string|null $prefix
-     * @param string|null $suffix
-     * @param string      $separator
-     *
-     * @return string
      */
     public function wrap(string $str, ?string $prefix, ?string $suffix, string $separator): string
     {
@@ -242,11 +205,6 @@ class Vouchers
      * Whether the given code already exists.
      *
      * Optionally check a given list of codes, before checking the database.
-     *
-     * @param string $code
-     * @param array  $codes
-     *
-     * @return bool
      */
     public function exists(string $code, array $codes = []): bool
     {
@@ -255,8 +213,6 @@ class Vouchers
 
     /**
      * Reset voucher options.
-     *
-     * @return void
      */
     public function reset(): void
     {
@@ -265,8 +221,6 @@ class Vouchers
 
     /**
      * Convenience method for interacting with Redeemer model.
-     *
-     * @return \FrittenKeeZ\Vouchers\Models\Redeemer
      */
     protected function redeemers(): Redeemer
     {
@@ -275,8 +229,6 @@ class Vouchers
 
     /**
      * Convenience method for interacting with Voucher model.
-     *
-     * @return \FrittenKeeZ\Vouchers\Models\Voucher
      */
     protected function vouchers(): Voucher
     {

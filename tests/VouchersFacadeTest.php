@@ -14,8 +14,6 @@ class VouchersFacadeTest extends TestCase
 {
     /**
      * Test facade instance through app::make().
-     *
-     * @return void
      */
     public function testFacadeInstance(): void
     {
@@ -24,8 +22,6 @@ class VouchersFacadeTest extends TestCase
 
     /**
      * Test facade accessor.
-     *
-     * @return void
      */
     public function testFacadeAccessor(): void
     {
