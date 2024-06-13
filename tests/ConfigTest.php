@@ -146,11 +146,7 @@ class ConfigTest extends TestCase
         $this->assertSame($options['separator'], $config->getSeparator());
 
         // Test 'without' calls.
-        $config
-            ->withoutPrefix()
-            ->withoutSuffix()
-            ->withoutSeparator()
-        ;
+        $config->withoutPrefix()->withoutSuffix()->withoutSeparator();
         $this->assertSame('', $config->getPrefix());
         $this->assertSame('', $config->getSuffix());
         $this->assertSame('', $config->getSeparator());
@@ -212,11 +208,11 @@ class ConfigTest extends TestCase
         );
 
         // Test owner.
-        $owner = $this->factory(User::class)->make();
+        $owner = User::factory()->make();
         $this->assertSame($owner, $config->withOwner($owner)->getOwner());
 
         // Test entities.
-        $entities = $this->factory(Color::class, 3)->make()->all();
+        $entities = Color::factory()->count(3)->make()->all();
         $this->assertSame($entities, $config->withEntities(...$entities)->getEntities());
     }
 

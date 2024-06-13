@@ -6,11 +6,13 @@ namespace FrittenKeeZ\Vouchers\Tests\Models;
 
 use FrittenKeeZ\Vouchers\Concerns\HasRedeemers;
 use FrittenKeeZ\Vouchers\Concerns\HasVouchers;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    use HasFactory;
     use HasRedeemers;
     use HasVouchers;
     use Notifiable;

@@ -39,6 +39,10 @@ Publish config using Artisan command:
 ```bash
 php artisan vendor:publish --tag=config --provider="FrittenKeeZ\Vouchers\VouchersServiceProvider"
 ```
+Publish migrations using Artisan command:
+```bash
+php artisan vendor:publish --tag=migrations --provider="FrittenKeeZ\Vouchers\VouchersServiceProvider"
+```
 Don't forget to run migrations:
 ```bash
 php artisan migrate

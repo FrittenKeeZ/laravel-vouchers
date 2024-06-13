@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace FrittenKeeZ\Vouchers;
 
-use FrittenKeeZ\Vouchers\Console\Commands\MigrateCommand;
 use Illuminate\Support\ServiceProvider;
 
 class VouchersServiceProvider extends ServiceProvider
@@ -22,13 +21,10 @@ class VouchersServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishes([$this->getPublishConfigPath() => config_path('vouchers.php')], 'config');
-        $this->publishes([$this->getPublishMigrationsPath() => database_path('migrations')], 'migrations');
 
-        $this->loadMigrationsFrom(__DIR__ . '/../migrations');
-
-        if ($this->app->runningInConsole()) {
-            $this->commands([MigrateCommand::class]);
-        }
+        with(method_exists($this, 'publishesMigrations') ? 'publishesMigrations' : 'publishes', function ($method) {
+            $this->{$method}([$this->getPublishMigrationsPath() => database_path('migrations')], 'migrations');
+        });
     }
 
     /**
@@ -38,9 +34,7 @@ class VouchersServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom($this->getPublishConfigPath(), 'vouchers');
 
-        $this->app->bind('vouchers', function () {
-            return new Vouchers();
-        });
+        $this->app->bind('vouchers', fn () => new Vouchers());
     }
 
     /**

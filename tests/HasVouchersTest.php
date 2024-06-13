@@ -18,7 +18,7 @@ class HasVouchersTest extends TestCase
      */
     public function testCreateVoucher(): void
     {
-        $user = $this->factory(User::class)->create();
+        $user = User::factory()->create();
         $voucher = $user->createVoucher();
 
         // Check user voucher relation.
@@ -31,8 +31,8 @@ class HasVouchersTest extends TestCase
      */
     public function testCreateVoucherWithCallback(): void
     {
-        $user = $this->factory(User::class)->create();
-        $color = $this->factory(Color::class)->create();
+        $user = User::factory()->create();
+        $color = Color::factory()->create();
         $voucher = $user->createVoucher(function (Vouchers $vouchers) use ($color) {
             $vouchers->withEntities($color);
         });
@@ -48,8 +48,8 @@ class HasVouchersTest extends TestCase
      */
     public function testCreateVoucherWithAssociated(): void
     {
-        $user = $this->factory(User::class)->create();
-        $other = $this->factory(User::class)->create();
+        $user = User::factory()->create();
+        $other = User::factory()->create();
         $voucher = $user->createVoucher(function (Vouchers $vouchers) use ($other) {
             $vouchers->withEntities($other);
         });
@@ -68,7 +68,7 @@ class HasVouchersTest extends TestCase
      */
     public function testCreateVouchers(): void
     {
-        $user = $this->factory(User::class)->create();
+        $user = User::factory()->create();
         $vouchers = $user->createVouchers(3);
 
         foreach ($vouchers as $index => $voucher) {
@@ -83,8 +83,8 @@ class HasVouchersTest extends TestCase
      */
     public function testCreateVouchersWithCallback(): void
     {
-        $user = $this->factory(User::class)->create();
-        $color = $this->factory(Color::class)->create();
+        $user = User::factory()->create();
+        $color = Color::factory()->create();
         $vouchers = $user->createVouchers(3, function (Vouchers $vouchers) use ($color) {
             $vouchers->withEntities($color);
         });

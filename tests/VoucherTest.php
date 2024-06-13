@@ -26,7 +26,7 @@ class VoucherTest extends TestCase
         });
 
         $vouchers = new Vouchers();
-        $user = $this->factory(User::class)->create();
+        $user = User::factory()->create();
         $voucher = $vouchers->create();
         $this->assertTrue($voucher->isRedeemable());
         $this->assertFalse($vouchers->redeem($voucher->code, $user));
@@ -46,7 +46,7 @@ class VoucherTest extends TestCase
         });
 
         $vouchers = new Vouchers();
-        $user = $this->factory(User::class)->create();
+        $user = User::factory()->create();
         $voucher = $vouchers->create();
         $this->assertTrue($voucher->isRedeemable());
         $this->assertTrue($vouchers->redeem($voucher->code, $user));
@@ -68,7 +68,7 @@ class VoucherTest extends TestCase
         });
 
         $vouchers = new Vouchers();
-        $user = $this->factory(User::class)->create();
+        $user = User::factory()->create();
         $voucher = $vouchers->create();
         $this->assertTrue($voucher->isRedeemable());
         $this->assertTrue($vouchers->redeem($voucher->code, $user));
@@ -89,8 +89,8 @@ class VoucherTest extends TestCase
         });
 
         $vouchers = new Vouchers();
-        $user = $this->factory(User::class)->create();
-        $other = $this->factory(User::class)->create();
+        $user = User::factory()->create();
+        $other = User::factory()->create();
         $voucher = $vouchers->withOwner($user)->create();
         $this->assertTrue($voucher->isRedeemable());
         $this->assertFalse($vouchers->redeem($voucher->code, $other));
