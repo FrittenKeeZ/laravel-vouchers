@@ -186,11 +186,11 @@ class VoucherScopesTest extends TestCase
     public function testEntitiesScope(): void
     {
         Vouchers::create();
-        Vouchers::withEntities(...$this->factory(Color::class, 3)->create())->create();
-        Vouchers::withEntities(...$this->factory(User::class, 3)->create())->create();
+        Vouchers::withEntities(...Color::factory()->count(3)->create())->create();
+        Vouchers::withEntities(...User::factory()->count(3)->create())->create();
         Vouchers::withEntities(
-            ...$this->factory(Color::class, 3)->create(),
-            ...$this->factory(User::class, 3)->create()
+            ...Color::factory()->count(3)->create(),
+            ...User::factory()->count(3)->create()
         )->create();
 
         $this->assertSame(4, Voucher::count());
@@ -205,9 +205,9 @@ class VoucherScopesTest extends TestCase
     public function testOwnerScopes(): void
     {
         // Create users.
-        $first = $this->factory(User::class)->create();
-        $second = $this->factory(User::class)->create();
-        $third = $this->factory(User::class)->create();
+        $first = User::factory()->create();
+        $second = User::factory()->create();
+        $third = User::factory()->create();
 
         // Create vouchers.
         Vouchers::create(2);

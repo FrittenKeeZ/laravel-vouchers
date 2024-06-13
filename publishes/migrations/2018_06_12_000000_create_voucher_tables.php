@@ -7,7 +7,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateVoucherTables extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -68,4 +68,4 @@ class CreateVoucherTables extends Migration
         Schema::dropIfExists(Config::table('redeemers'));
         Schema::dropIfExists(Config::table('vouchers'));
     }
-}
+};

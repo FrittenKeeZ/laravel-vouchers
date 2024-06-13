@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FrittenKeeZ\Vouchers\Tests\Database\Factories;
+namespace Database\Factories\FrittenKeeZ\Vouchers\Tests\Models;
 
 use FrittenKeeZ\Vouchers\Tests\Models\Color;
 use Illuminate\Database\Eloquent\Factories\Factory;

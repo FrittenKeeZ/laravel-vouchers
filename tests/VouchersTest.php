@@ -100,8 +100,8 @@ class VouchersTest extends TestCase
         $now = Carbon::now();
         $start_time = $now->copy()->add(CarbonInterval::create('P1D'));
         $expire_time = $now->copy()->add(CarbonInterval::create('P30D'));
-        $user = $this->factory(User::class)->create();
-        $users = $this->factory(User::class, 3)->create();
+        $user = User::factory()->create();
+        $users = User::factory()->count(3)->create();
         $voucher = $vouchers
             ->withMetadata($metadata)
             ->withStartTime($start_time)
@@ -112,14 +112,8 @@ class VouchersTest extends TestCase
         ;
         $this->assertInstanceOf(Voucher::class, $voucher);
         $this->assertSame($metadata, $voucher->metadata);
-        $this->assertSame(
-            $start_time->toDateTimeString(),
-            $voucher->starts_at->toDateTimeString()
-        );
-        $this->assertSame(
-            $expire_time->toDateTimeString(),
-            $voucher->expires_at->toDateTimeString()
-        );
+        $this->assertSame($start_time->toDateTimeString(), $voucher->starts_at->toDateTimeString());
+        $this->assertSame($expire_time->toDateTimeString(), $voucher->expires_at->toDateTimeString());
         $this->assertTrue($user->is($voucher->owner));
         foreach ($voucher->getEntities() as $index => $entity) {
             $this->assertTrue($users[$index]->is($entity));
@@ -143,7 +137,7 @@ class VouchersTest extends TestCase
     public function testVoucherRedemption(): void
     {
         $vouchers = new Vouchers();
-        $user = $this->factory(User::class)->create();
+        $user = User::factory()->create();
         $voucher = $vouchers->withOwner($user)->create();
 
         // Check user voucher relation.
@@ -153,9 +147,11 @@ class VouchersTest extends TestCase
         // Check voucher states.
         $this->assertTrue($voucher->isRedeemable());
         $this->assertTrue($vouchers->redeemable($voucher->code));
-        $this->assertFalse($vouchers->redeemable($voucher->code, function (Voucher $voucher) {
-            return $voucher->hasPrefix('thisprefixdoesnotexist');
-        }));
+        $this->assertFalse(
+            $vouchers->redeemable($voucher->code, function (Voucher $voucher) {
+                return $voucher->hasPrefix('thisprefixdoesnotexist');
+            })
+        );
         $this->assertEmpty($voucher->redeemers);
         $this->assertEmpty($voucher->getEntities());
         $metadata = ['foo' => 'bar', 'baz' => 'boom'];
@@ -179,7 +175,7 @@ class VouchersTest extends TestCase
     public function testVoucherNotFoundException(): void
     {
         $vouchers = new Vouchers();
-        $user = $this->factory(User::class)->create();
+        $user = User::factory()->create();
 
         $this->expectException(VoucherNotFoundException::class);
         $vouchers->redeem('idonotexist', $user);
@@ -192,7 +188,7 @@ class VouchersTest extends TestCase
     {
         $vouchers = new Vouchers();
         $voucher = $vouchers->create();
-        $user = $this->factory(User::class)->create();
+        $user = User::factory()->create();
 
         $this->assertTrue($vouchers->redeem($voucher->code, $user));
         $this->expectException(VoucherAlreadyRedeemedException::class);
@@ -249,9 +245,11 @@ class VouchersTest extends TestCase
         string $separator
     ): string {
         $match = preg_quote($characters, '/');
-        $inner = preg_replace_callback('/(?:\\\\\*)+/', function (array $matches) use ($match) {
-            return sprintf('[%s]{%d}', $match, mb_strlen($matches[0]) / 2);
-        }, preg_quote($mask, '/'));
+        $inner = preg_replace_callback(
+            "/(?:\\\\\*)+/",
+            fn (array $matches) => sprintf('[%s]{%d}', $match, mb_strlen($matches[0]) / 2),
+            preg_quote($mask, '/')
+        );
 
         return sprintf(
             '/%s%s%s/',
