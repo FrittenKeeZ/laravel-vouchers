@@ -1,6 +1,11 @@
 # Release Notes
 
-## [v0.4.0 (2024-06-24)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.3.2...0.4.0)
+## [v0.4.1 (2024-06-13)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.4.0...0.4.1)
+
+### Changed
+- Replaced PHP CS Fixer with Laravel Pint
+
+## [v0.4.0 (2024-06-12)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.3.2...0.4.0)
 
 ### Added
 - Added support for Laravel 11
