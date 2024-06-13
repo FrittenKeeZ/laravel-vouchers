@@ -38,33 +38,9 @@ class VoucherEntityScopesTest extends TestCase
         $this->assertTrue(VoucherEntity::withEntity($user)->exists());
         $this->assertSame(6, VoucherEntity::withEntityType(User::class)->count());
         $this->assertSame(9, VoucherEntity::withEntityType(Color::class)->count());
-        $this->assertSame(
-            3,
-            $first
-                ->voucherEntities()
-                ->withEntityType(User::class)
-                ->count()
-        );
-        $this->assertSame(
-            3,
-            $first
-                ->voucherEntities()
-                ->withEntityType(Color::class)
-                ->count()
-        );
-        $this->assertSame(
-            3,
-            $second
-                ->voucherEntities()
-                ->withEntityType(User::class)
-                ->count()
-        );
-        $this->assertSame(
-            6,
-            $second
-                ->voucherEntities()
-                ->withEntityType(Color::class)
-                ->count()
-        );
+        $this->assertSame(3, $first->voucherEntities()->withEntityType(User::class)->count());
+        $this->assertSame(3, $first->voucherEntities()->withEntityType(Color::class)->count());
+        $this->assertSame(3, $second->voucherEntities()->withEntityType(User::class)->count());
+        $this->assertSame(6, $second->voucherEntities()->withEntityType(Color::class)->count());
     }
 }

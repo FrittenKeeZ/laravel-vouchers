@@ -247,7 +247,7 @@ class VouchersTest extends TestCase
         $match = preg_quote($characters, '/');
         $inner = preg_replace_callback(
             "/(?:\\\\\*)+/",
-            fn (array $matches) =>  sprintf('[%s]{%d}', $match, mb_strlen($matches[0]) / 2),
+            fn (array $matches) => sprintf('[%s]{%d}', $match, mb_strlen($matches[0]) / 2),
             preg_quote($mask, '/')
         );
 
