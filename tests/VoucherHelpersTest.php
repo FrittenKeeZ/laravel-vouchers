@@ -13,8 +13,6 @@ class VoucherHelpersTest extends TestCase
 {
     /**
      * Test Voucher::scopeCode().
-     *
-     * @return void
      */
     public function testPrefixAndSuffixHelpers(): void
     {

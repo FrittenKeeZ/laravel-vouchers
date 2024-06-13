@@ -31,10 +31,6 @@ class Redeemer extends Model
 
     /**
      * Constructor.
-     *
-     * @param array $attributes
-     *
-     * @return void
      */
     public function __construct(array $attributes = [])
     {
@@ -45,8 +41,6 @@ class Redeemer extends Model
 
     /**
      * Associated redeemer entity.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function redeemer(): MorphTo
     {
@@ -55,8 +49,6 @@ class Redeemer extends Model
 
     /**
      * Associated voucher.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function voucher(): BelongsTo
     {

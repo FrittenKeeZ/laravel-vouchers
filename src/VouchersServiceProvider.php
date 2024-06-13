@@ -18,8 +18,6 @@ class VouchersServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap the application services.
-     *
-     * @return void
      */
     public function boot(): void
     {
@@ -35,8 +33,6 @@ class VouchersServiceProvider extends ServiceProvider
 
     /**
      * Register the application services.
-     *
-     * @return void
      */
     public function register(): void
     {
@@ -49,8 +45,6 @@ class VouchersServiceProvider extends ServiceProvider
 
     /**
      * Get publish config path.
-     *
-     * @return string
      */
     protected function getPublishConfigPath(): string
     {
@@ -59,8 +53,6 @@ class VouchersServiceProvider extends ServiceProvider
 
     /**
      * Get publish migrations path.
-     *
-     * @return string
      */
     protected function getPublishMigrationsPath(): string
     {

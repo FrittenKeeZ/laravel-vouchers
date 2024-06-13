@@ -15,8 +15,6 @@ class VoucherTest extends TestCase
 {
     /**
      * Test redeeming event.
-     *
-     * @return void
      */
     public function testRedeemingEvent(): void
     {
@@ -39,8 +37,6 @@ class VoucherTest extends TestCase
 
     /**
      * Test redeemed event.
-     *
-     * @return void
      */
     public function testRedeemedEvent(): void
     {
@@ -61,8 +57,6 @@ class VoucherTest extends TestCase
 
     /**
      * Test shouldMarkRedeemed event.
-     *
-     * @return void
      */
     public function testShouldMarkRedeemedEvent(): void
     {
@@ -86,8 +80,6 @@ class VoucherTest extends TestCase
 
     /**
      * Test redeeming by owning user only event.
-     *
-     * @return void
      */
     public function testRedeemingByOwningUserOnlyEvent(): void
     {

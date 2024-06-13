@@ -18,8 +18,6 @@ class Voucher extends Model
 
     /**
      * Active redeemer during events.
-     *
-     * @var \FrittenKeeZ\Vouchers\Models\Redeemer
      */
     public ?Redeemer $redeemer;
 
@@ -63,10 +61,6 @@ class Voucher extends Model
 
     /**
      * Constructor.
-     *
-     * @param array $attributes
-     *
-     * @return void
      */
     public function __construct(array $attributes = [])
     {
@@ -77,11 +71,6 @@ class Voucher extends Model
 
     /**
      * Whether voucher has prefix, optionally specifying a separator different from config.
-     *
-     * @param string      $prefix
-     * @param string|null $separator
-     *
-     * @return bool
      */
     public function hasPrefix(string $prefix, ?string $separator = null): bool
     {
@@ -92,11 +81,6 @@ class Voucher extends Model
 
     /**
      * Whether voucher has suffix, optionally specifying a separator different from config.
-     *
-     * @param string      $suffix
-     * @param string|null $separator
-     *
-     * @return bool
      */
     public function hasSuffix(string $suffix, ?string $separator = null): bool
     {
@@ -107,8 +91,6 @@ class Voucher extends Model
 
     /**
      * Whether voucher is started.
-     *
-     * @return bool
      */
     public function isStarted(): bool
     {
@@ -117,8 +99,6 @@ class Voucher extends Model
 
     /**
      * Whether voucher is expired.
-     *
-     * @return bool
      */
     public function isExpired(): bool
     {
@@ -127,8 +107,6 @@ class Voucher extends Model
 
     /**
      * Whether voucher is redeemed.
-     *
-     * @return bool
      */
     public function isRedeemed(): bool
     {
@@ -137,8 +115,6 @@ class Voucher extends Model
 
     /**
      * Whether voucher is redeemable.
-     *
-     * @return bool
      */
     public function isRedeemable(): bool
     {
@@ -147,10 +123,6 @@ class Voucher extends Model
 
     /**
      * Redeem voucher with the provided redeemer.
-     *
-     * @param \FrittenKeeZ\Vouchers\Models\Redeemer $redeemer
-     *
-     * @return bool
      */
     public function redeem(Redeemer $redeemer): bool
     {
@@ -194,8 +166,6 @@ class Voucher extends Model
 
     /**
      * Associated owner entity.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function owner(): MorphTo
     {
@@ -204,8 +174,6 @@ class Voucher extends Model
 
     /**
      * Associated voucher entities.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function voucherEntities(): HasMany
     {
@@ -214,8 +182,6 @@ class Voucher extends Model
 
     /**
      * Associated redeemers.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function redeemers(): HasMany
     {
@@ -224,10 +190,6 @@ class Voucher extends Model
 
     /**
      * Add related entities.
-     *
-     * @param \Illuminate\Database\Eloquent\Model ...$entities
-     *
-     * @return void
      */
     public function addEntities(Model ...$entities): void
     {
@@ -242,10 +204,6 @@ class Voucher extends Model
 
     /**
      * Get all associated entities - optionally with a specific type (class or alias).
-     *
-     * @param string|null $type
-     *
-     * @return \Illuminate\Support\Collection
      */
     public function getEntities(?string $type = null): Collection
     {
@@ -261,8 +219,6 @@ class Voucher extends Model
      * Register a redeeming voucher event with the dispatcher.
      *
      * @param \Closure|string $callback
-     *
-     * @return void
      */
     public static function redeeming($callback): void
     {
@@ -273,8 +229,6 @@ class Voucher extends Model
      * Register a redeemed voucher event with the dispatcher.
      *
      * @param \Closure|string $callback
-     *
-     * @return void
      */
     public static function redeemed($callback): void
     {
@@ -285,8 +239,6 @@ class Voucher extends Model
      * Register a shouldMarkRedeemed voucher event with the dispatcher.
      *
      * @param \Closure|string $callback
-     *
-     * @return void
      */
     public static function shouldMarkRedeemed($callback): void
     {

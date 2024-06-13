@@ -15,8 +15,6 @@ class HasVouchersTest extends TestCase
 {
     /**
      * Test HasVouchers::createVoucher().
-     *
-     * @return void
      */
     public function testCreateVoucher(): void
     {
@@ -30,8 +28,6 @@ class HasVouchersTest extends TestCase
 
     /**
      * Test HasVouchers::createVoucher() with callback.
-     *
-     * @return void
      */
     public function testCreateVoucherWithCallback(): void
     {
@@ -49,8 +45,6 @@ class HasVouchersTest extends TestCase
 
     /**
      * Test HasVouchers::createVoucher() with associated entities.
-     *
-     * @return void
      */
     public function testCreateVoucherWithAssociated(): void
     {
@@ -71,8 +65,6 @@ class HasVouchersTest extends TestCase
 
     /**
      * Test HasVouchers::createVouchers().
-     *
-     * @return void
      */
     public function testCreateVouchers(): void
     {
@@ -88,8 +80,6 @@ class HasVouchersTest extends TestCase
 
     /**
      * Test HasVouchers::createVouchers() with callback.
-     *
-     * @return void
      */
     public function testCreateVouchersWithCallback(): void
     {

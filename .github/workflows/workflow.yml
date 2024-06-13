@@ -1,4 +1,4 @@
-name: Tests
+name: Linting & Testing
 
 on:
   workflow_dispatch:
@@ -18,7 +18,33 @@ on:
       - "**.yml"
 
 jobs:
-  tests:
+  laravel-pint:
+    name: PHP Linting (Pint)
+
+    if: github.event.pull_request.draft == false
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Make sure the actual branch is checked out when running on pull requests.
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Laravel Pint
+        uses: aglipanci/laravel-pint-action@2.4
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: PHP Linting (Pint)
+          skip_fetch: true
+
+  testing:
+    needs: laravel-pint
+
     strategy:
       fail-fast: true
       matrix:

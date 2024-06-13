@@ -17,8 +17,6 @@ class VoucherScopesTest extends TestCase
 {
     /**
      * Test Voucher::scopeCode().
-     *
-     * @return void
      */
     public function testCodeScope(): void
     {
@@ -30,8 +28,6 @@ class VoucherScopesTest extends TestCase
 
     /**
      * Test Voucher::scopeHasPrefix() and Voucher::scopeHasSuffix().
-     *
-     * @return void
      */
     public function testPrefixAndSuffixScopes(): void
     {
@@ -128,8 +124,6 @@ class VoucherScopesTest extends TestCase
 
     /**
      * Test Voucher::scopeWithStarted().
-     *
-     * @return void
      */
     public function testStartedScope(): void
     {
@@ -144,8 +138,6 @@ class VoucherScopesTest extends TestCase
 
     /**
      * Test Voucher::scopeWithExpired().
-     *
-     * @return void
      */
     public function testExpiredScope(): void
     {
@@ -160,8 +152,6 @@ class VoucherScopesTest extends TestCase
 
     /**
      * Test Voucher::scopeWithRedeemed().
-     *
-     * @return void
      */
     public function testRedeemedScope(): void
     {
@@ -175,8 +165,6 @@ class VoucherScopesTest extends TestCase
 
     /**
      * Test Voucher::scopeWithRedeemable().
-     *
-     * @return void
      */
     public function testRedeemableScope(): void
     {
@@ -194,8 +182,6 @@ class VoucherScopesTest extends TestCase
 
     /**
      * Test Voucher::scopeWithEntities().
-     *
-     * @return void
      */
     public function testEntitiesScope(): void
     {
@@ -215,8 +201,6 @@ class VoucherScopesTest extends TestCase
 
     /**
      * Test Voucher::scopeWithOwnerType() and Voucher::scopeWithOwner().
-     *
-     * @return void
      */
     public function testOwnerScopes(): void
     {

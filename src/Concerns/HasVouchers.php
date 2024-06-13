@@ -14,8 +14,6 @@ trait HasVouchers
 {
     /**
      * Owned vouchers.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function vouchers(): MorphMany
     {
@@ -24,8 +22,6 @@ trait HasVouchers
 
     /**
      * Associated vouchers.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function associatedVouchers(): MorphToMany
     {
@@ -34,8 +30,6 @@ trait HasVouchers
 
     /**
      * Associated voucher entities.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function voucherEntities(): MorphMany
     {
@@ -44,10 +38,6 @@ trait HasVouchers
 
     /**
      * Create a single voucher with this entity related.
-     *
-     * @param \Closure|null $callback
-     *
-     * @return object
      */
     public function createVoucher(?Closure $callback = null): object
     {
@@ -56,13 +46,8 @@ trait HasVouchers
 
     /**
      * Create an amount of vouchers with this entity related.
-     *
-     * @param int           $amount
-     * @param \Closure|null $callback
-     *
-     * @return object|array
      */
-    public function createVouchers(int $amount, ?Closure $callback = null)
+    public function createVouchers(int $amount, ?Closure $callback = null): array|object
     {
         $vouchers = new Vouchers();
 

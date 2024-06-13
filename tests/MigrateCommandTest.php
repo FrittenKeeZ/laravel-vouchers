@@ -29,8 +29,6 @@ class MigrateCommandTest extends TestCase
 
     /**
      * Test arguments.
-     *
-     * @return void
      */
     public function testArguments(): void
     {
@@ -71,8 +69,6 @@ class MigrateCommandTest extends TestCase
 
     /**
      * Test migration with auto mode.
-     *
-     * @return void
      */
     public function testMigrationModeAuto(): void
     {
@@ -108,8 +104,6 @@ class MigrateCommandTest extends TestCase
 
     /**
      * Test migration with retain mode.
-     *
-     * @return void
      */
     public function testMigrationModeRetain(): void
     {
@@ -145,8 +139,6 @@ class MigrateCommandTest extends TestCase
 
     /**
      * Test migration with delete mode.
-     *
-     * @return void
      */
     public function testMigrationModeDelete(): void
     {

@@ -25,6 +25,7 @@
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.4",
         "illuminate/support": "^9.45|^10.0|^11.0",
+        "laravel/pint": "^1.16",
         "nesbot/carbon": "^2.63",
         "orchestra/testbench": "^7.0|^8.0|^9.0",
         "phpunit/phpunit": "^9.6|^10.5"
@@ -49,9 +50,8 @@
         }
     },
     "scripts": {
-        "test": "phpunit",
-        "fixer-check": "php-cs-fixer fix --verbose --dry-run",
-        "fixer-fix": "php-cs-fixer fix"
+        "pint": "pint",
+        "test": "phpunit"
     },
     "extra": {
         "laravel": {

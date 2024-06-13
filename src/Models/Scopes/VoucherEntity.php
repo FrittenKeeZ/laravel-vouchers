@@ -12,11 +12,6 @@ trait VoucherEntity
 {
     /**
      * Scope voucher query to specific entity type (class or alias).
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string                                $type
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithEntityType(Builder $query, string $type): Builder
     {
@@ -27,11 +22,6 @@ trait VoucherEntity
 
     /**
      * Scope voucher query to specific entity.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Database\Eloquent\Model   $entity
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithEntity(Builder $query, Model $entity): Builder
     {
