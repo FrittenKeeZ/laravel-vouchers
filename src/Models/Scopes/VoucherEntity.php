@@ -17,7 +17,7 @@ trait VoucherEntity
     {
         $class = Relation::getMorphedModel($type) ?? $type;
 
-        return $query->where($this->getTable() . '.entity_type', '=', (new $class())->getMorphClass());
+        return $query->where($this->getTable() . '.entity_type', '=', (new $class)->getMorphClass());
     }
 
     /**

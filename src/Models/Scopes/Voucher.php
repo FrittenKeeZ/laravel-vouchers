@@ -176,7 +176,7 @@ trait Voucher
     {
         $class = Relation::getMorphedModel($type) ?? $type;
 
-        return $query->where($this->getTable() . '.owner_type', '=', (new $class())->getMorphClass());
+        return $query->where($this->getTable() . '.owner_type', '=', (new $class)->getMorphClass());
     }
 
     /**

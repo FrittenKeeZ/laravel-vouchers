@@ -18,7 +18,7 @@ uses(FrittenKeeZ\Vouchers\Tests\TestCase::class);
  * Test Voucher::scopeWithEntityType() and Voucher::scopeWithEntity().
  */
 test('entity scopes', function () {
-    $vouchers = new Vouchers();
+    $vouchers = new Vouchers;
 
     // Create user.
     $user = User::factory()->create();

@@ -49,7 +49,7 @@ trait HasVouchers
      */
     public function createVouchers(int $amount, ?Closure $callback = null): array|object
     {
-        $vouchers = new Vouchers();
+        $vouchers = new Vouchers;
 
         if ($callback) {
             $callback($vouchers);

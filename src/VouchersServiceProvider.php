@@ -34,7 +34,7 @@ class VouchersServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom($this->getPublishConfigPath(), 'vouchers');
 
-        $this->app->bind('vouchers', fn () => new Vouchers());
+        $this->app->bind('vouchers', fn () => new Vouchers);
     }
 
     /**

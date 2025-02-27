@@ -23,7 +23,7 @@ test('redeeming event', function () {
         return false;
     });
 
-    $vouchers = new Vouchers();
+    $vouchers = new Vouchers;
     $user = User::factory()->create();
     $voucher = $vouchers->create();
     expect($voucher->isRedeemable())->toBeTrue();
@@ -42,7 +42,7 @@ test('redeemed event', function () {
         expect($voucher->isRedeemed())->toBeTrue();
     });
 
-    $vouchers = new Vouchers();
+    $vouchers = new Vouchers;
     $user = User::factory()->create();
     $voucher = $vouchers->create();
     expect($voucher->isRedeemable())->toBeTrue();
@@ -63,7 +63,7 @@ test('should mark redeemed event', function () {
         return false;
     });
 
-    $vouchers = new Vouchers();
+    $vouchers = new Vouchers;
     $user = User::factory()->create();
     $voucher = $vouchers->create();
     expect($voucher->isRedeemable())->toBeTrue();
@@ -83,7 +83,7 @@ test('redeeming by owning user only event', function () {
         return $voucher->redeemer->redeemer->is($voucher->owner);
     });
 
-    $vouchers = new Vouchers();
+    $vouchers = new Vouchers;
     $user = User::factory()->create();
     $other = User::factory()->create();
     $voucher = $vouchers->withOwner($user)->create();

@@ -29,7 +29,7 @@ test('instance', function () {
  * Test that Vouchers::getConfig() returns clone and not same instance.
  */
 test('config clone', function () {
-    $vouchers = new Vouchers();
+    $vouchers = new Vouchers;
     $config = $vouchers->getConfig();
 
     $this->assertNotSame($config, $vouchers->getConfig());
@@ -39,7 +39,7 @@ test('config clone', function () {
  * Test code generation.
  */
 test('code generation', function () {
-    $vouchers = new Vouchers();
+    $vouchers = new Vouchers;
     $config = $vouchers->getConfig();
 
     // Grab mask, characters, prefix, suffix and separator.
@@ -80,7 +80,7 @@ test('code generation', function () {
  * Test voucher creation.
  */
 test('voucher creation', function () {
-    $vouchers = new Vouchers();
+    $vouchers = new Vouchers;
 
     // Simple voucher.
     $voucher = $vouchers->create();
@@ -130,7 +130,7 @@ test('voucher creation', function () {
  * Test voucher redemption.
  */
 test('voucher redemption', function () {
-    $vouchers = new Vouchers();
+    $vouchers = new Vouchers;
     $user = User::factory()->create();
     $voucher = $vouchers->withOwner($user)->create();
 
@@ -167,7 +167,7 @@ test('voucher redemption', function () {
  * Test voucher not found exception.
  */
 test('voucher not found exception', function () {
-    $vouchers = new Vouchers();
+    $vouchers = new Vouchers;
     $user = User::factory()->create();
 
     $this->expectException(VoucherNotFoundException::class);
@@ -178,7 +178,7 @@ test('voucher not found exception', function () {
  * Test voucher already redeemed exception.
  */
 test('voucher already redeemed exception', function () {
-    $vouchers = new Vouchers();
+    $vouchers = new Vouchers;
     $voucher = $vouchers->create();
     $user = User::factory()->create();
 
@@ -189,7 +189,6 @@ test('voucher already redeemed exception', function () {
 
 /**
  * Test Vouchers::wrap() method.
- *
  */
 test('string wrapping', function (
     string $str,
@@ -198,7 +197,7 @@ test('string wrapping', function (
     string $separator,
     string $expected
 ) {
-    expect((new Vouchers())->wrap($str, $prefix, $suffix, $separator))->toBe($expected);
+    expect((new Vouchers)->wrap($str, $prefix, $suffix, $separator))->toBe($expected);
 })->with('wrapProvider');
 
 /**
@@ -206,7 +205,7 @@ test('string wrapping', function (
  */
 test('invalid magic call', function () {
     $this->expectException('ErrorException');
-    $vouchers = new Vouchers();
+    $vouchers = new Vouchers;
     $vouchers->methodthatdoesnotexist();
 });
 
@@ -224,8 +223,8 @@ dataset('wrapProvider', [
 
 // Helpers
 /**
-     * Generate regex to validate a code generated with a specific mask, character list, prefix, suffix and separator.
-     */
+ * Generate regex to validate a code generated with a specific mask, character list, prefix, suffix and separator.
+ */
 function generateCodeValidationRegex(
     string $mask,
     string $characters,
