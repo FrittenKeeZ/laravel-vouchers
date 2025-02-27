@@ -13,6 +13,9 @@
         "multiline_whitespace_before_semicolons": {
             "strategy": "new_line_for_chained_calls"
         },
+        "new_with_parentheses": {
+            "anonymous_class": false
+        },
         "not_operator_with_successor_space": false,
         "ordered_types": {
             "null_adjustment": "always_last",
@@ -26,6 +29,7 @@
             "null_adjustment": "always_last"
         },
         "simplified_null_return": true,
+        "single_line_empty_body": false,
         "single_trait_insert_per_statement": true
     }
 }
