@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use FrittenKeeZ\Vouchers\Facades\Vouchers;
-use ReflectionMethod;
 
 uses(FrittenKeeZ\Vouchers\Tests\TestCase::class);
 
