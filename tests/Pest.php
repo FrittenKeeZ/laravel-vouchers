@@ -1,5 +1,7 @@
 <?php
 
+uses(\FrittenKeeZ\Vouchers\Tests\TestCase::class)->in('database', 'Datasets', 'Models');
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
