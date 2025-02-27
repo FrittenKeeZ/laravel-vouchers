@@ -2,32 +2,28 @@
 
 declare(strict_types=1);
 
-namespace FrittenKeeZ\Vouchers\Tests;
-
 use FrittenKeeZ\Vouchers\Facades\Vouchers;
 use ReflectionMethod;
+
+uses(FrittenKeeZ\Vouchers\Tests\TestCase::class);
 
 /**
  * @internal
  */
-class VouchersFacadeTest extends TestCase
-{
-    /**
-     * Test facade instance through app::make().
-     */
-    public function testFacadeInstance(): void
-    {
-        $this->assertInstanceOf(Vouchers::class, $this->app->make('Vouchers'));
-    }
 
-    /**
-     * Test facade accessor.
-     */
-    public function testFacadeAccessor(): void
-    {
-        $method = new ReflectionMethod(Vouchers::class, 'getFacadeAccessor');
-        $method->setAccessible(true);
+/**
+ * Test facade instance through app::make().
+ */
+test('facade instance', function () {
+    $this->assertInstanceOf(Vouchers::class, app()->make('Vouchers'));
+});
 
-        $this->assertSame('vouchers', $method->invoke(null));
-    }
-}
+/**
+ * Test facade accessor.
+ */
+test('facade accessor', function () {
+    $method = new ReflectionMethod(Vouchers::class, 'getFacadeAccessor');
+    $method->setAccessible(true);
+
+    $this->assertSame('vouchers', $method->invoke(null));
+});
