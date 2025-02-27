@@ -22,9 +22,9 @@ uses(FrittenKeeZ\Vouchers\Tests\TestCase::class);
  */
 test('model resolving', function () {
     // Test defaults.
-    $this->assertSame(Voucher::class, Config::model('voucher'));
-    $this->assertSame(VoucherEntity::class, Config::model('entity'));
-    $this->assertSame(Redeemer::class, Config::model('redeemer'));
+    expect(Config::model('voucher'))->toBe(Voucher::class);
+    expect(Config::model('entity'))->toBe(VoucherEntity::class);
+    expect(Config::model('redeemer'))->toBe(Redeemer::class);
 
     // Test fake overrides.
     $models = [
@@ -34,12 +34,12 @@ test('model resolving', function () {
     ];
     app()['config']->set('vouchers.models', $models);
     foreach ($models as $name => $model) {
-        $this->assertSame($model, Config::model($name));
+        expect(Config::model($name))->toBe($model);
     }
 
     // Test non-existing.
-    $this->assertNull(Config::model('idontexist'));
-    $this->assertNull(Config::model('idontexisteither'));
+    expect(Config::model('idontexist'))->toBeNull();
+    expect(Config::model('idontexisteither'))->toBeNull();
 });
 
 /**
@@ -47,9 +47,9 @@ test('model resolving', function () {
  */
 test('table resolving', function () {
     // Test defaults.
-    $this->assertSame('vouchers', Config::table('vouchers'));
-    $this->assertSame('voucher_entity', Config::table('entities'));
-    $this->assertSame('redeemers', Config::table('redeemers'));
+    expect(Config::table('vouchers'))->toBe('vouchers');
+    expect(Config::table('entities'))->toBe('voucher_entity');
+    expect(Config::table('redeemers'))->toBe('redeemers');
 
     // Test fake overrides.
     $tables = [
@@ -59,12 +59,12 @@ test('table resolving', function () {
     ];
     app()['config']->set('vouchers.tables', $tables);
     foreach ($tables as $name => $table) {
-        $this->assertSame($table, Config::table($name));
+        expect(Config::table($name))->toBe($table);
     }
 
     // Test non-existing.
-    $this->assertNull(Config::table('idontexist'));
-    $this->assertNull(Config::table('idontexisteither'));
+    expect(Config::table('idontexist'))->toBeNull();
+    expect(Config::table('idontexisteither'))->toBeNull();
 });
 
 /**
@@ -74,12 +74,12 @@ test('default options', function () {
     $config = new Config();
     $app_config = app()['config'];
 
-    $this->assertEmpty($config->getOptions());
-    $this->assertSame($app_config->get('vouchers.characters'), $config->getCharacters());
-    $this->assertSame($app_config->get('vouchers.mask'), $config->getMask());
-    $this->assertSame($app_config->get('vouchers.prefix'), $config->getPrefix());
-    $this->assertSame($app_config->get('vouchers.suffix'), $config->getSuffix());
-    $this->assertSame($app_config->get('vouchers.separator'), $config->getSeparator());
+    expect($config->getOptions())->toBeEmpty();
+    expect($config->getCharacters())->toBe($app_config->get('vouchers.characters'));
+    expect($config->getMask())->toBe($app_config->get('vouchers.mask'));
+    expect($config->getPrefix())->toBe($app_config->get('vouchers.prefix'));
+    expect($config->getSuffix())->toBe($app_config->get('vouchers.suffix'));
+    expect($config->getSeparator())->toBe($app_config->get('vouchers.separator'));
 });
 
 /**
@@ -103,12 +103,12 @@ test('config overridden options', function () {
         $app_config->set('vouchers.' . $key, $value);
     }
 
-    $this->assertEmpty($config->getOptions());
-    $this->assertSame($options['characters'], $config->getCharacters());
-    $this->assertSame($options['mask'], $config->getMask());
-    $this->assertSame($options['prefix'], $config->getPrefix());
-    $this->assertSame($options['suffix'], $config->getSuffix());
-    $this->assertSame($options['separator'], $config->getSeparator());
+    expect($config->getOptions())->toBeEmpty();
+    expect($config->getCharacters())->toBe($options['characters']);
+    expect($config->getMask())->toBe($options['mask']);
+    expect($config->getPrefix())->toBe($options['prefix']);
+    expect($config->getSuffix())->toBe($options['suffix']);
+    expect($config->getSeparator())->toBe($options['separator']);
 });
 
 /**
@@ -133,17 +133,17 @@ test('dynamically overridden options', function () {
     }
 
     assertArrayStructure($options, $config->getOptions());
-    $this->assertSame($options['characters'], $config->getCharacters());
-    $this->assertSame($options['mask'], $config->getMask());
-    $this->assertSame($options['prefix'], $config->getPrefix());
-    $this->assertSame($options['suffix'], $config->getSuffix());
-    $this->assertSame($options['separator'], $config->getSeparator());
+    expect($config->getCharacters())->toBe($options['characters']);
+    expect($config->getMask())->toBe($options['mask']);
+    expect($config->getPrefix())->toBe($options['prefix']);
+    expect($config->getSuffix())->toBe($options['suffix']);
+    expect($config->getSeparator())->toBe($options['separator']);
 
     // Test 'without' calls.
     $config->withoutPrefix()->withoutSuffix()->withoutSeparator();
-    $this->assertSame('', $config->getPrefix());
-    $this->assertSame('', $config->getSuffix());
-    $this->assertSame('', $config->getSeparator());
+    expect($config->getPrefix())->toBe('');
+    expect($config->getSuffix())->toBe('');
+    expect($config->getSeparator())->toBe('');
 });
 
 /**
@@ -160,7 +160,7 @@ test('additional options', function () {
             'level' => 'shizzle',
         ],
     ];
-    $this->assertSame($metadata, $config->withMetadata($metadata)->getMetadata());
+    expect($config->withMetadata($metadata)->getMetadata())->toBe($metadata);
 
     // Test start time.
     $interval = CarbonInterval::create('P10DT30M45S');
@@ -202,11 +202,11 @@ test('additional options', function () {
 
     // Test owner.
     $owner = User::factory()->make();
-    $this->assertSame($owner, $config->withOwner($owner)->getOwner());
+    expect($config->withOwner($owner)->getOwner())->toBe($owner);
 
     // Test entities.
     $entities = Color::factory()->count(3)->make()->all();
-    $this->assertSame($entities, $config->withEntities(...$entities)->getEntities());
+    expect($config->withEntities(...$entities)->getEntities())->toBe($entities);
 });
 
 // Helpers
@@ -215,5 +215,5 @@ test('additional options', function () {
      */
 function assertArrayStructure(array $expected, array $actual): void
 {
-    test()->assertTrue(empty(array_diff_key($expected, $actual)) && empty(array_diff_key($actual, $expected)));
+    expect(empty(array_diff_key($expected, $actual)) && empty(array_diff_key($actual, $expected)))->toBeTrue();
 }

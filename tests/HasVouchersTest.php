@@ -20,8 +20,8 @@ test('create voucher', function () {
     $voucher = $user->createVoucher();
 
     // Check user voucher relation.
-    $this->assertTrue($user->is($voucher->owner));
-    $this->assertTrue($voucher->is($user->vouchers->first()));
+    expect($user->is($voucher->owner))->toBeTrue();
+    expect($voucher->is($user->vouchers->first()))->toBeTrue();
 });
 
 /**
@@ -35,9 +35,9 @@ test('create voucher with callback', function () {
     });
 
     // Check user voucher relation.
-    $this->assertTrue($user->is($voucher->owner));
-    $this->assertTrue($voucher->is($user->vouchers->first()));
-    $this->assertTrue($color->is($voucher->getEntities(Color::class)->first()));
+    expect($user->is($voucher->owner))->toBeTrue();
+    expect($voucher->is($user->vouchers->first()))->toBeTrue();
+    expect($color->is($voucher->getEntities(Color::class)->first()))->toBeTrue();
 });
 
 /**
@@ -51,12 +51,12 @@ test('create voucher with associated', function () {
     });
 
     // Check user voucher relation.
-    $this->assertTrue($user->is($voucher->owner));
-    $this->assertTrue($voucher->is($user->vouchers->first()));
-    $this->assertFalse($other->is($voucher->owner));
-    $this->assertTrue($other->is($voucher->getEntities(User::class)->first()));
-    $this->assertTrue($voucher->is($other->voucherEntities->first()->voucher));
-    $this->assertTrue($voucher->is($other->associatedVouchers->first()));
+    expect($user->is($voucher->owner))->toBeTrue();
+    expect($voucher->is($user->vouchers->first()))->toBeTrue();
+    expect($other->is($voucher->owner))->toBeFalse();
+    expect($other->is($voucher->getEntities(User::class)->first()))->toBeTrue();
+    expect($voucher->is($other->voucherEntities->first()->voucher))->toBeTrue();
+    expect($voucher->is($other->associatedVouchers->first()))->toBeTrue();
 });
 
 /**
@@ -68,8 +68,8 @@ test('create vouchers', function () {
 
     foreach ($vouchers as $index => $voucher) {
         // Check user voucher relation.
-        $this->assertTrue($user->is($voucher->owner));
-        $this->assertTrue($voucher->is($user->vouchers[$index]));
+        expect($user->is($voucher->owner))->toBeTrue();
+        expect($voucher->is($user->vouchers[$index]))->toBeTrue();
     }
 });
 
@@ -85,8 +85,8 @@ test('create vouchers with callback', function () {
 
     foreach ($vouchers as $index => $voucher) {
         // Check user voucher relation.
-        $this->assertTrue($user->is($voucher->owner));
-        $this->assertTrue($voucher->is($user->vouchers[$index]));
-        $this->assertTrue($color->is($voucher->getEntities(Color::class)->first()));
+        expect($user->is($voucher->owner))->toBeTrue();
+        expect($voucher->is($user->vouchers[$index]))->toBeTrue();
+        expect($color->is($voucher->getEntities(Color::class)->first()))->toBeTrue();
     }
 });

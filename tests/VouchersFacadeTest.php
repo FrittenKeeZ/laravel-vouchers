@@ -14,7 +14,7 @@ uses(FrittenKeeZ\Vouchers\Tests\TestCase::class);
  * Test facade instance through app::make().
  */
 test('facade instance', function () {
-    $this->assertInstanceOf(Vouchers::class, app()->make('Vouchers'));
+    expect(app()->make('Vouchers'))->toBeInstanceOf(Vouchers::class);
 });
 
 /**
@@ -24,5 +24,5 @@ test('facade accessor', function () {
     $method = new ReflectionMethod(Vouchers::class, 'getFacadeAccessor');
     $method->setAccessible(true);
 
-    $this->assertSame('vouchers', $method->invoke(null));
+    expect($method->invoke(null))->toBe('vouchers');
 });

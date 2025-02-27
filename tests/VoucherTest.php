@@ -18,7 +18,7 @@ uses(FrittenKeeZ\Vouchers\Tests\TestCase::class);
 test('redeeming event', function () {
     // Prevent redeeming.
     Voucher::redeeming(function (Voucher $voucher) {
-        $this->assertFalse($voucher->isRedeemed());
+        expect($voucher->isRedeemed())->toBeFalse();
 
         return false;
     });
@@ -26,11 +26,11 @@ test('redeeming event', function () {
     $vouchers = new Vouchers();
     $user = User::factory()->create();
     $voucher = $vouchers->create();
-    $this->assertTrue($voucher->isRedeemable());
-    $this->assertFalse($vouchers->redeem($voucher->code, $user));
+    expect($voucher->isRedeemable())->toBeTrue();
+    expect($vouchers->redeem($voucher->code, $user))->toBeFalse();
     $voucher->refresh();
-    $this->assertFalse($voucher->isRedeemed());
-    $this->assertEmpty($voucher->redeemers);
+    expect($voucher->isRedeemed())->toBeFalse();
+    expect($voucher->redeemers)->toBeEmpty();
 });
 
 /**
@@ -39,17 +39,17 @@ test('redeeming event', function () {
 test('redeemed event', function () {
     // Check that voucher is redeemed.
     Voucher::redeemed(function (Voucher $voucher) {
-        $this->assertTrue($voucher->isRedeemed());
+        expect($voucher->isRedeemed())->toBeTrue();
     });
 
     $vouchers = new Vouchers();
     $user = User::factory()->create();
     $voucher = $vouchers->create();
-    $this->assertTrue($voucher->isRedeemable());
-    $this->assertTrue($vouchers->redeem($voucher->code, $user));
+    expect($voucher->isRedeemable())->toBeTrue();
+    expect($vouchers->redeem($voucher->code, $user))->toBeTrue();
     $voucher->refresh();
     $this->assertNotEmpty($voucher->redeemers);
-    $this->assertFalse($voucher->redeem($voucher->redeemers->first()));
+    expect($voucher->redeem($voucher->redeemers->first()))->toBeFalse();
 });
 
 /**
@@ -58,7 +58,7 @@ test('redeemed event', function () {
 test('should mark redeemed event', function () {
     // Don't mark voucher as redeemed for multiple uses.
     Voucher::shouldMarkRedeemed(function (Voucher $voucher) {
-        $this->assertFalse($voucher->isRedeemed());
+        expect($voucher->isRedeemed())->toBeFalse();
 
         return false;
     });
@@ -66,12 +66,12 @@ test('should mark redeemed event', function () {
     $vouchers = new Vouchers();
     $user = User::factory()->create();
     $voucher = $vouchers->create();
-    $this->assertTrue($voucher->isRedeemable());
-    $this->assertTrue($vouchers->redeem($voucher->code, $user));
+    expect($voucher->isRedeemable())->toBeTrue();
+    expect($vouchers->redeem($voucher->code, $user))->toBeTrue();
     $voucher->refresh();
-    $this->assertFalse($voucher->isRedeemed());
+    expect($voucher->isRedeemed())->toBeFalse();
     $this->assertNotEmpty($voucher->redeemers);
-    $this->assertTrue($voucher->redeem($voucher->redeemers->first()));
+    expect($voucher->redeem($voucher->redeemers->first()))->toBeTrue();
 });
 
 /**
@@ -87,14 +87,14 @@ test('redeeming by owning user only event', function () {
     $user = User::factory()->create();
     $other = User::factory()->create();
     $voucher = $vouchers->withOwner($user)->create();
-    $this->assertTrue($voucher->isRedeemable());
-    $this->assertFalse($vouchers->redeem($voucher->code, $other));
-    $this->assertFalse($voucher->isRedeemed());
-    $this->assertEmpty($voucher->redeemers);
+    expect($voucher->isRedeemable())->toBeTrue();
+    expect($vouchers->redeem($voucher->code, $other))->toBeFalse();
+    expect($voucher->isRedeemed())->toBeFalse();
+    expect($voucher->redeemers)->toBeEmpty();
     $voucher->refresh();
-    $this->assertTrue($voucher->isRedeemable());
-    $this->assertTrue($vouchers->redeem($voucher->code, $user));
+    expect($voucher->isRedeemable())->toBeTrue();
+    expect($vouchers->redeem($voucher->code, $user))->toBeTrue();
     $voucher->refresh();
-    $this->assertTrue($voucher->isRedeemed());
+    expect($voucher->isRedeemed())->toBeTrue();
     $this->assertNotEmpty($voucher->redeemers);
 });

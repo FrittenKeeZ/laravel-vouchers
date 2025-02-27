@@ -20,8 +20,8 @@ uses(FrittenKeeZ\Vouchers\Tests\TestCase::class);
 test('code scope', function () {
     $voucher = Vouchers::create();
 
-    $this->assertTrue(Voucher::code($voucher->code)->exists());
-    $this->assertFalse(Voucher::code('NOPE')->exists());
+    expect(Voucher::code($voucher->code)->exists())->toBeTrue();
+    expect(Voucher::code('NOPE')->exists())->toBeFalse();
 });
 
 /**
@@ -38,85 +38,85 @@ test('prefix and suffix scopes', function () {
     Voucher::create(['code' => 'FUU-TEST-BAZ']);
 
     // Test prefix scope with separator.
-    $this->assertSame(2, Voucher::withPrefix('FOO')->count());
-    $this->assertSame(2, Voucher::withPrefix('FOO', '-')->count());
-    $this->assertSame(2, Voucher::withPrefix('FUU')->count());
-    $this->assertSame(2, Voucher::withPrefix('FUU', '-')->count());
-    $this->assertSame(6, Voucher::withoutPrefix('FOO')->count());
-    $this->assertSame(6, Voucher::withoutPrefix('FOO', '-')->count());
-    $this->assertSame(6, Voucher::withoutPrefix('FUU')->count());
-    $this->assertSame(6, Voucher::withoutPrefix('FUU', '-')->count());
+    expect(Voucher::withPrefix('FOO')->count())->toBe(2);
+    expect(Voucher::withPrefix('FOO', '-')->count())->toBe(2);
+    expect(Voucher::withPrefix('FUU')->count())->toBe(2);
+    expect(Voucher::withPrefix('FUU', '-')->count())->toBe(2);
+    expect(Voucher::withoutPrefix('FOO')->count())->toBe(6);
+    expect(Voucher::withoutPrefix('FOO', '-')->count())->toBe(6);
+    expect(Voucher::withoutPrefix('FUU')->count())->toBe(6);
+    expect(Voucher::withoutPrefix('FUU', '-')->count())->toBe(6);
     // Test prefix scope without separator
-    $this->assertSame(4, Voucher::withPrefix('FOO', '')->count());
-    $this->assertSame(4, Voucher::withPrefix('FUU', '')->count());
-    $this->assertSame(4, Voucher::withoutPrefix('FOO', '')->count());
-    $this->assertSame(4, Voucher::withoutPrefix('FUU', '')->count());
+    expect(Voucher::withPrefix('FOO', '')->count())->toBe(4);
+    expect(Voucher::withPrefix('FUU', '')->count())->toBe(4);
+    expect(Voucher::withoutPrefix('FOO', '')->count())->toBe(4);
+    expect(Voucher::withoutPrefix('FUU', '')->count())->toBe(4);
 
     // Test suffix scope with separator.
-    $this->assertSame(2, Voucher::withSuffix('BAR')->count());
-    $this->assertSame(2, Voucher::withSuffix('BAR', '-')->count());
-    $this->assertSame(2, Voucher::withSuffix('BAZ')->count());
-    $this->assertSame(2, Voucher::withSuffix('BAZ', '-')->count());
-    $this->assertSame(6, Voucher::withoutSuffix('BAR')->count());
-    $this->assertSame(6, Voucher::withoutSuffix('BAR', '-')->count());
-    $this->assertSame(6, Voucher::withoutSuffix('BAZ')->count());
-    $this->assertSame(6, Voucher::withoutSuffix('BAZ', '-')->count());
+    expect(Voucher::withSuffix('BAR')->count())->toBe(2);
+    expect(Voucher::withSuffix('BAR', '-')->count())->toBe(2);
+    expect(Voucher::withSuffix('BAZ')->count())->toBe(2);
+    expect(Voucher::withSuffix('BAZ', '-')->count())->toBe(2);
+    expect(Voucher::withoutSuffix('BAR')->count())->toBe(6);
+    expect(Voucher::withoutSuffix('BAR', '-')->count())->toBe(6);
+    expect(Voucher::withoutSuffix('BAZ')->count())->toBe(6);
+    expect(Voucher::withoutSuffix('BAZ', '-')->count())->toBe(6);
     // Test suffix scope without separator
-    $this->assertSame(4, Voucher::withSuffix('BAR', '')->count());
-    $this->assertSame(4, Voucher::withSuffix('BAZ', '')->count());
-    $this->assertSame(4, Voucher::withoutSuffix('BAR', '')->count());
-    $this->assertSame(4, Voucher::withoutSuffix('BAZ', '')->count());
+    expect(Voucher::withSuffix('BAR', '')->count())->toBe(4);
+    expect(Voucher::withSuffix('BAZ', '')->count())->toBe(4);
+    expect(Voucher::withoutSuffix('BAR', '')->count())->toBe(4);
+    expect(Voucher::withoutSuffix('BAZ', '')->count())->toBe(4);
 
     // Test prefix and suffix scopes together with separator.
-    $this->assertSame(1, Voucher::withPrefix('FOO')->withSuffix('BAR')->count());
-    $this->assertSame(1, Voucher::withPrefix('FOO', '-')->withSuffix('BAR', '-')->count());
-    $this->assertSame(1, Voucher::withPrefix('FUU')->withSuffix('BAR')->count());
-    $this->assertSame(1, Voucher::withPrefix('FUU', '-')->withSuffix('BAR', '-')->count());
-    $this->assertSame(1, Voucher::withPrefix('FOO')->withSuffix('BAZ')->count());
-    $this->assertSame(1, Voucher::withPrefix('FOO', '-')->withSuffix('BAZ', '-')->count());
-    $this->assertSame(1, Voucher::withPrefix('FUU')->withSuffix('BAZ')->count());
-    $this->assertSame(1, Voucher::withPrefix('FUU', '-')->withSuffix('BAZ', '-')->count());
-    $this->assertSame(1, Voucher::withoutPrefix('FOO')->withSuffix('BAR')->count());
-    $this->assertSame(1, Voucher::withoutPrefix('FOO', '-')->withSuffix('BAR', '-')->count());
-    $this->assertSame(1, Voucher::withoutPrefix('FUU')->withSuffix('BAR')->count());
-    $this->assertSame(1, Voucher::withoutPrefix('FUU', '-')->withSuffix('BAR', '-')->count());
-    $this->assertSame(1, Voucher::withoutPrefix('FOO')->withSuffix('BAZ')->count());
-    $this->assertSame(1, Voucher::withoutPrefix('FOO', '-')->withSuffix('BAZ', '-')->count());
-    $this->assertSame(1, Voucher::withoutPrefix('FUU')->withSuffix('BAZ')->count());
-    $this->assertSame(1, Voucher::withoutPrefix('FUU', '-')->withSuffix('BAZ', '-')->count());
-    $this->assertSame(1, Voucher::withPrefix('FOO')->withoutSuffix('BAR')->count());
-    $this->assertSame(1, Voucher::withPrefix('FOO', '-')->withoutSuffix('BAR', '-')->count());
-    $this->assertSame(1, Voucher::withPrefix('FUU')->withoutSuffix('BAR')->count());
-    $this->assertSame(1, Voucher::withPrefix('FUU', '-')->withoutSuffix('BAR', '-')->count());
-    $this->assertSame(1, Voucher::withPrefix('FOO')->withoutSuffix('BAZ')->count());
-    $this->assertSame(1, Voucher::withPrefix('FOO', '-')->withoutSuffix('BAZ', '-')->count());
-    $this->assertSame(1, Voucher::withPrefix('FUU')->withoutSuffix('BAZ')->count());
-    $this->assertSame(1, Voucher::withPrefix('FUU', '-')->withoutSuffix('BAZ', '-')->count());
-    $this->assertSame(5, Voucher::withoutPrefix('FOO')->withoutSuffix('BAR')->count());
-    $this->assertSame(5, Voucher::withoutPrefix('FOO', '-')->withoutSuffix('BAR', '-')->count());
-    $this->assertSame(5, Voucher::withoutPrefix('FUU')->withoutSuffix('BAR')->count());
-    $this->assertSame(5, Voucher::withoutPrefix('FUU', '-')->withoutSuffix('BAR', '-')->count());
-    $this->assertSame(5, Voucher::withoutPrefix('FOO')->withoutSuffix('BAZ')->count());
-    $this->assertSame(5, Voucher::withoutPrefix('FOO', '-')->withoutSuffix('BAZ', '-')->count());
-    $this->assertSame(5, Voucher::withoutPrefix('FUU')->withoutSuffix('BAZ')->count());
-    $this->assertSame(5, Voucher::withoutPrefix('FUU', '-')->withoutSuffix('BAZ', '-')->count());
+    expect(Voucher::withPrefix('FOO')->withSuffix('BAR')->count())->toBe(1);
+    expect(Voucher::withPrefix('FOO', '-')->withSuffix('BAR', '-')->count())->toBe(1);
+    expect(Voucher::withPrefix('FUU')->withSuffix('BAR')->count())->toBe(1);
+    expect(Voucher::withPrefix('FUU', '-')->withSuffix('BAR', '-')->count())->toBe(1);
+    expect(Voucher::withPrefix('FOO')->withSuffix('BAZ')->count())->toBe(1);
+    expect(Voucher::withPrefix('FOO', '-')->withSuffix('BAZ', '-')->count())->toBe(1);
+    expect(Voucher::withPrefix('FUU')->withSuffix('BAZ')->count())->toBe(1);
+    expect(Voucher::withPrefix('FUU', '-')->withSuffix('BAZ', '-')->count())->toBe(1);
+    expect(Voucher::withoutPrefix('FOO')->withSuffix('BAR')->count())->toBe(1);
+    expect(Voucher::withoutPrefix('FOO', '-')->withSuffix('BAR', '-')->count())->toBe(1);
+    expect(Voucher::withoutPrefix('FUU')->withSuffix('BAR')->count())->toBe(1);
+    expect(Voucher::withoutPrefix('FUU', '-')->withSuffix('BAR', '-')->count())->toBe(1);
+    expect(Voucher::withoutPrefix('FOO')->withSuffix('BAZ')->count())->toBe(1);
+    expect(Voucher::withoutPrefix('FOO', '-')->withSuffix('BAZ', '-')->count())->toBe(1);
+    expect(Voucher::withoutPrefix('FUU')->withSuffix('BAZ')->count())->toBe(1);
+    expect(Voucher::withoutPrefix('FUU', '-')->withSuffix('BAZ', '-')->count())->toBe(1);
+    expect(Voucher::withPrefix('FOO')->withoutSuffix('BAR')->count())->toBe(1);
+    expect(Voucher::withPrefix('FOO', '-')->withoutSuffix('BAR', '-')->count())->toBe(1);
+    expect(Voucher::withPrefix('FUU')->withoutSuffix('BAR')->count())->toBe(1);
+    expect(Voucher::withPrefix('FUU', '-')->withoutSuffix('BAR', '-')->count())->toBe(1);
+    expect(Voucher::withPrefix('FOO')->withoutSuffix('BAZ')->count())->toBe(1);
+    expect(Voucher::withPrefix('FOO', '-')->withoutSuffix('BAZ', '-')->count())->toBe(1);
+    expect(Voucher::withPrefix('FUU')->withoutSuffix('BAZ')->count())->toBe(1);
+    expect(Voucher::withPrefix('FUU', '-')->withoutSuffix('BAZ', '-')->count())->toBe(1);
+    expect(Voucher::withoutPrefix('FOO')->withoutSuffix('BAR')->count())->toBe(5);
+    expect(Voucher::withoutPrefix('FOO', '-')->withoutSuffix('BAR', '-')->count())->toBe(5);
+    expect(Voucher::withoutPrefix('FUU')->withoutSuffix('BAR')->count())->toBe(5);
+    expect(Voucher::withoutPrefix('FUU', '-')->withoutSuffix('BAR', '-')->count())->toBe(5);
+    expect(Voucher::withoutPrefix('FOO')->withoutSuffix('BAZ')->count())->toBe(5);
+    expect(Voucher::withoutPrefix('FOO', '-')->withoutSuffix('BAZ', '-')->count())->toBe(5);
+    expect(Voucher::withoutPrefix('FUU')->withoutSuffix('BAZ')->count())->toBe(5);
+    expect(Voucher::withoutPrefix('FUU', '-')->withoutSuffix('BAZ', '-')->count())->toBe(5);
     // Test prefix and suffix scopes together without separator
-    $this->assertSame(2, Voucher::withPrefix('FOO', '')->withSuffix('BAR', '')->count());
-    $this->assertSame(2, Voucher::withPrefix('FUU', '')->withSuffix('BAR', '')->count());
-    $this->assertSame(2, Voucher::withPrefix('FOO', '')->withSuffix('BAZ', '')->count());
-    $this->assertSame(2, Voucher::withPrefix('FUU', '')->withSuffix('BAZ', '')->count());
-    $this->assertSame(2, Voucher::withoutPrefix('FOO', '')->withSuffix('BAR', '')->count());
-    $this->assertSame(2, Voucher::withoutPrefix('FUU', '')->withSuffix('BAR', '')->count());
-    $this->assertSame(2, Voucher::withoutPrefix('FOO', '')->withSuffix('BAZ', '')->count());
-    $this->assertSame(2, Voucher::withoutPrefix('FUU', '')->withSuffix('BAZ', '')->count());
-    $this->assertSame(2, Voucher::withPrefix('FOO', '')->withoutSuffix('BAR', '')->count());
-    $this->assertSame(2, Voucher::withPrefix('FUU', '')->withoutSuffix('BAR', '')->count());
-    $this->assertSame(2, Voucher::withPrefix('FOO', '')->withoutSuffix('BAZ', '')->count());
-    $this->assertSame(2, Voucher::withPrefix('FUU', '')->withoutSuffix('BAZ', '')->count());
-    $this->assertSame(2, Voucher::withoutPrefix('FOO', '')->withoutSuffix('BAR', '')->count());
-    $this->assertSame(2, Voucher::withoutPrefix('FUU', '')->withoutSuffix('BAR', '')->count());
-    $this->assertSame(2, Voucher::withoutPrefix('FOO', '')->withoutSuffix('BAZ', '')->count());
-    $this->assertSame(2, Voucher::withoutPrefix('FUU', '')->withoutSuffix('BAZ', '')->count());
+    expect(Voucher::withPrefix('FOO', '')->withSuffix('BAR', '')->count())->toBe(2);
+    expect(Voucher::withPrefix('FUU', '')->withSuffix('BAR', '')->count())->toBe(2);
+    expect(Voucher::withPrefix('FOO', '')->withSuffix('BAZ', '')->count())->toBe(2);
+    expect(Voucher::withPrefix('FUU', '')->withSuffix('BAZ', '')->count())->toBe(2);
+    expect(Voucher::withoutPrefix('FOO', '')->withSuffix('BAR', '')->count())->toBe(2);
+    expect(Voucher::withoutPrefix('FUU', '')->withSuffix('BAR', '')->count())->toBe(2);
+    expect(Voucher::withoutPrefix('FOO', '')->withSuffix('BAZ', '')->count())->toBe(2);
+    expect(Voucher::withoutPrefix('FUU', '')->withSuffix('BAZ', '')->count())->toBe(2);
+    expect(Voucher::withPrefix('FOO', '')->withoutSuffix('BAR', '')->count())->toBe(2);
+    expect(Voucher::withPrefix('FUU', '')->withoutSuffix('BAR', '')->count())->toBe(2);
+    expect(Voucher::withPrefix('FOO', '')->withoutSuffix('BAZ', '')->count())->toBe(2);
+    expect(Voucher::withPrefix('FUU', '')->withoutSuffix('BAZ', '')->count())->toBe(2);
+    expect(Voucher::withoutPrefix('FOO', '')->withoutSuffix('BAR', '')->count())->toBe(2);
+    expect(Voucher::withoutPrefix('FUU', '')->withoutSuffix('BAR', '')->count())->toBe(2);
+    expect(Voucher::withoutPrefix('FOO', '')->withoutSuffix('BAZ', '')->count())->toBe(2);
+    expect(Voucher::withoutPrefix('FUU', '')->withoutSuffix('BAZ', '')->count())->toBe(2);
 });
 
 /**
@@ -127,9 +127,9 @@ test('started scope', function () {
     Vouchers::withStartTime(Carbon::now()->subDay())->create();
     Vouchers::withStartTime(Carbon::now()->addDay())->create();
 
-    $this->assertSame(3, Voucher::count());
-    $this->assertSame(2, Voucher::withStarted()->count());
-    $this->assertSame(1, Voucher::withoutStarted()->count());
+    expect(Voucher::count())->toBe(3);
+    expect(Voucher::withStarted()->count())->toBe(2);
+    expect(Voucher::withoutStarted()->count())->toBe(1);
 });
 
 /**
@@ -140,9 +140,9 @@ test('expired scope', function () {
     Vouchers::withExpireTime(Carbon::now()->subDay())->create();
     Vouchers::withExpireTime(Carbon::now()->addDay())->create();
 
-    $this->assertSame(3, Voucher::count());
-    $this->assertSame(1, Voucher::withExpired()->count());
-    $this->assertSame(2, Voucher::withoutExpired()->count());
+    expect(Voucher::count())->toBe(3);
+    expect(Voucher::withExpired()->count())->toBe(1);
+    expect(Voucher::withoutExpired()->count())->toBe(2);
 });
 
 /**
@@ -152,9 +152,9 @@ test('redeemed scope', function () {
     Vouchers::create();
     Vouchers::create()->update(['redeemed_at' => Carbon::now()->subDay()]);
 
-    $this->assertSame(2, Voucher::count());
-    $this->assertSame(1, Voucher::withRedeemed()->count());
-    $this->assertSame(1, Voucher::withoutRedeemed()->count());
+    expect(Voucher::count())->toBe(2);
+    expect(Voucher::withRedeemed()->count())->toBe(1);
+    expect(Voucher::withoutRedeemed()->count())->toBe(1);
 });
 
 /**
@@ -168,9 +168,9 @@ test('redeemable scope', function () {
     Vouchers::withExpireTime(Carbon::now()->addDay())->create();
     Vouchers::create()->update(['redeemed_at' => Carbon::now()->subDay()]);
 
-    $this->assertSame(6, Voucher::count());
-    $this->assertSame(3, Voucher::withRedeemable()->count());
-    $this->assertSame(3, Voucher::withoutRedeemable()->count());
+    expect(Voucher::count())->toBe(6);
+    expect(Voucher::withRedeemable()->count())->toBe(3);
+    expect(Voucher::withoutRedeemable()->count())->toBe(3);
 });
 
 /**
@@ -185,10 +185,10 @@ test('entities scope', function () {
         ...User::factory()->count(3)->create()
     )->create();
 
-    $this->assertSame(4, Voucher::count());
-    $this->assertSame(3, Voucher::withEntities()->count());
-    $this->assertSame(2, Voucher::withEntities(Color::class)->count());
-    $this->assertSame(2, Voucher::withEntities(User::class)->count());
+    expect(Voucher::count())->toBe(4);
+    expect(Voucher::withEntities()->count())->toBe(3);
+    expect(Voucher::withEntities(Color::class)->count())->toBe(2);
+    expect(Voucher::withEntities(User::class)->count())->toBe(2);
 });
 
 /**
@@ -206,10 +206,10 @@ test('owner scopes', function () {
     $second->createVouchers(2);
     $third->createVouchers(3);
 
-    $this->assertSame(8, Voucher::count());
-    $this->assertSame(2, Voucher::withoutOwner()->count());
-    $this->assertSame(6, Voucher::withOwnerType(User::class)->count());
-    $this->assertSame(1, Voucher::withOwner($first)->count());
-    $this->assertSame(2, Voucher::withOwner($second)->count());
-    $this->assertSame(3, Voucher::withOwner($third)->count());
+    expect(Voucher::count())->toBe(8);
+    expect(Voucher::withoutOwner()->count())->toBe(2);
+    expect(Voucher::withOwnerType(User::class)->count())->toBe(6);
+    expect(Voucher::withOwner($first)->count())->toBe(1);
+    expect(Voucher::withOwner($second)->count())->toBe(2);
+    expect(Voucher::withOwner($third)->count())->toBe(3);
 });

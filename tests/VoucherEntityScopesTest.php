@@ -33,11 +33,11 @@ test('entity scopes', function () {
         ->create()
     ;
 
-    $this->assertTrue(VoucherEntity::withEntity($user)->exists());
-    $this->assertSame(6, VoucherEntity::withEntityType(User::class)->count());
-    $this->assertSame(9, VoucherEntity::withEntityType(Color::class)->count());
-    $this->assertSame(3, $first->voucherEntities()->withEntityType(User::class)->count());
-    $this->assertSame(3, $first->voucherEntities()->withEntityType(Color::class)->count());
-    $this->assertSame(3, $second->voucherEntities()->withEntityType(User::class)->count());
-    $this->assertSame(6, $second->voucherEntities()->withEntityType(Color::class)->count());
+    expect(VoucherEntity::withEntity($user)->exists())->toBeTrue();
+    expect(VoucherEntity::withEntityType(User::class)->count())->toBe(6);
+    expect(VoucherEntity::withEntityType(Color::class)->count())->toBe(9);
+    expect($first->voucherEntities()->withEntityType(User::class)->count())->toBe(3);
+    expect($first->voucherEntities()->withEntityType(Color::class)->count())->toBe(3);
+    expect($second->voucherEntities()->withEntityType(User::class)->count())->toBe(3);
+    expect($second->voucherEntities()->withEntityType(Color::class)->count())->toBe(6);
 });

@@ -22,7 +22,7 @@ uses(FrittenKeeZ\Vouchers\Tests\TestCase::class);
  * Test vouchers instance through app::make().
  */
 test('instance', function () {
-    $this->assertInstanceOf(Vouchers::class, app()->make('vouchers'));
+    expect(app()->make('vouchers'))->toBeInstanceOf(Vouchers::class);
 });
 
 /**
@@ -50,11 +50,11 @@ test('code generation', function () {
     $separator = $config->getSeparator();
 
     // Check vouchers proxy call to config.
-    $this->assertSame($mask, $vouchers->getMask());
-    $this->assertSame($characters, $vouchers->getCharacters());
-    $this->assertSame($prefix, $vouchers->getPrefix());
-    $this->assertSame($suffix, $vouchers->getSuffix());
-    $this->assertSame($separator, $vouchers->getSeparator());
+    expect($vouchers->getMask())->toBe($mask);
+    expect($vouchers->getCharacters())->toBe($characters);
+    expect($vouchers->getPrefix())->toBe($prefix);
+    expect($vouchers->getSuffix())->toBe($suffix);
+    expect($vouchers->getSeparator())->toBe($separator);
 
     // Grab validation regex.
     $regex = generateCodeValidationRegex($mask, $characters, $prefix, $suffix, $separator);
@@ -73,7 +73,7 @@ test('code generation', function () {
     }
 
     // Test negative batch amount.
-    $this->assertEmpty($vouchers->batch(-10));
+    expect($vouchers->batch(-10))->toBeEmpty();
 });
 
 /**
@@ -84,11 +84,11 @@ test('voucher creation', function () {
 
     // Simple voucher.
     $voucher = $vouchers->create();
-    $this->assertInstanceOf(Voucher::class, $voucher);
-    $this->assertNull($voucher->metadata);
-    $this->assertNull($voucher->starts_at);
-    $this->assertNull($voucher->expires_at);
-    $this->assertEmpty($voucher->getEntities());
+    expect($voucher)->toBeInstanceOf(Voucher::class);
+    expect($voucher->metadata)->toBeNull();
+    expect($voucher->starts_at)->toBeNull();
+    expect($voucher->expires_at)->toBeNull();
+    expect($voucher->getEntities())->toBeEmpty();
 
     // With metdata, start time and expire time.
     $metadata = ['foo' => 'bar', 'baz' => 'boom'];
@@ -105,25 +105,25 @@ test('voucher creation', function () {
         ->withEntities(...$users->all())
         ->create()
     ;
-    $this->assertInstanceOf(Voucher::class, $voucher);
-    $this->assertSame($metadata, $voucher->metadata);
-    $this->assertSame($start_time->toDateTimeString(), $voucher->starts_at->toDateTimeString());
-    $this->assertSame($expire_time->toDateTimeString(), $voucher->expires_at->toDateTimeString());
-    $this->assertTrue($user->is($voucher->owner));
+    expect($voucher)->toBeInstanceOf(Voucher::class);
+    expect($voucher->metadata)->toBe($metadata);
+    expect($voucher->starts_at->toDateTimeString())->toBe($start_time->toDateTimeString());
+    expect($voucher->expires_at->toDateTimeString())->toBe($expire_time->toDateTimeString());
+    expect($user->is($voucher->owner))->toBeTrue();
     foreach ($voucher->getEntities() as $index => $entity) {
-        $this->assertTrue($users[$index]->is($entity));
+        expect($users[$index]->is($entity))->toBeTrue();
     }
 
     // Test amount.
     $amount = 10;
     $batch = $vouchers->create($amount);
-    $this->assertSame($amount, \count($batch));
+    expect(\count($batch))->toBe($amount);
     foreach ($batch as $voucher) {
-        $this->assertInstanceOf(Voucher::class, $voucher);
+        expect($voucher)->toBeInstanceOf(Voucher::class);
     }
 
     // Test negative amount.
-    $this->assertEmpty($vouchers->create(-10));
+    expect($vouchers->create(-10))->toBeEmpty();
 });
 
 /**
@@ -135,32 +135,32 @@ test('voucher redemption', function () {
     $voucher = $vouchers->withOwner($user)->create();
 
     // Check user voucher relation.
-    $this->assertTrue($user->is($voucher->owner));
-    $this->assertTrue($voucher->is($user->vouchers->first()));
+    expect($user->is($voucher->owner))->toBeTrue();
+    expect($voucher->is($user->vouchers->first()))->toBeTrue();
 
     // Check voucher states.
-    $this->assertTrue($voucher->isRedeemable());
-    $this->assertTrue($vouchers->redeemable($voucher->code));
+    expect($voucher->isRedeemable())->toBeTrue();
+    expect($vouchers->redeemable($voucher->code))->toBeTrue();
     $this->assertFalse(
         $vouchers->redeemable($voucher->code, function (Voucher $voucher) {
             return $voucher->hasPrefix('thisprefixdoesnotexist');
         })
     );
-    $this->assertEmpty($voucher->redeemers);
-    $this->assertEmpty($voucher->getEntities());
+    expect($voucher->redeemers)->toBeEmpty();
+    expect($voucher->getEntities())->toBeEmpty();
     $metadata = ['foo' => 'bar', 'baz' => 'boom'];
-    $this->assertTrue($vouchers->redeem($voucher->code, $user, $metadata));
+    expect($vouchers->redeem($voucher->code, $user, $metadata))->toBeTrue();
     // Refresh instance.
     $voucher->refresh();
-    $this->assertFalse($voucher->isRedeemable());
-    $this->assertFalse($vouchers->redeemable($voucher->code));
+    expect($voucher->isRedeemable())->toBeFalse();
+    expect($vouchers->redeemable($voucher->code))->toBeFalse();
     $this->assertNotEmpty($voucher->redeemers);
     $redeemer = $voucher->redeemers->first();
-    $this->assertInstanceOf(Redeemer::class, $redeemer);
-    $this->assertTrue($user->is($redeemer->redeemer));
-    $this->assertSame($metadata, $redeemer->metadata);
-    $this->assertTrue($redeemer->is($user->redeemers->first()));
-    $this->assertTrue($voucher->is($redeemer->voucher));
+    expect($redeemer)->toBeInstanceOf(Redeemer::class);
+    expect($user->is($redeemer->redeemer))->toBeTrue();
+    expect($redeemer->metadata)->toBe($metadata);
+    expect($redeemer->is($user->redeemers->first()))->toBeTrue();
+    expect($voucher->is($redeemer->voucher))->toBeTrue();
 });
 
 /**
@@ -182,7 +182,7 @@ test('voucher already redeemed exception', function () {
     $voucher = $vouchers->create();
     $user = User::factory()->create();
 
-    $this->assertTrue($vouchers->redeem($voucher->code, $user));
+    expect($vouchers->redeem($voucher->code, $user))->toBeTrue();
     $this->expectException(VoucherAlreadyRedeemedException::class);
     $vouchers->redeem($voucher->code, $user);
 });
@@ -198,7 +198,7 @@ test('string wrapping', function (
     string $separator,
     string $expected
 ) {
-    $this->assertSame($expected, (new Vouchers())->wrap($str, $prefix, $suffix, $separator));
+    expect((new Vouchers())->wrap($str, $prefix, $suffix, $separator))->toBe($expected);
 })->with('wrapProvider');
 
 /**
