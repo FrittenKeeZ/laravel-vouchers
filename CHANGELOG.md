@@ -1,5 +1,25 @@
 # Release Notes
 
+## [v0.6.0 (2025-02-27)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.5.0...0.6.0)
+
+### Added
+- Added support for Laravel 12
+
+### Changed
+- Replaced PHPUnit with Pest
+
+### Deprecated
+- Dropped support for Laravel 9
+
+## [v0.5.0 (2024-06-13)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.4.1...0.5.0)
+
+### Changed
+- Made all migrations publishable
+
+### Deprecated
+- Removed 0.1.x -> 0.2.0 migration command
+- Removed legacy factories from tests
+
 ## [v0.4.1 (2024-06-13)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.4.0...0.4.1)
 
 ### Changed
