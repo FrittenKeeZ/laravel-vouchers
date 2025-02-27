@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 use FrittenKeeZ\Vouchers\Models\Voucher;
 
-uses(FrittenKeeZ\Vouchers\Tests\TestCase::class);
-
-/**
- * @internal
- */
-
 /**
  * Test Voucher::scopeCode().
  */

@@ -11,9 +11,6 @@ use FrittenKeeZ\Vouchers\VouchersServiceProvider;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
-/**
- * @internal
- */
 class TestCase extends BaseTestCase
 {
     /**

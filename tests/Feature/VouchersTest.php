@@ -10,13 +10,42 @@ use FrittenKeeZ\Vouchers\Models\Redeemer;
 use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
 use FrittenKeeZ\Vouchers\Vouchers;
-use PHPUnit\Runner\Version;
-
-uses(FrittenKeeZ\Vouchers\Tests\TestCase::class);
 
 /**
- * @internal
+ * Generate regex to validate a code generated with a specific mask, character list, prefix, suffix and separator.
  */
+function _generate_code_validation_regex(
+    string $mask,
+    string $characters,
+    ?string $prefix,
+    ?string $suffix,
+    string $separator
+): string {
+    $match = preg_quote($characters, '/');
+    $inner = preg_replace_callback(
+        "/(?:\\\\\*)+/",
+        fn (array $matches) => sprintf('[%s]{%d}', $match, mb_strlen($matches[0]) / 2),
+        preg_quote($mask, '/')
+    );
+
+    return sprintf(
+        '/%s%s%s/',
+        empty($prefix) ? '' : preg_quote($prefix . $separator, '/'),
+        $inner,
+        empty($suffix) ? '' : preg_quote($separator . $suffix, '/')
+    );
+}
+
+/**
+ * Data provider for Vouchers::wrap().
+ */
+dataset('wraps', [
+    'string only'                        => ['code', null, null, '-', 'code'],
+    'prefix dash separator'              => ['code', 'foo', null, '-', 'foo-code'],
+    'suffix dash separator'              => ['code', null, 'bar', '-', 'code-bar'],
+    'prefix suffix dash separator'       => ['code', 'foo', 'bar', '-', 'foo-code-bar'],
+    'prefix suffix underscore separator' => ['code', 'foo', 'bar', '_', 'foo_code_bar'],
+]);
 
 /**
  * Test vouchers instance through app::make().
@@ -29,7 +58,7 @@ test('instance', function () {
  * Test that Vouchers::getConfig() returns clone and not same instance.
  */
 test('config clone', function () {
-    $vouchers = new Vouchers;
+    $vouchers = new Vouchers();
     $config = $vouchers->getConfig();
 
     $this->assertNotSame($config, $vouchers->getConfig());
@@ -39,7 +68,7 @@ test('config clone', function () {
  * Test code generation.
  */
 test('code generation', function () {
-    $vouchers = new Vouchers;
+    $vouchers = new Vouchers();
     $config = $vouchers->getConfig();
 
     // Grab mask, characters, prefix, suffix and separator.
@@ -57,19 +86,14 @@ test('code generation', function () {
     expect($vouchers->getSeparator())->toBe($separator);
 
     // Grab validation regex.
-    $regex = generateCodeValidationRegex($mask, $characters, $prefix, $suffix, $separator);
-
-    $regex_assert_method = 'assertRegExp';
-    if ((float) Version::series() >= 9.1) {
-        $regex_assert_method = 'assertMatchesRegularExpression';
-    }
+    $regex = _generate_code_validation_regex($mask, $characters, $prefix, $suffix, $separator);
 
     // Test single generation.
-    $this->{$regex_assert_method}($regex, $vouchers->generate($mask, $characters));
+    $this->assertMatchesRegularExpression($regex, $vouchers->generate($mask, $characters));
 
     // Test batch operation.
     foreach ($vouchers->batch(10) as $code) {
-        $this->{$regex_assert_method}($regex, $code);
+        $this->assertMatchesRegularExpression($regex, $code);
     }
 
     // Test negative batch amount.
@@ -80,7 +104,7 @@ test('code generation', function () {
  * Test voucher creation.
  */
 test('voucher creation', function () {
-    $vouchers = new Vouchers;
+    $vouchers = new Vouchers();
 
     // Simple voucher.
     $voucher = $vouchers->create();
@@ -130,7 +154,7 @@ test('voucher creation', function () {
  * Test voucher redemption.
  */
 test('voucher redemption', function () {
-    $vouchers = new Vouchers;
+    $vouchers = new Vouchers();
     $user = User::factory()->create();
     $voucher = $vouchers->withOwner($user)->create();
 
@@ -167,7 +191,7 @@ test('voucher redemption', function () {
  * Test voucher not found exception.
  */
 test('voucher not found exception', function () {
-    $vouchers = new Vouchers;
+    $vouchers = new Vouchers();
     $user = User::factory()->create();
 
     $this->expectException(VoucherNotFoundException::class);
@@ -178,7 +202,7 @@ test('voucher not found exception', function () {
  * Test voucher already redeemed exception.
  */
 test('voucher already redeemed exception', function () {
-    $vouchers = new Vouchers;
+    $vouchers = new Vouchers();
     $voucher = $vouchers->create();
     $user = User::factory()->create();
 
@@ -190,59 +214,15 @@ test('voucher already redeemed exception', function () {
 /**
  * Test Vouchers::wrap() method.
  */
-test('string wrapping', function (
-    string $str,
-    ?string $prefix,
-    ?string $suffix,
-    string $separator,
-    string $expected
-) {
-    expect((new Vouchers)->wrap($str, $prefix, $suffix, $separator))->toBe($expected);
-})->with('wrapProvider');
+test('string wrapping', function (string $str, ?string $prefix, ?string $suffix, string $separator, string $expected) {
+    expect((new Vouchers())->wrap($str, $prefix, $suffix, $separator))->toBe($expected);
+})->with('wraps');
 
 /**
  * Test invalid magic call (Vouchers::__call()).
  */
 test('invalid magic call', function () {
     $this->expectException('ErrorException');
-    $vouchers = new Vouchers;
+    $vouchers = new Vouchers();
     $vouchers->methodthatdoesnotexist();
 });
-
-// Datasets
-/**
- * Data provider for Vouchers::wrap().
- */
-dataset('wrapProvider', [
-    'string only'                        => ['code', null, null, '-', 'code'],
-    'prefix dash separator'              => ['code', 'foo', null, '-', 'foo-code'],
-    'suffix dash separator'              => ['code', null, 'bar', '-', 'code-bar'],
-    'prefix suffix dash separator'       => ['code', 'foo', 'bar', '-', 'foo-code-bar'],
-    'prefix suffix underscore separator' => ['code', 'foo', 'bar', '_', 'foo_code_bar'],
-]);
-
-// Helpers
-/**
- * Generate regex to validate a code generated with a specific mask, character list, prefix, suffix and separator.
- */
-function generateCodeValidationRegex(
-    string $mask,
-    string $characters,
-    ?string $prefix,
-    ?string $suffix,
-    string $separator
-): string {
-    $match = preg_quote($characters, '/');
-    $inner = preg_replace_callback(
-        "/(?:\\\\\*)+/",
-        fn (array $matches) => sprintf('[%s]{%d}', $match, mb_strlen($matches[0]) / 2),
-        preg_quote($mask, '/')
-    );
-
-    return sprintf(
-        '/%s%s%s/',
-        empty($prefix) ? '' : preg_quote($prefix . $separator, '/'),
-        $inner,
-        empty($suffix) ? '' : preg_quote($separator . $suffix, '/')
-    );
-}

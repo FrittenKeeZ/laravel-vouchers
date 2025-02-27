@@ -112,10 +112,10 @@ class Vouchers
     {
         $voucher = $this->vouchers()->code($code)->first();
         if ($voucher === null) {
-            throw new VoucherNotFoundException;
+            throw new VoucherNotFoundException();
         }
         if (!$voucher->isRedeemable()) {
-            throw new VoucherAlreadyRedeemedException;
+            throw new VoucherAlreadyRedeemedException();
         }
 
         $redeemer = $this->redeemers();
@@ -216,7 +216,7 @@ class Vouchers
      */
     public function reset(): void
     {
-        $this->config = new Config;
+        $this->config = new Config();
     }
 
     /**

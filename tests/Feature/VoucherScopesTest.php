@@ -8,12 +8,6 @@ use FrittenKeeZ\Vouchers\Tests\Models\Color;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
 use Illuminate\Support\Carbon;
 
-uses(FrittenKeeZ\Vouchers\Tests\TestCase::class);
-
-/**
- * @internal
- */
-
 /**
  * Test Voucher::scopeCode().
  */
@@ -180,10 +174,7 @@ test('entities scope', function () {
     Vouchers::create();
     Vouchers::withEntities(...Color::factory()->count(3)->create())->create();
     Vouchers::withEntities(...User::factory()->count(3)->create())->create();
-    Vouchers::withEntities(
-        ...Color::factory()->count(3)->create(),
-        ...User::factory()->count(3)->create()
-    )->create();
+    Vouchers::withEntities(...Color::factory()->count(3)->create(), ...User::factory()->count(3)->create())->create();
 
     expect(Voucher::count())->toBe(4);
     expect(Voucher::withEntities()->count())->toBe(3);

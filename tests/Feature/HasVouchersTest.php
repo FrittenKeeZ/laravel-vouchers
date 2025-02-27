@@ -6,12 +6,6 @@ use FrittenKeeZ\Vouchers\Tests\Models\Color;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
 use FrittenKeeZ\Vouchers\Vouchers;
 
-uses(FrittenKeeZ\Vouchers\Tests\TestCase::class);
-
-/**
- * @internal
- */
-
 /**
  * Test HasVouchers::createVoucher().
  */

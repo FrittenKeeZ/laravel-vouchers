@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 use FrittenKeeZ\Vouchers\Facades\Vouchers;
 
-uses(FrittenKeeZ\Vouchers\Tests\TestCase::class);
-
-/**
- * @internal
- */
-
 /**
  * Test facade instance through app::make().
  */

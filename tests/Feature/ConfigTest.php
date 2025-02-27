@@ -11,11 +11,13 @@ use FrittenKeeZ\Vouchers\Models\VoucherEntity;
 use FrittenKeeZ\Vouchers\Tests\Models\Color;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
 
-uses(FrittenKeeZ\Vouchers\Tests\TestCase::class);
-
 /**
- * @internal
+ * Assert array structure.
  */
+function _assert_array_structure(array $expected, array $actual): void
+{
+    expect(empty(array_diff_key($expected, $actual)) && empty(array_diff_key($actual, $expected)))->toBeTrue();
+}
 
 /**
  * Test Config::model() method.
@@ -71,7 +73,7 @@ test('table resolving', function () {
  * Test default options from config.
  */
 test('default options', function () {
-    $config = new Config;
+    $config = new Config();
     $app_config = app()['config'];
 
     expect($config->getOptions())->toBeEmpty();
@@ -86,7 +88,7 @@ test('default options', function () {
  * Test options overridden in config.
  */
 test('config overridden options', function () {
-    $config = new Config;
+    $config = new Config();
     $app_config = app()['config'];
 
     // Override config.
@@ -115,7 +117,7 @@ test('config overridden options', function () {
  * Test dynamically overridden options using 'with' methods.
  */
 test('dynamically overridden options', function () {
-    $config = new Config;
+    $config = new Config();
 
     // Override config.
     $options = [
@@ -132,7 +134,7 @@ test('dynamically overridden options', function () {
         $config->{$setter}($value);
     }
 
-    assertArrayStructure($options, $config->getOptions());
+    _assert_array_structure($options, $config->getOptions());
     expect($config->getCharacters())->toBe($options['characters']);
     expect($config->getMask())->toBe($options['mask']);
     expect($config->getPrefix())->toBe($options['prefix']);
@@ -150,7 +152,7 @@ test('dynamically overridden options', function () {
  * Test additional options using 'with' methods.
  */
 test('additional options', function () {
-    $config = new Config;
+    $config = new Config();
 
     // Test metadata
     $metadata = [
@@ -208,12 +210,3 @@ test('additional options', function () {
     $entities = Color::factory()->count(3)->make()->all();
     expect($config->withEntities(...$entities)->getEntities())->toBe($entities);
 });
-
-// Helpers
-/**
- * Assert array structure.
- */
-function assertArrayStructure(array $expected, array $actual): void
-{
-    expect(empty(array_diff_key($expected, $actual)) && empty(array_diff_key($actual, $expected)))->toBeTrue();
-}

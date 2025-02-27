@@ -1,6 +1,8 @@
 <?php
 
-uses(\FrittenKeeZ\Vouchers\Tests\TestCase::class)->in('database', 'Datasets', 'Models');
+use FrittenKeeZ\Vouchers\Tests\TestCase;
+
+uses(TestCase::class)->in('Feature');
 
 /*
 |--------------------------------------------------------------------------

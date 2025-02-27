@@ -2,23 +2,16 @@
 
 declare(strict_types=1);
 
-use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Models\VoucherEntity;
 use FrittenKeeZ\Vouchers\Tests\Models\Color;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
 use FrittenKeeZ\Vouchers\Vouchers;
 
-uses(FrittenKeeZ\Vouchers\Tests\TestCase::class);
-
-/**
- * @internal
- */
-
 /**
  * Test Voucher::scopeWithEntityType() and Voucher::scopeWithEntity().
  */
 test('entity scopes', function () {
-    $vouchers = new Vouchers;
+    $vouchers = new Vouchers();
 
     // Create user.
     $user = User::factory()->create();
