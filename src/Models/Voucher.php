@@ -191,13 +191,12 @@ class Voucher extends Model
     /**
      * Add related entities.
      */
-    public function addEntities(Model ...$entities): void
+    public function addEntities(iterable|Model $entities = [], Model ...$remaining): void
     {
-        if (!empty($entities)) {
+        $entities = collect(is_iterable($entities) ? $entities : [$entities])->concat($remaining);
+        if ($entities->isNotEmpty()) {
             $model = Config::model('entity');
-            $models = collect($entities)->map(function (Model $entity) use ($model) {
-                return $model::make()->entity()->associate($entity);
-            });
+            $models = $entities->map(fn (Model $entity) => $model::make()->entity()->associate($entity));
             $this->voucherEntities()->saveMany($models);
         }
     }

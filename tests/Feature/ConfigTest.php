@@ -208,5 +208,18 @@ test('additional options', function () {
 
     // Test entities.
     $entities = Color::factory()->count(3)->make()->all();
+    // Using spread operator.
     expect($config->withEntities(...$entities)->getEntities())->toBe($entities);
+    // Using empty spread operator.
+    expect($config->withEntities(...[])->getEntities())->toBe([]);
+    // Using array.
+    expect($config->withEntities($entities)->getEntities())->toBe($entities);
+    // Using collection.
+    expect($config->withEntities(collect($entities))->getEntities())->toBe($entities);
+    // Using generator.
+    expect($config->withEntities((function () use ($entities) {
+        foreach ($entities as $entity) {
+            yield $entity;
+        }
+    })())->getEntities())->toBe($entities);
 });

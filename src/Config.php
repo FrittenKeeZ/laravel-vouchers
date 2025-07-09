@@ -260,9 +260,13 @@ class Config
     /**
      * With entities.
      */
-    public function withEntities(Model ...$entities): self
+    public function withEntities(iterable|Model $entities = [], Model ...$remaining): self
     {
-        Arr::set($this->options, 'entities', $entities);
+        Arr::set(
+            $this->options,
+            'entities',
+            collect(is_iterable($entities) ? $entities : [$entities])->concat($remaining)->all()
+        );
 
         return $this;
     }
