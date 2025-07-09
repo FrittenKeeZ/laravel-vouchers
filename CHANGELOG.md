@@ -1,5 +1,10 @@
 # Release Notes
 
+## [v0.6.1 (2025-07-09)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.6.0...0.6.1)
+
+### Changed
+- Allow withEntities to accept any iterable
+
 ## [v0.6.0 (2025-02-27)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.5.0...0.6.0)
 
 ### Added
