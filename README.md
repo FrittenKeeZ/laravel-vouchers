@@ -131,8 +131,12 @@ Vouchers::withExpireTimeIn(DateInterval $interval);
 Vouchers::withExpireDate(DateTime $timestamp);
 // Set voucher expire date using interval - time component is set to end of day (23:59:59).
 Vouchers::withExpireDateIn(DateInterval $interval);
-// Set related entities to voucher.
+// Set related entities to voucher - using spread operater.
 Vouchers::withEntities(Illuminate\Database\Eloquent\Model ...$entities);
+// Set related entities to voucher - iterable.
+Vouchers::withEntities(Illuminate\Database\Eloquent\Model[] $entities);
+Vouchers::withEntities(Illuminate\Support\Collection<Illuminate\Database\Eloquent\Model> $entities);
+Vouchers::withEntities(Generator<Illuminate\Database\Eloquent\Model> $entities);
 // Set owning entity for voucher.
 Vouchers::withOwner(Illuminate\Database\Eloquent\Model $owner);
 ```
