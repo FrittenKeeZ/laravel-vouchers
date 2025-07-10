@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+      - "release/**"
     paths:
       - "**.json"
       - "**.php"
@@ -12,6 +13,7 @@ on:
   pull_request:
     branches:
       - master
+      - "release/**"
     paths:
       - "**.json"
       - "**.php"
