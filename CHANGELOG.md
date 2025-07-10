@@ -1,9 +1,14 @@
 # Release Notes
 
+## [v0.6.2 (2025-07-10)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.6.1...0.6.2)
+
+### Changed
+- Allow `Vouchers::withStart*()` and `Vouchers::withExpire*()` methods to accept `null`
+
 ## [v0.6.1 (2025-07-09)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.6.0...0.6.1)
 
 ### Changed
-- Allow withEntities to accept any iterable
+- Allow `Vouchers::withEntities()` method to accept any `iterable`
 
 ## [v0.6.0 (2025-02-27)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.5.0...0.6.0)
 

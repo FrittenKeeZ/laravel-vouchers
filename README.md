@@ -116,21 +116,21 @@ Following methods only apply to `Vouchers::create()` call.
 // Add metadata to voucher.
 Vouchers::withMetadata(array $metadata);
 // Set voucher start time.
-Vouchers::withStartTime(DateTime $timestamp);
+Vouchers::withStartTime(DateTime|null $timestamp);
 // Set voucher start time using interval.
-Vouchers::withStartTimeIn(DateInterval $interval);
+Vouchers::withStartTimeIn(DateInterval|null $interval);
 // Set voucher start date - time component is zeroed.
-Vouchers::withStartDate(DateTime $timestamp);
+Vouchers::withStartDate(DateTime|null $timestamp);
 // Set voucher start date using interval - time component is zeroed.
-Vouchers::withStartDateIn(DateInterval $interval);
+Vouchers::withStartDateIn(DateInterval|null $interval);
 // Set voucher expire time.
-Vouchers::withExpireTime(DateTime $timestamp);
+Vouchers::withExpireTime(DateTime|null $timestamp);
 // Set voucher expire time using interval.
-Vouchers::withExpireTimeIn(DateInterval $interval);
+Vouchers::withExpireTimeIn(DateInterval|null $interval);
 // Set voucher expire date - time component is set to end of day (23:59:59).
-Vouchers::withExpireDate(DateTime $timestamp);
+Vouchers::withExpireDate(DateTime|null $timestamp);
 // Set voucher expire date using interval - time component is set to end of day (23:59:59).
-Vouchers::withExpireDateIn(DateInterval $interval);
+Vouchers::withExpireDateIn(DateInterval|null $interval);
 // Set related entities to voucher - using spread operater.
 Vouchers::withEntities(Illuminate\Database\Eloquent\Model ...$entities);
 // Set related entities to voucher - iterable.

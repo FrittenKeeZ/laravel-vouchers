@@ -170,18 +170,22 @@ test('additional options', function () {
         Carbon::now()->toDateTimeString(),
         $config->withStartTime(Carbon::now())->getStartTime()->toDateTimeString()
     );
+    $this->assertNull($config->withStartTime(null)->getStartTime());
     $this->assertSame(
         Carbon::now()->add($interval)->toDateTimeString(),
         $config->withStartTimeIn($interval)->getStartTime()->toDateTimeString()
     );
+    $this->assertNull($config->withStartTimeIn(null)->getStartTime());
     $this->assertSame(
         Carbon::now()->startOfDay()->toDateTimeString(),
         $config->withStartDate(Carbon::now())->getStartTime()->toDateTimeString()
     );
+    $this->assertNull($config->withStartDate(null)->getStartTime());
     $this->assertSame(
         Carbon::now()->add($interval)->startOfDay()->toDateTimeString(),
         $config->withStartDateIn($interval)->getStartTime()->toDateTimeString()
     );
+    $this->assertNull($config->withStartDateIn(null)->getStartTime());
 
     // Test expire time.
     $interval = CarbonInterval::create('P15DT20M10S');
@@ -189,18 +193,22 @@ test('additional options', function () {
         Carbon::now()->toDateTimeString(),
         $config->withExpireTime(Carbon::now())->getExpireTime()->toDateTimeString()
     );
+    $this->assertNull($config->withExpireTime(null)->getExpireTime());
     $this->assertSame(
         Carbon::now()->add($interval)->toDateTimeString(),
         $config->withExpireTimeIn($interval)->getExpireTime()->toDateTimeString()
     );
+    $this->assertNull($config->withExpireTimeIn(null)->getExpireTime());
     $this->assertSame(
         Carbon::now()->endOfDay()->toDateTimeString(),
         $config->withExpireDate(Carbon::now())->getExpireTime()->toDateTimeString()
     );
+    $this->assertNull($config->withExpireDate(null)->getExpireTime());
     $this->assertSame(
         Carbon::now()->add($interval)->endOfDay()->toDateTimeString(),
         $config->withExpireDateIn($interval)->getExpireTime()->toDateTimeString()
     );
+    $this->assertNull($config->withExpireDateIn(null)->getExpireTime());
 
     // Test owner.
     $owner = User::factory()->make();

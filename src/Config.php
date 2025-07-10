@@ -174,9 +174,13 @@ class Config
     /**
      * With start time.
      */
-    public function withStartTime(DateTime $timestamp): self
+    public function withStartTime(?DateTime $timestamp): self
     {
-        Arr::set($this->options, 'starts_at', Carbon::instance($timestamp));
+        if ($timestamp === null) {
+            Arr::forget($this->options, 'starts_at');
+        } else {
+            Arr::set($this->options, 'starts_at', Carbon::instance($timestamp));
+        }
 
         return $this;
     }
@@ -184,25 +188,25 @@ class Config
     /**
      * With start time in the given interval.
      */
-    public function withStartTimeIn(DateInterval $interval): self
+    public function withStartTimeIn(?DateInterval $interval): self
     {
-        return $this->withStartTime(Carbon::now()->add($interval));
+        return $this->withStartTime($interval ? Carbon::now()->add($interval) : null);
     }
 
     /**
      * With start date - time component is set to 00:00:00.000000.
      */
-    public function withStartDate(DateTime $timestamp): self
+    public function withStartDate(?DateTime $timestamp): self
     {
-        return $this->withStartTime(Carbon::instance($timestamp)->startOfDay());
+        return $this->withStartTime($timestamp ? Carbon::instance($timestamp)->startOfDay() : null);
     }
 
     /**
      * With start date in the given interval - time component is set to 00:00:00.000000.
      */
-    public function withStartDateIn(DateInterval $interval): self
+    public function withStartDateIn(?DateInterval $interval): self
     {
-        return $this->withStartTime(Carbon::now()->add($interval)->startOfDay());
+        return $this->withStartTime($interval ? Carbon::now()->add($interval)->startOfDay() : null);
     }
 
     /**
@@ -216,9 +220,13 @@ class Config
     /**
      * With expire time.
      */
-    public function withExpireTime(DateTime $timestamp): self
+    public function withExpireTime(?DateTime $timestamp): self
     {
-        Arr::set($this->options, 'expires_at', Carbon::instance($timestamp));
+        if ($timestamp === null) {
+            Arr::forget($this->options, 'expires_at');
+        } else {
+            Arr::set($this->options, 'expires_at', Carbon::instance($timestamp));
+        }
 
         return $this;
     }
@@ -226,25 +234,25 @@ class Config
     /**
      * With expire time in the given interval.
      */
-    public function withExpireTimeIn(DateInterval $interval): self
+    public function withExpireTimeIn(?DateInterval $interval): self
     {
-        return $this->withExpireTime(Carbon::now()->add($interval));
+        return $this->withExpireTime($interval ? Carbon::now()->add($interval) : null);
     }
 
     /**
      * With expire date - time component is set to 23:59:59.999999.
      */
-    public function withExpireDate(DateTime $timestamp): self
+    public function withExpireDate(?DateTime $timestamp): self
     {
-        return $this->withExpireTime(Carbon::instance($timestamp)->endOfDay());
+        return $this->withExpireTime($timestamp ? Carbon::instance($timestamp)->endOfDay() : null);
     }
 
     /**
      * With expire date in the given interval - time component is set to 23:59:59.999999.
      */
-    public function withExpireDateIn(DateInterval $interval): self
+    public function withExpireDateIn(?DateInterval $interval): self
     {
-        return $this->withExpireTime(Carbon::now()->add($interval)->endOfDay());
+        return $this->withExpireTime($interval ? Carbon::now()->add($interval)->endOfDay() : null);
     }
 
     /**
