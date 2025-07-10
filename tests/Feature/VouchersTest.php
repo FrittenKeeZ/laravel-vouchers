@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
-use FrittenKeeZ\Vouchers\Exceptions\VoucherAlreadyRedeemedException;
-use FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException;
+use FrittenKeeZ\Vouchers\Exceptions;
 use FrittenKeeZ\Vouchers\Models\Redeemer;
 use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
@@ -194,20 +193,44 @@ test('voucher not found exception', function () {
     $vouchers = new Vouchers();
     $user = User::factory()->create();
 
-    $this->expectException(VoucherNotFoundException::class);
+    $this->expectException(Exceptions\VoucherNotFoundException::class);
     $vouchers->redeem('idonotexist', $user);
 });
 
 /**
- * Test voucher already redeemed exception.
+ * Test voucher redeemed exception.
  */
-test('voucher already redeemed exception', function () {
+test('voucher redeemed exception', function () {
     $vouchers = new Vouchers();
     $voucher = $vouchers->create();
     $user = User::factory()->create();
 
     expect($vouchers->redeem($voucher->code, $user))->toBeTrue();
-    $this->expectException(VoucherAlreadyRedeemedException::class);
+    $this->expectException(Exceptions\VoucherRedeemedException::class);
+    $vouchers->redeem($voucher->code, $user);
+});
+
+/**
+ * Test voucher unstarted exception.
+ */
+test('voucher unstarted exception', function () {
+    $vouchers = new Vouchers();
+    $voucher = $vouchers->withStartTime(Carbon::now()->addMonth())->create();
+    $user = User::factory()->create();
+
+    $this->expectException(Exceptions\VoucherUnstartedException::class);
+    $vouchers->redeem($voucher->code, $user);
+});
+
+/**
+ * Test voucher expired exception.
+ */
+test('voucher expired exception', function () {
+    $vouchers = new Vouchers();
+    $voucher = $vouchers->withExpireTime(Carbon::now()->subMonth())->create();
+    $user = User::factory()->create();
+
+    $this->expectException(Exceptions\VoucherExpiredException::class);
     $vouchers->redeem($voucher->code, $user);
 });
 

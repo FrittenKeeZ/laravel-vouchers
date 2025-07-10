@@ -5,14 +5,46 @@ declare(strict_types=1);
 namespace FrittenKeeZ\Vouchers;
 
 use Closure;
-use FrittenKeeZ\Vouchers\Exceptions\VoucherAlreadyRedeemedException;
-use FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException;
 use FrittenKeeZ\Vouchers\Models\Redeemer;
 use FrittenKeeZ\Vouchers\Models\Voucher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+/**
+ * @method array           getOptions()                                                     Get dynamically set options.
+ * @method string          getCharacters()
+ * @method self            withCharacters(string $characters)
+ * @method string          getMask()
+ * @method self            withMask(string $mask)
+ * @method ?string         getPrefix()
+ * @method self            withPrefix(string $prefix)
+ * @method self            withoutPrefix()
+ * @method ?string         getSuffix()
+ * @method self            withSuffix(string $suffix)
+ * @method self            withoutSuffix()
+ * @method string          getSeparator()
+ * @method self            withSeparator(string $separator)
+ * @method self            withoutSeparator()
+ * @method ?array          getMetadata()
+ * @method self            withMetadata(array $metadata)
+ * @method ?\Carbon\Carbon getStartTime()
+ * @method self            withStartTime(?\DateTime $timestamp)
+ * @method self            withStartTimeIn(?\DateInterval $interval)
+ * @method self            withStartDate(?\DateTime $timestamp)
+ * @method self            withStartDateIn(?\DateInterval $interval)
+ * @method ?\Carbon\Carbon getExpireTime()
+ * @method self            withExpireTime(?\DateTime $timestamp)
+ * @method self            withExpireTimeIn(?\DateInterval $interval)
+ * @method self            withExpireDate(?\DateTime $timestamp)
+ * @method self            withExpireDateIn(?\DateInterval $interval)
+ * @method array|Model[]   getEntities()
+ * @method self            withEntities(iterable|Model $entities = [], Model ...$remaining)
+ * @method ?Model          getOwner()
+ * @method self            withOwner(Model $owner)
+ *
+ * @see \FrittenKeeZ\Vouchers\Config
+ */
 class Vouchers
 {
     /**
@@ -106,16 +138,29 @@ class Vouchers
      * @param array                               $metadata Additional metadata for redeemer.
      *
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException
-     * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherAlreadyRedeemedException
+     * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherRedeemedException
+     * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherUnstartedException
+     * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherExpiredException
+     * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherNotRedeemableException
      */
     public function redeem(string $code, Model $entity, array $metadata = []): bool
     {
+        /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
         $voucher = $this->vouchers()->code($code)->first();
-        if ($voucher === null) {
-            throw new VoucherNotFoundException();
-        }
-        if (!$voucher->isRedeemable()) {
-            throw new VoucherAlreadyRedeemedException();
+        // If the voucher is null or not redeemable, throw an appropriate exception.
+        if ($voucher === null || !$voucher->isRedeemable()) {
+            switch (true) {
+                case $voucher === null:
+                    throw new Exceptions\VoucherNotFoundException();
+                case $voucher->isRedeemed():
+                    throw new Exceptions\VoucherRedeemedException();
+                case !$voucher->isStarted():
+                    throw new Exceptions\VoucherUnstartedException();
+                case $voucher->isExpired():
+                    throw new Exceptions\VoucherExpiredException();
+                default:
+                    throw new Exceptions\VoucherNotRedeemableException();
+            }
         }
 
         $redeemer = $this->redeemers();
@@ -137,6 +182,7 @@ class Vouchers
      */
     public function redeemable(string $code, ?Closure $callback = null): bool
     {
+        /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
         $voucher = $this->vouchers()->code($code)->first();
 
         return $voucher !== null && $voucher->isRedeemable() && ($callback === null || $callback($voucher));
@@ -208,7 +254,7 @@ class Vouchers
      */
     public function exists(string $code, array $codes = []): bool
     {
-        return \in_array($code, $codes) || $this->vouchers()->code($code)->exists();
+        return \in_array($code, $codes, true) || $this->vouchers()->code($code)->exists();
     }
 
     /**
