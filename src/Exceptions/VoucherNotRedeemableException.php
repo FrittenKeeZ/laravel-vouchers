@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace FrittenKeeZ\Vouchers\Exceptions;
 
-class VoucherAlreadyRedeemedException extends VoucherException
+class VoucherNotRedeemableException extends VoucherException
 {
     /**
      * Exception message.
      *
      * @var string
      */
-    protected $message = 'Voucher has already been redeemed.';
+    protected $message = 'Voucher is not redeemable.';
 
     /**
      * Exception code - we use 409 Conflict.
