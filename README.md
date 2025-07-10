@@ -84,9 +84,23 @@ Vouchers::redeem(string $code, Illuminate\Database\Eloquent\Model $entity, array
 try {
     $success = Vouchers::redeem('123-456-789', $user, ['foo' => 'bar']);
 } catch (FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException $e) {
-    // Code provided did not match any vouchers in the database.
-} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherAlreadyRedeemedException $e) {
+    // Voucher was not found with the provided code.
+} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherRedeemedException $e) {
     // Voucher has already been redeemed.
+} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherUnstartedException $e) {
+    // Voucher is not yet started.
+} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherExpiredException $e) {
+    // Voucher is expired.
+}
+```
+Or if you don't care about the specific exceptions:
+```php
+try {
+    $success = Vouchers::redeem('123-456-789', $user, ['foo' => 'bar']);
+} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException $e) {
+    // Voucher was not found with the provided code.
+} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherNotRedeemableException $e) {
+    // Voucher is not redeemable.
 }
 ```
 
