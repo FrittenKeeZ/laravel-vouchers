@@ -97,10 +97,8 @@ Or if you don't care about the specific exceptions:
 ```php
 try {
     $success = Vouchers::redeem('123-456-789', $user, ['foo' => 'bar']);
-} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException $e) {
-    // Voucher was not found with the provided code.
-} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherNotRedeemableException $e) {
-    // Voucher is not redeemable.
+} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherException $e) {
+    // Voucher was not possible to redeem.
 }
 ```
 

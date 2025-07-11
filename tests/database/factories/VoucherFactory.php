@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace FrittenKeeZ\Vouchers\Tests\Database\Factories;
 
-use FrittenKeeZ\Vouchers\Tests\Models\Color;
+use FrittenKeeZ\Vouchers\Tests\Models\Voucher;
+use FrittenKeeZ\Vouchers\Vouchers;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class ColorFactory extends Factory
+class VoucherFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Color::class;
+    protected $model = Voucher::class;
 
     /**
      * Define the model's default state.
@@ -22,7 +23,7 @@ class ColorFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->colorName(),
+            'code' => (new Vouchers())->generate(),
         ];
     }
 }

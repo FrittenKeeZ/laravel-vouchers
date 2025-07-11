@@ -46,7 +46,7 @@
         ],
         "psr-4": {
             "FrittenKeeZ\\Vouchers\\Tests\\": "tests",
-            "Database\\Factories\\FrittenKeeZ\\Vouchers\\Tests\\Models\\": "tests/database/factories"
+            "FrittenKeeZ\\Vouchers\\Tests\\Database\\Factories\\": "tests/database/factories"
         }
     },
     "scripts": {

@@ -60,7 +60,7 @@ test('config clone', function () {
     $vouchers = new Vouchers();
     $config = $vouchers->getConfig();
 
-    $this->assertNotSame($config, $vouchers->getConfig());
+    expect($config)->not->toBe($vouchers->getConfig());
 });
 
 /**
@@ -88,11 +88,11 @@ test('code generation', function () {
     $regex = _generate_code_validation_regex($mask, $characters, $prefix, $suffix, $separator);
 
     // Test single generation.
-    $this->assertMatchesRegularExpression($regex, $vouchers->generate($mask, $characters));
+    expect($vouchers->generate($mask, $characters))->toMatch($regex);
 
     // Test batch operation.
     foreach ($vouchers->batch(10) as $code) {
-        $this->assertMatchesRegularExpression($regex, $code);
+        expect($code)->toMatch($regex);
     }
 
     // Test negative batch amount.
@@ -164,11 +164,11 @@ test('voucher redemption', function () {
     // Check voucher states.
     expect($voucher->isRedeemable())->toBeTrue();
     expect($vouchers->redeemable($voucher->code))->toBeTrue();
-    $this->assertFalse(
+    expect(
         $vouchers->redeemable($voucher->code, function (Voucher $voucher) {
             return $voucher->hasPrefix('thisprefixdoesnotexist');
         })
-    );
+    )->toBeFalse();
     expect($voucher->redeemers)->toBeEmpty();
     expect($voucher->getEntities())->toBeEmpty();
     $metadata = ['foo' => 'bar', 'baz' => 'boom'];
@@ -177,7 +177,7 @@ test('voucher redemption', function () {
     $voucher->refresh();
     expect($voucher->isRedeemable())->toBeFalse();
     expect($vouchers->redeemable($voucher->code))->toBeFalse();
-    $this->assertNotEmpty($voucher->redeemers);
+    expect($voucher->redeemers)->not->toBeEmpty();
     $redeemer = $voucher->redeemers->first();
     expect($redeemer)->toBeInstanceOf(Redeemer::class);
     expect($user->is($redeemer->redeemer))->toBeTrue();

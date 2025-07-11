@@ -101,7 +101,7 @@ test('config overridden options', function () {
     ];
     foreach ($options as $key => $value) {
         $getter = 'get' . ucfirst($key);
-        $this->assertNotSame($value, $config->{$getter}());
+        expect($value)->not->toBe($config->{$getter}());
         $app_config->set('vouchers.' . $key, $value);
     }
 
@@ -130,7 +130,7 @@ test('dynamically overridden options', function () {
     foreach ($options as $key => $value) {
         $getter = 'get' . ucfirst($key);
         $setter = 'with' . ucfirst($key);
-        $this->assertNotSame($value, $config->{$getter}());
+        expect($value)->not->toBe($config->{$getter}());
         $config->{$setter}($value);
     }
 
@@ -166,49 +166,41 @@ test('additional options', function () {
 
     // Test start time.
     $interval = CarbonInterval::create('P10DT30M45S');
-    $this->assertSame(
-        Carbon::now()->toDateTimeString(),
-        $config->withStartTime(Carbon::now())->getStartTime()->toDateTimeString()
-    );
-    $this->assertNull($config->withStartTime(null)->getStartTime());
-    $this->assertSame(
-        Carbon::now()->add($interval)->toDateTimeString(),
-        $config->withStartTimeIn($interval)->getStartTime()->toDateTimeString()
-    );
-    $this->assertNull($config->withStartTimeIn(null)->getStartTime());
-    $this->assertSame(
-        Carbon::now()->startOfDay()->toDateTimeString(),
-        $config->withStartDate(Carbon::now())->getStartTime()->toDateTimeString()
-    );
-    $this->assertNull($config->withStartDate(null)->getStartTime());
-    $this->assertSame(
-        Carbon::now()->add($interval)->startOfDay()->toDateTimeString(),
-        $config->withStartDateIn($interval)->getStartTime()->toDateTimeString()
-    );
-    $this->assertNull($config->withStartDateIn(null)->getStartTime());
+    expect(Carbon::now()->toDateTimeString())
+        ->toBe($config->withStartTime(Carbon::now())->getStartTime()->toDateTimeString())
+    ;
+    expect($config->withStartTime(null)->getStartTime())->toBeNull();
+    expect(Carbon::now()->add($interval)->toDateTimeString())
+        ->toBe($config->withStartTimeIn($interval)->getStartTime()->toDateTimeString())
+    ;
+    expect($config->withStartTimeIn(null)->getStartTime())->toBeNull();
+    expect(Carbon::now()->startOfDay()->toDateTimeString())
+        ->toBe($config->withStartDate(Carbon::now())->getStartTime()->toDateTimeString())
+    ;
+    expect($config->withStartDate(null)->getStartTime())->toBeNull();
+    expect(Carbon::now()->add($interval)->startOfDay()->toDateTimeString())
+        ->toBe($config->withStartDateIn($interval)->getStartTime()->toDateTimeString())
+    ;
+    expect($config->withStartDateIn(null)->getStartTime())->toBeNull();
 
     // Test expire time.
     $interval = CarbonInterval::create('P15DT20M10S');
-    $this->assertSame(
-        Carbon::now()->toDateTimeString(),
-        $config->withExpireTime(Carbon::now())->getExpireTime()->toDateTimeString()
-    );
-    $this->assertNull($config->withExpireTime(null)->getExpireTime());
-    $this->assertSame(
-        Carbon::now()->add($interval)->toDateTimeString(),
-        $config->withExpireTimeIn($interval)->getExpireTime()->toDateTimeString()
-    );
-    $this->assertNull($config->withExpireTimeIn(null)->getExpireTime());
-    $this->assertSame(
-        Carbon::now()->endOfDay()->toDateTimeString(),
-        $config->withExpireDate(Carbon::now())->getExpireTime()->toDateTimeString()
-    );
-    $this->assertNull($config->withExpireDate(null)->getExpireTime());
-    $this->assertSame(
-        Carbon::now()->add($interval)->endOfDay()->toDateTimeString(),
-        $config->withExpireDateIn($interval)->getExpireTime()->toDateTimeString()
-    );
-    $this->assertNull($config->withExpireDateIn(null)->getExpireTime());
+    expect(Carbon::now()->toDateTimeString())
+        ->toBe($config->withExpireTime(Carbon::now())->getExpireTime()->toDateTimeString())
+    ;
+    expect($config->withExpireTime(null)->getExpireTime())->toBeNull();
+    expect(Carbon::now()->add($interval)->toDateTimeString())
+        ->toBe($config->withExpireTimeIn($interval)->getExpireTime()->toDateTimeString())
+    ;
+    expect($config->withExpireTimeIn(null)->getExpireTime())->toBeNull();
+    expect(Carbon::now()->endOfDay()->toDateTimeString())
+        ->toBe($config->withExpireDate(Carbon::now())->getExpireTime()->toDateTimeString())
+    ;
+    expect($config->withExpireDate(null)->getExpireTime())->toBeNull();
+    expect(Carbon::now()->add($interval)->endOfDay()->toDateTimeString())
+        ->toBe($config->withExpireDateIn($interval)->getExpireTime()->toDateTimeString())
+    ;
+    expect($config->withExpireDateIn(null)->getExpireTime())->toBeNull();
 
     // Test owner.
     $owner = User::factory()->make();

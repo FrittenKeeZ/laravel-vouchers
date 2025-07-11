@@ -6,6 +6,7 @@ namespace FrittenKeeZ\Vouchers\Tests\Models;
 
 use FrittenKeeZ\Vouchers\Concerns\HasRedeemers;
 use FrittenKeeZ\Vouchers\Concerns\HasVouchers;
+use FrittenKeeZ\Vouchers\Tests\Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -37,4 +38,12 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory()
+    {
+        return UserFactory::new();
+    }
 }
