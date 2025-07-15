@@ -51,7 +51,8 @@
     },
     "scripts": {
         "pint": "pint",
-        "test": "pest --parallel"
+        "test": "pest --parallel",
+        "test-coverage": "pest --parallel --coverage"
     },
     "extra": {
         "laravel": {

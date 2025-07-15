@@ -26,4 +26,14 @@ class VoucherFactory extends Factory
             'code' => (new Vouchers())->generate(),
         ];
     }
+
+    /**
+     * Define the redeemed state.
+     */
+    public function redeemed(): static
+    {
+        return $this->state([
+            'redeemed_at' => $this->faker->dateTime(),
+        ]);
+    }
 }
