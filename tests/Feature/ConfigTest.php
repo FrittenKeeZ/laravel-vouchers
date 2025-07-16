@@ -12,14 +12,6 @@ use FrittenKeeZ\Vouchers\Tests\Models\Color;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
 
 /**
- * Assert array structure.
- */
-function _assert_array_structure(array $expected, array $actual): void
-{
-    expect(empty(array_diff_key($expected, $actual)) && empty(array_diff_key($actual, $expected)))->toBeTrue();
-}
-
-/**
  * Test Config::model() method.
  */
 test('model resolving', function () {
@@ -134,7 +126,7 @@ test('dynamically overridden options', function () {
         $config->{$setter}($value);
     }
 
-    _assert_array_structure($options, $config->getOptions());
+    expect($config->getOptions())->toBe($options);
     expect($config->getCharacters())->toBe($options['characters']);
     expect($config->getMask())->toBe($options['mask']);
     expect($config->getPrefix())->toBe($options['prefix']);

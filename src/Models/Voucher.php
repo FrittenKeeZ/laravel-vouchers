@@ -57,6 +57,9 @@ class Voucher extends Model
         'redeeming',
         'redeemed',
         'shouldMarkRedeemed',
+        'unredeeming',
+        'unredeemed',
+        'shouldMarkUnredeemed',
     ];
 
     /**
@@ -274,7 +277,7 @@ class Voucher extends Model
      *
      * @param array|callable|class-string|\Illuminate\Events\QueuedClosure $callback
      */
-    public static function redeeming($callback): void
+    public static function redeeming(mixed $callback): void
     {
         static::registerModelEvent('redeeming', $callback);
     }
@@ -284,7 +287,7 @@ class Voucher extends Model
      *
      * @param array|callable|class-string|\Illuminate\Events\QueuedClosure $callback
      */
-    public static function redeemed($callback): void
+    public static function redeemed(mixed $callback): void
     {
         static::registerModelEvent('redeemed', $callback);
     }
@@ -294,7 +297,7 @@ class Voucher extends Model
      *
      * @param array|callable|class-string|\Illuminate\Events\QueuedClosure $callback
      */
-    public static function shouldMarkRedeemed($callback): void
+    public static function shouldMarkRedeemed(mixed $callback): void
     {
         static::registerModelEvent('shouldMarkRedeemed', $callback);
     }
@@ -304,7 +307,7 @@ class Voucher extends Model
      *
      * @param array|callable|class-string|\Illuminate\Events\QueuedClosure $callback
      */
-    public static function unredeeming($callback): void
+    public static function unredeeming(mixed $callback): void
     {
         static::registerModelEvent('unredeeming', $callback);
     }
@@ -314,7 +317,7 @@ class Voucher extends Model
      *
      * @param array|callable|class-string|\Illuminate\Events\QueuedClosure $callback
      */
-    public static function unredeemed($callback): void
+    public static function unredeemed(mixed $callback): void
     {
         static::registerModelEvent('unredeemed', $callback);
     }
@@ -324,7 +327,7 @@ class Voucher extends Model
      *
      * @param array|callable|class-string|\Illuminate\Events\QueuedClosure $callback
      */
-    public static function shouldMarkUnredeemed($callback): void
+    public static function shouldMarkUnredeemed(mixed $callback): void
     {
         static::registerModelEvent('shouldMarkUnredeemed', $callback);
     }
