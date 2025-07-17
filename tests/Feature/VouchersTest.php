@@ -116,8 +116,8 @@ test('voucher creation', function () {
     // With metdata, start time and expire time.
     $metadata = ['foo' => 'bar', 'baz' => 'boom'];
     $now = Carbon::now();
-    $start_time = $now->copy()->add(CarbonInterval::create('P1D'));
-    $expire_time = $now->copy()->add(CarbonInterval::create('P30D'));
+    $start_time = $now->copy()->add(CarbonInterval::create(days: 1));
+    $expire_time = $now->copy()->add(CarbonInterval::create(days: 30));
     $user = User::factory()->create();
     $users = User::factory()->count(3)->create();
     $voucher = $vouchers
@@ -193,9 +193,8 @@ test('voucher not found exception', function () {
     $vouchers = new Vouchers();
     $user = User::factory()->create();
 
-    $this->expectException(Exceptions\VoucherNotFoundException::class);
     $vouchers->redeem('idonotexist', $user);
-});
+})->throws(Exceptions\VoucherNotFoundException::class);
 
 /**
  * Test voucher redeemed exception.
@@ -206,9 +205,8 @@ test('voucher redeemed exception', function () {
     $user = User::factory()->create();
 
     expect($vouchers->redeem($voucher->code, $user))->toBeTrue();
-    $this->expectException(Exceptions\VoucherRedeemedException::class);
     $vouchers->redeem($voucher->code, $user);
-});
+})->throws(Exceptions\VoucherRedeemedException::class);
 
 /**
  * Test voucher unstarted exception.
@@ -218,9 +216,8 @@ test('voucher unstarted exception', function () {
     $voucher = $vouchers->withStartTime(Carbon::now()->addMonth())->create();
     $user = User::factory()->create();
 
-    $this->expectException(Exceptions\VoucherUnstartedException::class);
     $vouchers->redeem($voucher->code, $user);
-});
+})->throws(Exceptions\VoucherUnstartedException::class);
 
 /**
  * Test voucher expired exception.
@@ -230,9 +227,8 @@ test('voucher expired exception', function () {
     $voucher = $vouchers->withExpireTime(Carbon::now()->subMonth())->create();
     $user = User::factory()->create();
 
-    $this->expectException(Exceptions\VoucherExpiredException::class);
     $vouchers->redeem($voucher->code, $user);
-});
+})->throws(Exceptions\VoucherExpiredException::class);
 
 /**
  * Test Vouchers::wrap() method.
@@ -245,7 +241,6 @@ test('string wrapping', function (string $str, ?string $prefix, ?string $suffix,
  * Test invalid magic call (Vouchers::__call()).
  */
 test('invalid magic call', function () {
-    $this->expectException('ErrorException');
     $vouchers = new Vouchers();
     $vouchers->methodthatdoesnotexist();
-});
+})->throws(ErrorException::class, 'Call to undefined method ' . Vouchers::class . '::methodthatdoesnotexist()');

@@ -157,7 +157,7 @@ test('additional options', function () {
     expect($config->withMetadata($metadata)->getMetadata())->toBe($metadata);
 
     // Test start time.
-    $interval = CarbonInterval::create('P10DT30M45S');
+    $interval = CarbonInterval::create(days: 10, minutes: 30, seconds: 45);
     expect(Carbon::now()->toDateTimeString())
         ->toBe($config->withStartTime(Carbon::now())->getStartTime()->toDateTimeString())
     ;
@@ -176,7 +176,7 @@ test('additional options', function () {
     expect($config->withStartDateIn(null)->getStartTime())->toBeNull();
 
     // Test expire time.
-    $interval = CarbonInterval::create('P15DT20M10S');
+    $interval = CarbonInterval::create(days: 15, minutes: 20, seconds: 10);
     expect(Carbon::now()->toDateTimeString())
         ->toBe($config->withExpireTime(Carbon::now())->getExpireTime()->toDateTimeString())
     ;
