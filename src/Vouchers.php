@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FrittenKeeZ\Vouchers;
 
 use Closure;
+use ErrorException;
 use FrittenKeeZ\Vouchers\Models\Redeemer;
 use FrittenKeeZ\Vouchers\Models\Voucher;
 use Illuminate\Database\Eloquent\Model;
@@ -79,7 +80,7 @@ class Vouchers
             }
         }
 
-        trigger_error('Call to undefined method ' . static::class . '::' . $name . '()', \E_USER_ERROR);
+        throw new ErrorException('Call to undefined method ' . static::class . '::' . $name . '()', \E_USER_ERROR);
     }
 
     /**
@@ -141,26 +142,19 @@ class Vouchers
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherRedeemedException
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherUnstartedException
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherExpiredException
-     * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherNotRedeemableException
      */
     public function redeem(string $code, Model $entity, array $metadata = []): bool
     {
         /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
         $voucher = $this->vouchers()->code($code)->first();
         // If the voucher is null or not redeemable, throw an appropriate exception.
-        if ($voucher === null || !$voucher->isRedeemable()) {
-            switch (true) {
-                case $voucher === null:
-                    throw new Exceptions\VoucherNotFoundException();
-                case $voucher->isRedeemed():
-                    throw new Exceptions\VoucherRedeemedException();
-                case !$voucher->isStarted():
-                    throw new Exceptions\VoucherUnstartedException();
-                case $voucher->isExpired():
-                    throw new Exceptions\VoucherExpiredException();
-                default:
-                    throw new Exceptions\VoucherNotRedeemableException();
-            }
+        if (!$voucher?->isRedeemable()) {
+            match (true) {
+                $voucher === null      => throw new Exceptions\VoucherNotFoundException(),
+                $voucher->isRedeemed() => throw new Exceptions\VoucherRedeemedException(),
+                !$voucher->isStarted() => throw new Exceptions\VoucherUnstartedException(),
+                $voucher->isExpired()  => throw new Exceptions\VoucherExpiredException(),
+            };
         }
 
         $redeemer = $this->redeemers();
@@ -186,6 +180,17 @@ class Vouchers
         $voucher = $this->vouchers()->code($code)->first();
 
         return $voucher !== null && $voucher->isRedeemable() && ($callback === null || $callback($voucher));
+    }
+
+    /**
+     * Whether a voucher code is unredeemable.
+     */
+    public function unredeemable(string $code, ?Closure $callback = null): bool
+    {
+        /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
+        $voucher = $this->vouchers()->code($code)->first();
+
+        return $voucher !== null && $voucher->isUnredeemable() && ($callback === null || $callback($voucher));
     }
 
     /**

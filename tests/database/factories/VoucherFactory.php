@@ -36,4 +36,24 @@ class VoucherFactory extends Factory
             'redeemed_at' => $this->faker->dateTime(),
         ]);
     }
+
+    /**
+     * Define the unstarted state.
+     */
+    public function unstarted(): static
+    {
+        return $this->state([
+            'starts_at' => $this->faker->dateTimeBetween('tomorrow', '+1 month'),
+        ]);
+    }
+
+    /**
+     * Define the expired state.
+     */
+    public function expired(): static
+    {
+        return $this->state([
+            'expires_at' => $this->faker->dateTime('yesterday'),
+        ]);
+    }
 }

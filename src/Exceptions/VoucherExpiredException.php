@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrittenKeeZ\Vouchers\Exceptions;
 
-class VoucherExpiredException extends VoucherNotRedeemableException
+class VoucherExpiredException extends VoucherStateException
 {
     /**
      * Exception message.

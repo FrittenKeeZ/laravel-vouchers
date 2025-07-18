@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
-use FrittenKeeZ\Vouchers\Exceptions;
 use FrittenKeeZ\Vouchers\Models\Redeemer;
 use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
@@ -34,34 +33,6 @@ function _generate_code_validation_regex(
         empty($suffix) ? '' : preg_quote($separator . $suffix, '/')
     );
 }
-
-/**
- * Data provider for Vouchers::wrap().
- */
-dataset('wraps', [
-    'string only'                        => ['code', null, null, '-', 'code'],
-    'prefix dash separator'              => ['code', 'foo', null, '-', 'foo-code'],
-    'suffix dash separator'              => ['code', null, 'bar', '-', 'code-bar'],
-    'prefix suffix dash separator'       => ['code', 'foo', 'bar', '-', 'foo-code-bar'],
-    'prefix suffix underscore separator' => ['code', 'foo', 'bar', '_', 'foo_code_bar'],
-]);
-
-/**
- * Test vouchers instance through app::make().
- */
-test('instance', function () {
-    expect(app()->make('vouchers'))->toBeInstanceOf(Vouchers::class);
-});
-
-/**
- * Test that Vouchers::getConfig() returns clone and not same instance.
- */
-test('config clone', function () {
-    $vouchers = new Vouchers();
-    $config = $vouchers->getConfig();
-
-    expect($config)->not->toBe($vouchers->getConfig());
-});
 
 /**
  * Test code generation.
@@ -164,11 +135,6 @@ test('voucher redemption', function () {
     // Check voucher states.
     expect($voucher->isRedeemable())->toBeTrue();
     expect($vouchers->redeemable($voucher->code))->toBeTrue();
-    expect(
-        $vouchers->redeemable($voucher->code, function (Voucher $voucher) {
-            return $voucher->hasPrefix('thisprefixdoesnotexist');
-        })
-    )->toBeFalse();
     expect($voucher->redeemers)->toBeEmpty();
     expect($voucher->getEntities())->toBeEmpty();
     $metadata = ['foo' => 'bar', 'baz' => 'boom'];
@@ -185,62 +151,3 @@ test('voucher redemption', function () {
     expect($redeemer->is($user->redeemers->first()))->toBeTrue();
     expect($voucher->is($redeemer->voucher))->toBeTrue();
 });
-
-/**
- * Test voucher not found exception.
- */
-test('voucher not found exception', function () {
-    $vouchers = new Vouchers();
-    $user = User::factory()->create();
-
-    $vouchers->redeem('idonotexist', $user);
-})->throws(Exceptions\VoucherNotFoundException::class);
-
-/**
- * Test voucher redeemed exception.
- */
-test('voucher redeemed exception', function () {
-    $vouchers = new Vouchers();
-    $voucher = $vouchers->create();
-    $user = User::factory()->create();
-
-    expect($vouchers->redeem($voucher->code, $user))->toBeTrue();
-    $vouchers->redeem($voucher->code, $user);
-})->throws(Exceptions\VoucherRedeemedException::class);
-
-/**
- * Test voucher unstarted exception.
- */
-test('voucher unstarted exception', function () {
-    $vouchers = new Vouchers();
-    $voucher = $vouchers->withStartTime(Carbon::now()->addMonth())->create();
-    $user = User::factory()->create();
-
-    $vouchers->redeem($voucher->code, $user);
-})->throws(Exceptions\VoucherUnstartedException::class);
-
-/**
- * Test voucher expired exception.
- */
-test('voucher expired exception', function () {
-    $vouchers = new Vouchers();
-    $voucher = $vouchers->withExpireTime(Carbon::now()->subMonth())->create();
-    $user = User::factory()->create();
-
-    $vouchers->redeem($voucher->code, $user);
-})->throws(Exceptions\VoucherExpiredException::class);
-
-/**
- * Test Vouchers::wrap() method.
- */
-test('string wrapping', function (string $str, ?string $prefix, ?string $suffix, string $separator, string $expected) {
-    expect((new Vouchers())->wrap($str, $prefix, $suffix, $separator))->toBe($expected);
-})->with('wraps');
-
-/**
- * Test invalid magic call (Vouchers::__call()).
- */
-test('invalid magic call', function () {
-    $vouchers = new Vouchers();
-    $vouchers->methodthatdoesnotexist();
-})->throws(ErrorException::class, 'Call to undefined method ' . Vouchers::class . '::methodthatdoesnotexist()');

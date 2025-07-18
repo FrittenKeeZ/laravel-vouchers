@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace FrittenKeeZ\Vouchers\Exceptions;
 
-class VoucherNotRedeemableException extends VoucherException
+class VoucherStateException extends VoucherException
 {
     /**
      * Exception message.
      *
      * @var string
      */
-    protected $message = 'Voucher is not redeemable.';
+    protected $message = 'Voucher state cannot be changed.';
 
     /**
      * Exception code - we use 409 Conflict.
