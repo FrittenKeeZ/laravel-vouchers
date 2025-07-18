@@ -40,20 +40,24 @@ class VoucherFactory extends Factory
     /**
      * Define the unstarted state.
      */
-    public function unstarted(): static
+    public function started(bool $started = true): static
     {
         return $this->state([
-            'starts_at' => $this->faker->dateTimeBetween('tomorrow', '+1 month'),
+            'starts_at' => $started
+                ? $this->faker->dateTime('-1 day')
+                : $this->faker->dateTimeBetween('+1 day', '+1 month'),
         ]);
     }
 
     /**
      * Define the expired state.
      */
-    public function expired(): static
+    public function expired(bool $expired = true): static
     {
         return $this->state([
-            'expires_at' => $this->faker->dateTime('yesterday'),
+            'expires_at' => $expired
+                ? $this->faker->dateTime('-1 day')
+                : $this->faker->dateTimeBetween('+1 dat', '+1 month'),
         ]);
     }
 }

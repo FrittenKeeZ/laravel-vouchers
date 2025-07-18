@@ -20,14 +20,14 @@ test('redeemable checks', function () {
     $vouchers = new Vouchers();
 
     // Not found.
-    expect($vouchers->redeemable('RANDOM'))->toBeFalse();
+    expect($vouchers->redeemable('NOPE'))->toBeFalse();
 
     // Unredeemed.
     expect($vouchers->redeemable(Voucher::factory()->create()->code))->toBeTrue();
     // Redeemed.
     expect($vouchers->redeemable(Voucher::factory()->redeemed()->create()->code))->toBeFalse();
     // Unstarted.
-    expect($vouchers->redeemable(Voucher::factory()->unstarted()->create()->code))->toBeFalse();
+    expect($vouchers->redeemable(Voucher::factory()->started(false)->create()->code))->toBeFalse();
     // Expired.
     expect($vouchers->redeemable(Voucher::factory()->expired()->create()->code))->toBeFalse();
 
@@ -44,7 +44,7 @@ test('unredeemable checks', function () {
     $vouchers = new Vouchers();
 
     // Not found.
-    expect($vouchers->unredeemable('RANDOM'))->toBeFalse();
+    expect($vouchers->unredeemable('NOPE'))->toBeFalse();
 
     // Unredeemed.
     expect($vouchers->unredeemable(Voucher::factory()->create()->code))->toBeFalse();
@@ -56,7 +56,7 @@ test('unredeemable checks', function () {
         )
     )->toBeTrue();
     // Unstarted.
-    expect($vouchers->unredeemable(Voucher::factory()->unstarted()->create()->code))->toBeFalse();
+    expect($vouchers->unredeemable(Voucher::factory()->started(false)->create()->code))->toBeFalse();
     // Expired.
     expect($vouchers->unredeemable(Voucher::factory()->expired()->create()->code))->toBeFalse();
 

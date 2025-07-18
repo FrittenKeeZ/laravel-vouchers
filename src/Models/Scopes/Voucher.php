@@ -110,7 +110,7 @@ trait Voucher
     }
 
     /**
-     * Scope voucher query to redeemed or unredeemed vouchers.
+     * Scope voucher query to redeemed or without redeemed vouchers.
      */
     public function scopeWithRedeemed(Builder $query, bool $redeemed = true): Builder
     {
@@ -120,7 +120,7 @@ trait Voucher
     }
 
     /**
-     * Scope voucher query to unredeemed vouchers.
+     * Scope voucher query to without redeemed vouchers.
      */
     public function scopeWithoutRedeemed(Builder $query): Builder
     {
@@ -128,7 +128,7 @@ trait Voucher
     }
 
     /**
-     * Scope voucher query to redeemable or unredeemable vouchers.
+     * Scope voucher query to redeemable or without redeemable vouchers.
      */
     public function scopeWithRedeemable(Builder $query, bool $redeemable = true): Builder
     {
@@ -137,18 +137,14 @@ trait Voucher
         }
 
         return $query
-            ->where(function (Builder $query) {
-                return $query->withRedeemed(true);
-            })->orWhere(function (Builder $query) {
-                return $query->withStarted(false);
-            })->orWhere(function (Builder $query) {
-                return $query->withExpired(true);
-            })
+            ->where(fn (Builder $query) => $query->withRedeemed(true))
+            ->orWhere(fn (Builder $query) => $query->withStarted(false))
+            ->orWhere(fn (Builder $query) => $query->withExpired(true))
         ;
     }
 
     /**
-     * Scope voucher query to unredeemable vouchers.
+     * Scope voucher query to without redeemable vouchers.
      */
     public function scopeWithoutRedeemable(Builder $query): Builder
     {
@@ -156,17 +152,41 @@ trait Voucher
     }
 
     /**
+     * Scope voucher query to unredeemable or without unredeemable vouchers.
+     */
+    public function scopeWithUnredeemable(Builder $query, bool $unredeemable = true): Builder
+    {
+        if ($unredeemable) {
+            return $query
+                ->where(fn (Builder $query) => $query->withRedeemed(true)->orHas('redeemers'))
+                ->withStarted(true)
+                ->withExpired(false)
+            ;
+        }
+
+        return $query
+            ->where(fn (Builder $query) => $query->withRedeemed(false)->doesntHave('redeemers'))
+            ->orWhere(fn (Builder $query) => $query->withStarted(false))
+            ->orWhere(fn (Builder $query) => $query->withExpired(true))
+        ;
+    }
+
+    /**
+     * Scope voucher query to without unredeemable vouchers.
+     */
+    public function scopeWithoutUnredeemable(Builder $query): Builder
+    {
+        return $this->scopeWithUnredeemable($query, false);
+    }
+
+    /**
      * Scope voucher query to have voucher entities, optionally of a specific type (class or alias).
      */
     public function scopeWithEntities(Builder $query, ?string $type = null): Builder
     {
-        if (empty($type)) {
-            return $query->has('voucherEntities');
-        }
-
-        return $query->whereHas('voucherEntities', function (Builder $query) use ($type) {
-            $query->withEntityType($type);
-        });
+        return empty($type)
+            ? $query->has('voucherEntities')
+            : $query->whereHas('voucherEntities', fn (Builder $query) => $query->withEntityType($type));
     }
 
     /**
