@@ -71,9 +71,9 @@ trait Voucher
         $column = $this->getTable() . '.starts_at';
 
         if ($started) {
-            return $query->where(function (Builder $query) use ($column) {
-                return $query->whereNull($column)->orWhere($column, '<=', Carbon::now());
-            });
+            return $query->where(
+                fn (Builder $query) => $query->whereNull($column)->orWhere($column, '<=', Carbon::now())
+            );
         }
 
         return $query->where($column, '>', Carbon::now());
@@ -94,11 +94,10 @@ trait Voucher
     {
         $column = $this->getTable() . '.expires_at';
 
-        return $query->where(function (Builder $query) use ($expired, $column) {
-            return $expired
-                ? $query->whereNotNull($column)->where($column, '<=', Carbon::now())
-                : $query->whereNull($column)->orWhere($column, '>', Carbon::now());
-        });
+        return $query->where(fn (Builder $query) => $expired
+            ? $query->whereNotNull($column)->where($column, '<=', Carbon::now())
+            : $query->whereNull($column)->orWhere($column, '>', Carbon::now())
+        );
     }
 
     /**
@@ -157,15 +156,11 @@ trait Voucher
     public function scopeWithUnredeemable(Builder $query, bool $unredeemable = true): Builder
     {
         if ($unredeemable) {
-            return $query
-                ->where(fn (Builder $query) => $query->withRedeemed(true)->orHas('redeemers'))
-                ->withStarted(true)
-                ->withExpired(false)
-            ;
+            return $query->has('redeemers')->withStarted(true)->withExpired(false);
         }
 
         return $query
-            ->where(fn (Builder $query) => $query->withRedeemed(false)->doesntHave('redeemers'))
+            ->where(fn (Builder $query) => $query->doesntHave('redeemers'))
             ->orWhere(fn (Builder $query) => $query->withStarted(false))
             ->orWhere(fn (Builder $query) => $query->withExpired(true))
         ;

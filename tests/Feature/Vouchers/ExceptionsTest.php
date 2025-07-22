@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-use Carbon\Carbon;
 use FrittenKeeZ\Vouchers\Exceptions;
+use FrittenKeeZ\Vouchers\Tests\Models\Redeemer;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
+use FrittenKeeZ\Vouchers\Tests\Models\Voucher;
 use FrittenKeeZ\Vouchers\Vouchers;
 
 /**
- * Test voucher not found exception.
+ * Test redeeming voucher not found exception.
  */
-test('voucher not found exception', function () {
+test('redeeming voucher not found exception', function () {
     $vouchers = new Vouchers();
     $user = User::factory()->create();
 
@@ -18,37 +19,91 @@ test('voucher not found exception', function () {
 })->throws(Exceptions\VoucherNotFoundException::class);
 
 /**
- * Test voucher redeemed exception.
+ * Test redeeming voucher redeemed exception.
  */
-test('voucher redeemed exception', function () {
+test('redeeming voucher redeemed exception', function () {
     $vouchers = new Vouchers();
-    $voucher = $vouchers->create();
+    $voucher = Voucher::factory()->redeemed()->create();
     $user = User::factory()->create();
 
-    expect($vouchers->redeem($voucher->code, $user))->toBeTrue();
     $vouchers->redeem($voucher->code, $user);
 })->throws(Exceptions\VoucherRedeemedException::class);
 
 /**
- * Test voucher unstarted exception.
+ * Test redeeming voucher unstarted exception.
  */
-test('voucher unstarted exception', function () {
+test('redeeming voucher unstarted exception', function () {
     $vouchers = new Vouchers();
-    $voucher = $vouchers->withStartTime(Carbon::now()->addMonth())->create();
+    $voucher = Voucher::factory()->started(false)->create();
     $user = User::factory()->create();
 
     $vouchers->redeem($voucher->code, $user);
 })->throws(Exceptions\VoucherUnstartedException::class);
 
 /**
- * Test voucher expired exception.
+ * Test redeeming voucher expired exception.
  */
-test('voucher expired exception', function () {
+test('redeeming voucher expired exception', function () {
     $vouchers = new Vouchers();
-    $voucher = $vouchers->withExpireTime(Carbon::now()->subMonth())->create();
+    $voucher = Voucher::factory()->expired()->create();
     $user = User::factory()->create();
 
     $vouchers->redeem($voucher->code, $user);
+})->throws(Exceptions\VoucherExpiredException::class);
+
+/**
+ * Test unredeeming voucher not found exception.
+ */
+test('unredeeming voucher not found exception', function () {
+    $vouchers = new Vouchers();
+    $user = User::factory()->create();
+
+    $vouchers->unredeem('idonotexist', $user);
+})->throws(Exceptions\VoucherNotFoundException::class);
+
+/**
+ * Test unredeeming voucher redeemer not found exception.
+ */
+test('unredeeming voucher redeemer not found exception', function () {
+    $vouchers = new Vouchers();
+    $voucher = Voucher::factory()->redeemed()->has(Redeemer::factory()->for(User::factory(), 'redeemer'))->create();
+    $user = User::factory()->create();
+
+    $vouchers->unredeem($voucher->code, $user);
+})->throws(Exceptions\VoucherRedeemerNotFoundException::class);
+
+/**
+ * Test unredeeming voucher redeemer not found exception with callback filter.
+ */
+test('unredeeming voucher redeemer not found exception with callback filter', function () {
+    $vouchers = new Vouchers();
+    $voucher = Voucher::factory()->redeemed()->create();
+    Redeemer::factory()->for(User::factory(), 'redeemer')->for($voucher)->create(['metadata' => ['foo' => 'bar']]);
+    Redeemer::factory()->for(User::factory(), 'redeemer')->for($voucher)->create(['metadata' => ['foo' => 'baz']]);
+
+    $vouchers->unredeem($voucher->code, null, fn ($query) => $query->where('metadata->foo', 'nope'));
+})->throws(Exceptions\VoucherRedeemerNotFoundException::class);
+
+/**
+ * Test unredeeming voucher unstarted exception.
+ */
+test('unredeeming voucher unstarted exception', function () {
+    $vouchers = new Vouchers();
+    $user = User::factory()->create();
+    $voucher = Voucher::factory()->started(false)->has(Redeemer::factory()->for($user, 'redeemer'))->create();
+
+    $vouchers->unredeem($voucher->code, $user);
+})->throws(Exceptions\VoucherUnstartedException::class);
+
+/**
+ * Test unredeeming voucher expired exception.
+ */
+test('unredeeming voucher expired exception', function () {
+    $vouchers = new Vouchers();
+    $user = User::factory()->create();
+    $voucher = Voucher::factory()->expired()->has(Redeemer::factory()->for($user, 'redeemer'))->create();
+
+    $vouchers->unredeem($voucher->code, $user);
 })->throws(Exceptions\VoucherExpiredException::class);
 
 /**

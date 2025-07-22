@@ -129,7 +129,7 @@ class Voucher extends Model
      */
     public function isUnredeemable(): bool
     {
-        return ($this->isRedeemed() || $this->redeemers()->exists()) && $this->isStarted() && !$this->isExpired();
+        return $this->redeemers()->exists() && $this->isStarted() && !$this->isExpired();
     }
 
     /**

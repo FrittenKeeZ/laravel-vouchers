@@ -7,14 +7,14 @@ use FrittenKeeZ\Vouchers\Vouchers;
 /**
  * Test vouchers instance through app::make().
  */
-test('instance', function () {
+test('vouchers instance', function () {
     expect(app()->make('vouchers'))->toBeInstanceOf(Vouchers::class);
 });
 
 /**
  * Test that Vouchers::getConfig() returns clone and not same instance.
  */
-test('config clone', function () {
+test('vouchers config clone', function () {
     $vouchers = new Vouchers();
     $config = $vouchers->getConfig();
 
@@ -24,7 +24,7 @@ test('config clone', function () {
 /**
  * Test Vouchers::wrap() method.
  */
-test('string wrapping', function (string $str, ?string $prefix, ?string $suffix, string $separator, string $expected) {
+test('vouchers string wrapping', function (string $str, ?string $prefix, ?string $suffix, string $separator, string $expected) {
     expect((new Vouchers())->wrap($str, $prefix, $suffix, $separator))->toBe($expected);
 })->with([
     'string only'                        => ['code', null, null, '-', 'code'],

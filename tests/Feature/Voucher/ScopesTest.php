@@ -160,7 +160,7 @@ test('redeemable scope', function () {
     Voucher::factory()->started(false)->create();
     Voucher::factory()->expired()->create();
     Voucher::factory()->expired(false)->create();
-    Voucher::factory()->redeemed()->create();
+    Voucher::factory()->redeemed()->has(Redeemer::factory()->for(User::factory(), 'redeemer'))->create();
     Voucher::factory()->has(Redeemer::factory()->for(User::factory(), 'redeemer'))->create();
 
     expect(Voucher::count())->toBe(7);
@@ -177,7 +177,7 @@ test('unredeemable scope', function () {
     Voucher::factory()->started(false)->create();
     Voucher::factory()->expired()->create();
     Voucher::factory()->expired(false)->create();
-    Voucher::factory()->redeemed()->create();
+    Voucher::factory()->redeemed()->has(Redeemer::factory()->for(User::factory(), 'redeemer'))->create();
     Voucher::factory()->has(Redeemer::factory()->for(User::factory(), 'redeemer'))->create();
 
     expect(Voucher::count())->toBe(7);

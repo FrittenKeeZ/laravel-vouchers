@@ -38,6 +38,8 @@ trait HasVouchers
 
     /**
      * Create a single voucher with this entity related.
+     *
+     * @param \Closure(\FrittenKeeZ\Vouchers\Vouchers)|null $callback Optional callback for extra configuration.
      */
     public function createVoucher(?Closure $callback = null): object
     {
@@ -46,6 +48,8 @@ trait HasVouchers
 
     /**
      * Create an amount of vouchers with this entity related.
+     *
+     * @param \Closure(\FrittenKeeZ\Vouchers\Vouchers)|null $callback Optional callback for extra configuration.
      */
     public function createVouchers(int $amount, ?Closure $callback = null): array|object
     {

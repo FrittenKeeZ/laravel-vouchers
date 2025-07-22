@@ -138,6 +138,20 @@ test('dynamically overridden options', function () {
     expect($config->getPrefix())->toBe('');
     expect($config->getSuffix())->toBe('');
     expect($config->getSeparator())->toBe('');
+
+    // Test 'null' resets.
+    $config
+        ->withCharacters(null)
+        ->withMask(null)
+        ->withPrefix(null)
+        ->withSuffix(null)
+        ->withSeparator(null)
+    ;
+    expect($config->getCharacters())->toBe(app()['config']->get('vouchers.characters'));
+    expect($config->getMask())->toBe(app()['config']->get('vouchers.mask'));
+    expect($config->getPrefix())->toBe(app()['config']->get('vouchers.prefix'));
+    expect($config->getSuffix())->toBe(app()['config']->get('vouchers.suffix'));
+    expect($config->getSeparator())->toBe(app()['config']->get('vouchers.separator'));
 });
 
 /**
@@ -155,6 +169,7 @@ test('additional options', function () {
         ],
     ];
     expect($config->withMetadata($metadata)->getMetadata())->toBe($metadata);
+    expect($config->withMetadata(null)->getMetadata())->toBeNull();
 
     // Test start time.
     $interval = CarbonInterval::create(days: 10, minutes: 30, seconds: 45);
@@ -197,6 +212,7 @@ test('additional options', function () {
     // Test owner.
     $owner = User::factory()->make();
     expect($config->withOwner($owner)->getOwner())->toBe($owner);
+    expect($config->withOwner(null)->getOwner())->toBeNull();
 
     // Test entities.
     $entities = Color::factory()->count(3)->make()->all();

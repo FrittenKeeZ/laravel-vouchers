@@ -49,7 +49,11 @@ test('unredeemable checks', function () {
     // Unredeemed.
     expect($vouchers->unredeemable(Voucher::factory()->create()->code))->toBeFalse();
     // Redeemed.
-    expect($vouchers->unredeemable(Voucher::factory()->redeemed()->create()->code))->toBeTrue();
+    expect(
+        $vouchers->unredeemable(
+            Voucher::factory()->redeemed()->has(Redeemer::factory()->for(User::factory(), 'redeemer'))->create()->code
+        )
+    )->toBeTrue();
     expect(
         $vouchers->unredeemable(
             Voucher::factory()->has(Redeemer::factory()->for(User::factory(), 'redeemer'))->create()->code

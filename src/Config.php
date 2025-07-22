@@ -36,9 +36,13 @@ class Config
     /**
      * With code character list.
      */
-    public function withCharacters(string $characters): self
+    public function withCharacters(?string $characters): self
     {
-        Arr::set($this->options, 'characters', $characters);
+        if ($characters === null) {
+            Arr::forget($this->options, 'characters');
+        } else {
+            Arr::set($this->options, 'characters', $characters);
+        }
 
         return $this;
     }
@@ -54,9 +58,13 @@ class Config
     /**
      * With code mask.
      */
-    public function withMask(string $mask): self
+    public function withMask(?string $mask): self
     {
-        Arr::set($this->options, 'mask', $mask);
+        if ($mask === null) {
+            Arr::forget($this->options, 'mask');
+        } else {
+            Arr::set($this->options, 'mask', $mask);
+        }
 
         return $this;
     }
@@ -72,9 +80,13 @@ class Config
     /**
      * With code prefix.
      */
-    public function withPrefix(string $prefix): self
+    public function withPrefix(?string $prefix): self
     {
-        Arr::set($this->options, 'prefix', $prefix);
+        if ($prefix === null) {
+            Arr::forget($this->options, 'prefix');
+        } else {
+            Arr::set($this->options, 'prefix', $prefix);
+        }
 
         return $this;
     }
@@ -84,9 +96,7 @@ class Config
      */
     public function withoutPrefix(): self
     {
-        Arr::set($this->options, 'prefix', '');
-
-        return $this;
+        return $this->withPrefix('');
     }
 
     /**
@@ -100,9 +110,13 @@ class Config
     /**
      * With code suffix.
      */
-    public function withSuffix(string $suffix): self
+    public function withSuffix(?string $suffix): self
     {
-        Arr::set($this->options, 'suffix', $suffix);
+        if ($suffix === null) {
+            Arr::forget($this->options, 'suffix');
+        } else {
+            Arr::set($this->options, 'suffix', $suffix);
+        }
 
         return $this;
     }
@@ -112,9 +126,7 @@ class Config
      */
     public function withoutSuffix(): self
     {
-        Arr::set($this->options, 'suffix', '');
-
-        return $this;
+        return $this->withSuffix('');
     }
 
     /**
@@ -128,9 +140,13 @@ class Config
     /**
      * With prefix and suffix separator.
      */
-    public function withSeparator(string $separator): self
+    public function withSeparator(?string $separator): self
     {
-        Arr::set($this->options, 'separator', $separator);
+        if ($separator === null) {
+            Arr::forget($this->options, 'separator');
+        } else {
+            Arr::set($this->options, 'separator', $separator);
+        }
 
         return $this;
     }
@@ -140,9 +156,7 @@ class Config
      */
     public function withoutSeparator(): self
     {
-        Arr::set($this->options, 'separator', '');
-
-        return $this;
+        return $this->withSeparator('');
     }
 
     /**
@@ -156,9 +170,13 @@ class Config
     /**
      * With metadata.
      */
-    public function withMetadata(array $metadata): self
+    public function withMetadata(?array $metadata): self
     {
-        Arr::set($this->options, 'metadata', $metadata);
+        if ($metadata === null) {
+            Arr::forget($this->options, 'metadata');
+        } else {
+            Arr::set($this->options, 'metadata', $metadata);
+        }
 
         return $this;
     }
@@ -284,15 +302,19 @@ class Config
      */
     public function getOwner(): ?Model
     {
-        return Arr::get($this->options, 'owner', null);
+        return Arr::get($this->options, 'owner');
     }
 
     /**
      * With owner.
      */
-    public function withOwner(Model $owner): self
+    public function withOwner(?Model $owner): self
     {
-        Arr::set($this->options, 'owner', $owner);
+        if ($owner === null) {
+            Arr::forget($this->options, 'owner');
+        } else {
+            Arr::set($this->options, 'owner', $owner);
+        }
 
         return $this;
     }
