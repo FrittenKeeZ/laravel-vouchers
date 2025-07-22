@@ -12,6 +12,9 @@ beforeEach(function () {
     Config::set('vouchers.models.voucher', Voucher::class);
 });
 
+/**
+ * Test redeemers morph relationship.
+ */
 test('redeemers morph relationship', function () {
     $user = User::factory()->create();
     Redeemer::factory()->for($user, 'redeemer')->for(Voucher::factory()->redeemed())->create();

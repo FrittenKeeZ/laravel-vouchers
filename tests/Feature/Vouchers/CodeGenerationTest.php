@@ -29,6 +29,9 @@ function _generate_code_validation_regex(
     );
 }
 
+/**
+ * Test code generation.
+ */
 test(
     'code generation',
     function (?string $mask, ?string $characters, ?string $prefix, ?string $suffix, ?string $separator) {
@@ -70,6 +73,9 @@ test(
     ['****-****', '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', null, null, '-'],
 ]);
 
+/**
+ * Test batch generation.
+ */
 test('batch generation', function () {
     $vouchers = new Vouchers();
 
