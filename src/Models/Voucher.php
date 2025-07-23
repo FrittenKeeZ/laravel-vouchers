@@ -206,7 +206,7 @@ class Voucher extends Model
 
         // Reset redeemed timestamp unless specified otherwise.
         // This will mark the voucher as unredeemed.
-        if ($this->fireModelEvent('shouldMarkUnredeemed') !== false) {
+        if ($this->fireModelEvent('shouldMarkUnredeemed') !== false || !$this->redeemers()->exists()) {
             $this->redeemed_at = null;
         }
 

@@ -102,31 +102,73 @@ try {
 }
 ```
 
+### Unredeem Vouchers
+Unredeeming voucher can be done by either providing a related redeemer entity, or by using a redeemer query filter to let the package find the redeemer for you.
+```php
+Vouchers::unredeem(string $code, Illuminate\Database\Eloquent\Model|null $entity = null, Closure(Illuminate\Database\Eloquent\Builder)|null $callback = null): bool;
+
+try {
+    $success = Vouchers::unredeem('123-456-789', $user);
+} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException $e) {
+    // Voucher was not found with the provided code.
+} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherRedeemerNotFoundException $e) {
+    // Voucher redeemer was not found.
+} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherUnstartedException $e) {
+    // Voucher is not yet started.
+} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherExpiredException $e) {
+    // Voucher is expired.
+}
+```
+Or if you don't care about the specific exceptions:
+```php
+try {
+    $success = Vouchers::unredeem('123-456-789', $user);
+} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherException $e) {
+    // Voucher was not possible to unredeem.
+}
+```
+Without specifying the redeemer entity, which will use the first redeemer found:
+```php
+try {
+    $success = Vouchers::unredeem('123-456-789');
+} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherException $e) {
+    // Voucher was not possible to unredeem.
+}
+```
+With specifying a redeemer query filter:
+```php
+try {
+    $success = Vouchers::unredeem(code: '123-456-789', callback: fn (Illuminate\Database\Eloquent\Builder $query) => $query->where('metadata->foo', 'bar));
+} catch (FrittenKeeZ\Vouchers\Exceptions\VoucherException $e) {
+    // Voucher was not possible to unredeem.
+}
+```
+
 ### Options
 Besides defaults specified in `config/vouchers.php`, one can override options when generating codes or creating vouchers.  
 Following methods apply to `Vouchers::generate()`, `Vouchers::batch()` and `Vouchers::create()` calls.
 ```php
 // Override characters list.
-Vouchers::withCharacters(string $characters);
+Vouchers::withCharacters(string|null $characters);
 // Override code mask.
-Vouchers::withMask(string $mask);
+Vouchers::withMask(string|null $mask);
 // Override code prefix.
-Vouchers::withPrefix(string $prefix);
+Vouchers::withPrefix(string|null $prefix);
 // Disable code prefix.
 Vouchers::withoutPrefix();
 // Override code suffix.
-Vouchers::withSuffix(string $suffix);
+Vouchers::withSuffix(string|null $suffix);
 // Disable code suffix.
 Vouchers::withoutSuffix();
 // Override prefix and suffix separator.
-Vouchers::withSeparator(string $separator);
+Vouchers::withSeparator(string|null $separator);
 // Disable prefix and suffix separator.
 Vouchers::withoutSeparator();
 ```
 Following methods only apply to `Vouchers::create()` call.
 ```php
 // Add metadata to voucher.
-Vouchers::withMetadata(array $metadata);
+Vouchers::withMetadata(array|null $metadata);
 // Set voucher start time.
 Vouchers::withStartTime(DateTime|null $timestamp);
 // Set voucher start time using interval.
@@ -150,7 +192,7 @@ Vouchers::withEntities(Illuminate\Database\Eloquent\Model[] $entities);
 Vouchers::withEntities(Illuminate\Support\Collection<Illuminate\Database\Eloquent\Model> $entities);
 Vouchers::withEntities(Generator<Illuminate\Database\Eloquent\Model> $entities);
 // Set owning entity for voucher.
-Vouchers::withOwner(Illuminate\Database\Eloquent\Model $owner);
+Vouchers::withOwner(Illuminate\Database\Eloquent\Model|null $owner);
 ```
 All calls are chainable and dynamic options will be reset when calling `Vouchers::create()` or `Vouchers::reset()`.
 ```php
@@ -188,9 +230,29 @@ Voucher::redeeming(function (Voucher $voucher) {
 $voucher = Vouchers::withOwner($user)->create();
 Vouchers::redeem($voucher->code, $user);
 ```
-To perform additional actions after a vouchers has been redeemed, subscribe to the `FrittenKeeZ\Vouchers\Models\Voucher::redeemed()` event.
+To perform additional actions after a voucher has been redeemed, subscribe to the `FrittenKeeZ\Vouchers\Models\Voucher::redeemed()` event.
 ```php
 Voucher::redeemed(function (Voucher $voucher) {
+    // Do some additional stuff here.
+});
+```
+To prevent a voucher to from being marked as unredeemed after first unredeeming, subscribe to the `FrittenKeeZ\Vouchers\Models\Voucher::shouldMarkUnredeemed()` event. Note that a voucher will still be marked as unredeemed if there are no more redeemers left.
+```php
+Voucher::shouldMarkUnredeemed(function (Voucher $voucher) {
+    // Do some fancy checks here.
+    return false;
+});
+```
+To prevent a voucher from being unredeemed altogether, subscribe to the `FrittenKeeZ\Vouchers\Models\Voucher::unredeeming()` event.
+```php
+Voucher::unredeeming(function (Voucher $voucher) {
+    // Do some fancy checks here.
+    return false;
+});
+```
+To perform additional actions after a voucher has been unredeemed, subscribe to the `FrittenKeeZ\Vouchers\Models\Voucher::unredeemed()` event.
+```php
+Voucher::unredeemed(function (Voucher $voucher) {
     // Do some additional stuff here.
 });
 ```
@@ -211,7 +273,7 @@ HasVouchers::vouchers(): MorphMany;
 // Get all owned vouchers.
 $vouchers = $user->vouchers;
 
-// Associated vouchers relationship.
+// Associated vouchers through VoucherEntity relationship.
 HasVouchers::associatedVouchers(): MorphToMany;
 // Get all associated vouchers.
 $vouchers = $user->associatedVouchers;
@@ -223,7 +285,7 @@ $entities = $user->voucherEntities;
 ```
 You can also create vouchers owned by an entity using these convenience methods.
 ```php
-HasVouchers::createVoucher(Closure|null $callback = null): object;
+HasVouchers::createVoucher(Closure(FrittenKeeZ\Vouchers\Vouchers)|null $callback = null): object;
 
 // Without using callback.
 $voucher = $user->createVoucher();
@@ -232,7 +294,7 @@ $voucher = $user->createVoucher(function (FrittenKeeZ\Vouchers\Vouchers $voucher
     $vouchers->withPrefix('USR');
 });
 
-HasVouchers::createVouchers(int $amount, Closure|null $callback = null): object|array;
+HasVouchers::createVouchers(int $amount, Closure(FrittenKeeZ\Vouchers\Vouchers)|null $callback = null): object|array;
 
 // Without using callback.
 $vouchers = $user->createVouchers(3);
@@ -245,12 +307,23 @@ $vouchers = $user->createVouchers(3, function (FrittenKeeZ\Vouchers\Vouchers $vo
 ### Helpers
 Check whether a voucher code is redeemable without throwing any errors.
 ```php
-Vouchers::redeemable(string $code, Closure|null $callback = null): bool;
+Vouchers::redeemable(string $code, Closure(FrittenKeeZ\Vouchers\Models\Voucher)|null $callback = null): bool;
 
 // Without using callback.
 $valid = Vouchers::redeemable('123-456-789');
 // With using callback.
 $valid = Vouchers::redeemable('123-456-789', function (FrittenKeeZ\Vouchers\Models\Voucher $voucher) {
+    return $voucher->hasPrefix('foo');
+});
+```
+Check whether a voucher code is unredeemable without throwing any errors.
+```php
+Vouchers::unredeemable(string $code, Closure(FrittenKeeZ\Vouchers\Models\Voucher)|null $callback = null): bool;
+
+// Without using callback.
+$valid = Vouchers::unredeemable('123-456-789');
+// With using callback.
+$valid = Vouchers::unredeemable('123-456-789', function (FrittenKeeZ\Vouchers\Models\Voucher $voucher) {
     return $voucher->hasPrefix('foo');
 });
 ```
@@ -274,6 +347,8 @@ Voucher::isExpired(): bool;
 Voucher::isRedeemed(): bool;
 // Whether voucher is redeemable.
 Voucher::isRedeemable(): bool;
+// Whether voucher is unredeemable.
+Voucher::isUnredeemable(): bool;
 ```
 
 ### Scopes
@@ -297,12 +372,16 @@ Voucher::withExpired();
 Voucher::withoutExpired();
 // Scope voucher query to redeemed vouchers.
 Voucher::withRedeemed();
-// Scope voucher query to unredeemed vouchers.
+// Scope voucher query to without redeemed vouchers.
 Voucher::withoutRedeemed();
 // Scope voucher query to redeemable vouchers.
 Voucher::withRedeemable();
-// Scope voucher query to unredeemable vouchers.
+// Scope voucher query to without redeemable vouchers.
 Voucher::withoutRedeemable();
+// Scope voucher query to unredeemable vouchers.
+Voucher::withUnredeemable();
+// Scope voucher query to without unredeemable vouchers.
+Voucher::withoutUnredeemable();
 // Scope voucher query to have voucher entities, optionally of a specific type (class or alias).
 Voucher::withEntities(string|null $type = null);
 // Scope voucher query to specific owner type (class or alias).
@@ -314,9 +393,15 @@ Voucher::withoutOwner();
 ```
 
 ## Testing
-Running tests can be done either through composer, or directly calling the PHPUnit binary.
+Running tests can be done either through composer, or directly calling the Pest binary.
 ```bash
 composer test
+./vendor/bin/pest --parallel
+```
+It is also possible to run the tests with coverage report.
+```bash
+composer test-coverage
+./vendor/bin/pest --parallel --coverage
 ```
 
 ## License

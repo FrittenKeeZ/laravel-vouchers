@@ -76,21 +76,24 @@ test('unredeemed event', function () {
 test('should mark unredeemed event', function () {
     // Don't mark voucher as unredeemed for multiple uses.
     Voucher::shouldMarkUnredeemed(function (Voucher $voucher) {
-        expect($voucher->isRedeemed())->toBeFalse();
+        expect($voucher->isRedeemed())->toBeTrue();
 
         return false;
     });
 
-    $voucher = Voucher::factory()->create();
-    $redeemer = Redeemer::factory()->for(User::factory(), 'redeemer')->for($voucher)->create();
-    Redeemer::factory()->for(User::factory(), 'redeemer')->for($voucher)->create();
+    $voucher = Voucher::factory()->redeemed()->create();
+    $primary = Redeemer::factory()->for(User::factory(), 'redeemer')->for($voucher)->create();
+    $secondary = Redeemer::factory()->for(User::factory(), 'redeemer')->for($voucher)->create();
 
-    expect($voucher->isRedeemed())->toBeFalse();
+    expect($voucher->isRedeemed())->toBeTrue();
     expect($voucher->redeemers)->not->toBeEmpty();
     expect($voucher->isUnredeemable())->toBeTrue();
-    expect($voucher->unredeem($redeemer))->toBeTrue();
-    expect($voucher->isRedeemed())->toBeFalse();
+    expect($voucher->unredeem($primary))->toBeTrue();
+    expect($voucher->isRedeemed())->toBeTrue();
     expect($voucher->redeemers)->not->toBeEmpty();
+    expect($voucher->unredeem($secondary))->toBeTrue();
+    expect($voucher->isRedeemed())->toBeFalse();
+    expect($voucher->redeemers)->toBeEmpty();
 });
 
 /**
