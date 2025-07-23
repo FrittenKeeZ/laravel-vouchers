@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use FrittenKeeZ\Vouchers\Facades\Vouchers;
-use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Tests\Models\Color;
+use FrittenKeeZ\Vouchers\Tests\Models\Redeemer;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
-use Illuminate\Support\Carbon;
+use FrittenKeeZ\Vouchers\Tests\Models\Voucher;
 
 /**
  * Test Voucher::scopeCode().
@@ -117,9 +117,9 @@ test('prefix and suffix scopes', function () {
  * Test Voucher::scopeWithStarted().
  */
 test('started scope', function () {
-    Vouchers::create();
-    Vouchers::withStartTime(Carbon::now()->subDay())->create();
-    Vouchers::withStartTime(Carbon::now()->addDay())->create();
+    Voucher::factory()->create();
+    Voucher::factory()->started()->create();
+    Voucher::factory()->started(false)->create();
 
     expect(Voucher::count())->toBe(3);
     expect(Voucher::withStarted()->count())->toBe(2);
@@ -130,9 +130,9 @@ test('started scope', function () {
  * Test Voucher::scopeWithExpired().
  */
 test('expired scope', function () {
-    Vouchers::create();
-    Vouchers::withExpireTime(Carbon::now()->subDay())->create();
-    Vouchers::withExpireTime(Carbon::now()->addDay())->create();
+    Voucher::factory()->create();
+    Voucher::factory()->expired()->create();
+    Voucher::factory()->expired(false)->create();
 
     expect(Voucher::count())->toBe(3);
     expect(Voucher::withExpired()->count())->toBe(1);
@@ -143,8 +143,8 @@ test('expired scope', function () {
  * Test Voucher::scopeWithRedeemed().
  */
 test('redeemed scope', function () {
-    Vouchers::create();
-    Vouchers::create()->update(['redeemed_at' => Carbon::now()->subDay()]);
+    Voucher::factory()->create();
+    Voucher::factory()->redeemed()->create();
 
     expect(Voucher::count())->toBe(2);
     expect(Voucher::withRedeemed()->count())->toBe(1);
@@ -155,16 +155,34 @@ test('redeemed scope', function () {
  * Test Voucher::scopeWithRedeemable().
  */
 test('redeemable scope', function () {
-    Vouchers::create();
-    Vouchers::withStartTime(Carbon::now()->subDay())->create();
-    Vouchers::withStartTime(Carbon::now()->addDay())->create();
-    Vouchers::withExpireTime(Carbon::now()->subDay())->create();
-    Vouchers::withExpireTime(Carbon::now()->addDay())->create();
-    Vouchers::create()->update(['redeemed_at' => Carbon::now()->subDay()]);
+    Voucher::factory()->create();
+    Voucher::factory()->started()->create();
+    Voucher::factory()->started(false)->create();
+    Voucher::factory()->expired()->create();
+    Voucher::factory()->expired(false)->create();
+    Voucher::factory()->redeemed()->has(Redeemer::factory()->for(User::factory(), 'redeemer'))->create();
+    Voucher::factory()->has(Redeemer::factory()->for(User::factory(), 'redeemer'))->create();
 
-    expect(Voucher::count())->toBe(6);
-    expect(Voucher::withRedeemable()->count())->toBe(3);
+    expect(Voucher::count())->toBe(7);
+    expect(Voucher::withRedeemable()->count())->toBe(4);
     expect(Voucher::withoutRedeemable()->count())->toBe(3);
+});
+
+/**
+ * Test Voucher::scopeWithUnredeemable().
+ */
+test('unredeemable scope', function () {
+    Voucher::factory()->create();
+    Voucher::factory()->started()->create();
+    Voucher::factory()->started(false)->create();
+    Voucher::factory()->expired()->create();
+    Voucher::factory()->expired(false)->create();
+    Voucher::factory()->redeemed()->has(Redeemer::factory()->for(User::factory(), 'redeemer'))->create();
+    Voucher::factory()->has(Redeemer::factory()->for(User::factory(), 'redeemer'))->create();
+
+    expect(Voucher::count())->toBe(7);
+    expect(Voucher::withUnredeemable()->count())->toBe(2);
+    expect(Voucher::withoutUnredeemable()->count())->toBe(5);
 });
 
 /**

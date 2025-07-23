@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "illuminate/config": "^10.0|^11.0|^12.0",
         "illuminate/console": "^10.0|^11.0|^12.0",
         "illuminate/database": "^10.0|^11.0|^12.0",
@@ -46,12 +46,13 @@
         ],
         "psr-4": {
             "FrittenKeeZ\\Vouchers\\Tests\\": "tests",
-            "Database\\Factories\\FrittenKeeZ\\Vouchers\\Tests\\Models\\": "tests/database/factories"
+            "FrittenKeeZ\\Vouchers\\Tests\\Database\\Factories\\": "tests/database/factories"
         }
     },
     "scripts": {
         "pint": "pint",
-        "test": "pest --parallel"
+        "test": "pest --parallel",
+        "test-coverage": "pest --parallel --coverage"
     },
     "extra": {
         "laravel": {

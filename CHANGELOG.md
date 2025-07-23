@@ -1,5 +1,30 @@
 # Release Notes
 
+## [v0.7.0 (2025-07-23)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.6.2...0.7.0)
+
+### Added
+- New `Vouchers::unredeem()` and `Vouchers::unredeemable()` methods
+- New `Voucher::unredeem()` and `Voucher::isUnredeemable()` methods
+- New `Voucher::unredeeming()` and `Voucher::unredeemed()` and `Voucher::shouldMarkUnredeemed()` events
+- Additional exceptions for redeeming and unredeeming vouchers:  
+  `VoucherExpiredException`  
+  `VoucherRedeemedException`  
+  `VoucherRedeemerNotFoundException`  
+  `VoucherUnstartedException`
+- Added extra query scopes for Vouchers:  
+  `Voucher::withUnredeemable()`  
+  `Voucher::withoutUnredeemable()`
+
+### Changed
+- Updated `Vouchers::with*()` methods to accept `null` as a valid value for resetting to default
+- Improved PHPDocs comments for many methods and classes
+
+### Deprecated
+- Dropped support for PHP 8.1
+
+### Breaking Changes
+- Renamed `VoucherAlreadyRedeemedException` to `VoucherStateException`
+
 ## [v0.6.2 (2025-07-10)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.6.1...0.6.2)
 
 ### Changed

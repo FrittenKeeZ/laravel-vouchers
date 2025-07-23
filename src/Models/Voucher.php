@@ -57,6 +57,9 @@ class Voucher extends Model
         'redeeming',
         'redeemed',
         'shouldMarkRedeemed',
+        'unredeeming',
+        'unredeemed',
+        'shouldMarkUnredeemed',
     ];
 
     /**
@@ -122,6 +125,14 @@ class Voucher extends Model
     }
 
     /**
+     * Whether voucher is unredeemable.
+     */
+    public function isUnredeemable(): bool
+    {
+        return $this->redeemers()->exists() && $this->isStarted() && !$this->isExpired();
+    }
+
+    /**
      * Redeem voucher with the provided redeemer.
      */
     public function redeem(Redeemer $redeemer): bool
@@ -145,6 +156,8 @@ class Voucher extends Model
 
         // Save related redeemer.
         $this->redeemers()->save($redeemer);
+        // Unset redeemers relation to avoid caching issues.
+        $this->unsetRelation('redeemers');
 
         // Update redeemed timestamp unless specified otherwise.
         // This will mark the voucher as redeemed.
@@ -156,6 +169,51 @@ class Voucher extends Model
         // Perform any actions that are necessary after the voucher is saved.
         if ($saved) {
             $this->fireModelEvent('redeemed', false);
+        }
+
+        // Unset active redeemer.
+        $this->redeemer = null;
+
+        return $saved;
+    }
+
+    /**
+     * Unredeem voucher with the provided redeemer.
+     */
+    public function unredeem(Redeemer $redeemer): bool
+    {
+        if (!$this->isUnredeemable() || !$redeemer->exists || $this->isNot($redeemer->voucher)) {
+            return false;
+        }
+
+        // Set active redeemer.
+        $this->redeemer = $redeemer;
+
+        // If the "unredeeming" event returns false we'll bail out of the unredeem and return
+        // false, indicating that the unredeem failed. This provides a chance for any
+        // listeners to cancel unredeem operations if validations fail or whatever.
+        if ($this->fireModelEvent('unredeeming') === false) {
+            // Unset active redeemer.
+            $this->redeemer = null;
+
+            return false;
+        }
+
+        // Delete related redeemer.
+        $redeemer->delete();
+        // Unset redeemers relation to avoid caching issues.
+        $this->unsetRelation('redeemers');
+
+        // Reset redeemed timestamp unless specified otherwise.
+        // This will mark the voucher as unredeemed.
+        if ($this->fireModelEvent('shouldMarkUnredeemed') !== false || !$this->redeemers()->exists()) {
+            $this->redeemed_at = null;
+        }
+
+        $saved = $this->save();
+        // Perform any actions that are necessary after the voucher is saved.
+        if ($saved) {
+            $this->fireModelEvent('unredeemed', false);
         }
 
         // Unset active redeemer.
@@ -217,9 +275,9 @@ class Voucher extends Model
     /**
      * Register a redeeming voucher event with the dispatcher.
      *
-     * @param \Closure|string $callback
+     * @param array|callable|class-string|\Illuminate\Events\QueuedClosure $callback
      */
-    public static function redeeming($callback): void
+    public static function redeeming(mixed $callback): void
     {
         static::registerModelEvent('redeeming', $callback);
     }
@@ -227,9 +285,9 @@ class Voucher extends Model
     /**
      * Register a redeemed voucher event with the dispatcher.
      *
-     * @param \Closure|string $callback
+     * @param array|callable|class-string|\Illuminate\Events\QueuedClosure $callback
      */
-    public static function redeemed($callback): void
+    public static function redeemed(mixed $callback): void
     {
         static::registerModelEvent('redeemed', $callback);
     }
@@ -237,10 +295,40 @@ class Voucher extends Model
     /**
      * Register a shouldMarkRedeemed voucher event with the dispatcher.
      *
-     * @param \Closure|string $callback
+     * @param array|callable|class-string|\Illuminate\Events\QueuedClosure $callback
      */
-    public static function shouldMarkRedeemed($callback): void
+    public static function shouldMarkRedeemed(mixed $callback): void
     {
         static::registerModelEvent('shouldMarkRedeemed', $callback);
+    }
+
+    /**
+     * Register a unredeeming voucher event with the dispatcher.
+     *
+     * @param array|callable|class-string|\Illuminate\Events\QueuedClosure $callback
+     */
+    public static function unredeeming(mixed $callback): void
+    {
+        static::registerModelEvent('unredeeming', $callback);
+    }
+
+    /**
+     * Register a unredeemed voucher event with the dispatcher.
+     *
+     * @param array|callable|class-string|\Illuminate\Events\QueuedClosure $callback
+     */
+    public static function unredeemed(mixed $callback): void
+    {
+        static::registerModelEvent('unredeemed', $callback);
+    }
+
+    /**
+     * Register a shouldMarkUnredeemed voucher event with the dispatcher.
+     *
+     * @param array|callable|class-string|\Illuminate\Events\QueuedClosure $callback
+     */
+    public static function shouldMarkUnredeemed(mixed $callback): void
+    {
+        static::registerModelEvent('shouldMarkUnredeemed', $callback);
     }
 }
