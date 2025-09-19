@@ -26,7 +26,16 @@ test('model resolving', function () {
         'redeemer' => 'FakeRedeemer',
         'voucher'  => 'FakeVoucher',
     ];
-    app()['config']->set('vouchers.models', $models);
+
+    // Temporarily overrides.
+    Config::withModels(...$models);
+    foreach ($models as $name => $model) {
+        expect(Config::model($name))->toBe($model);
+    }
+    Config::resetModels();
+
+    // Config overrides.
+    config(['vouchers.models' => $models]);
     foreach ($models as $name => $model) {
         expect(Config::model($name))->toBe($model);
     }
@@ -51,7 +60,7 @@ test('table resolving', function () {
         'redeemers' => 'this_redeemers',
         'vouchers'  => 'this_vouchers',
     ];
-    app()['config']->set('vouchers.tables', $tables);
+    config(['vouchers.tables' => $tables]);
     foreach ($tables as $name => $table) {
         expect(Config::table($name))->toBe($table);
     }
@@ -66,14 +75,13 @@ test('table resolving', function () {
  */
 test('default options', function () {
     $config = new Config();
-    $app_config = app()['config'];
 
     expect($config->getOptions())->toBeEmpty();
-    expect($config->getCharacters())->toBe($app_config->get('vouchers.characters'));
-    expect($config->getMask())->toBe($app_config->get('vouchers.mask'));
-    expect($config->getPrefix())->toBe($app_config->get('vouchers.prefix'));
-    expect($config->getSuffix())->toBe($app_config->get('vouchers.suffix'));
-    expect($config->getSeparator())->toBe($app_config->get('vouchers.separator'));
+    expect($config->getCharacters())->toBe(config('vouchers.characters'));
+    expect($config->getMask())->toBe(config('vouchers.mask'));
+    expect($config->getPrefix())->toBe(config('vouchers.prefix'));
+    expect($config->getSuffix())->toBe(config('vouchers.suffix'));
+    expect($config->getSeparator())->toBe(config('vouchers.separator'));
 });
 
 /**
@@ -81,7 +89,6 @@ test('default options', function () {
  */
 test('config overridden options', function () {
     $config = new Config();
-    $app_config = app()['config'];
 
     // Override config.
     $options = [
@@ -94,7 +101,7 @@ test('config overridden options', function () {
     foreach ($options as $key => $value) {
         $getter = 'get' . ucfirst($key);
         expect($value)->not->toBe($config->{$getter}());
-        $app_config->set('vouchers.' . $key, $value);
+        config(["vouchers.{$key}" => $value]);
     }
 
     expect($config->getOptions())->toBeEmpty();
@@ -147,11 +154,11 @@ test('dynamically overridden options', function () {
         ->withSuffix(null)
         ->withSeparator(null)
     ;
-    expect($config->getCharacters())->toBe(app()['config']->get('vouchers.characters'));
-    expect($config->getMask())->toBe(app()['config']->get('vouchers.mask'));
-    expect($config->getPrefix())->toBe(app()['config']->get('vouchers.prefix'));
-    expect($config->getSuffix())->toBe(app()['config']->get('vouchers.suffix'));
-    expect($config->getSeparator())->toBe(app()['config']->get('vouchers.separator'));
+    expect($config->getCharacters())->toBe(config('vouchers.characters'));
+    expect($config->getMask())->toBe(config('vouchers.mask'));
+    expect($config->getPrefix())->toBe(config('vouchers.prefix'));
+    expect($config->getSuffix())->toBe(config('vouchers.suffix'));
+    expect($config->getSeparator())->toBe(config('vouchers.separator'));
 });
 
 /**

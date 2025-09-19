@@ -76,7 +76,7 @@ $vouchers = Vouchers::create(10);
 ```
 
 ### Redeem Vouchers
-Redeeming vouchers requires that one provides a redeemer entity.  
+Redeeming vouchers requires that you provide a redeemer entity.  
 Additional metadata for the redeemer can be provided.
 ```php
 Vouchers::redeem(string $code, Illuminate\Database\Eloquent\Model $entity, array $metadata = []): bool;
@@ -145,7 +145,14 @@ try {
 ```
 
 ### Options
-Besides defaults specified in `config/vouchers.php`, one can override options when generating codes or creating vouchers.  
+Besides defaults specified in `config/vouchers.php`, you can override options when generating codes or creating vouchers.  
+Overriding model class names on runtime can be done using these methods.
+```php
+// Override model class names.
+Config::withModels(string|null $voucher = null, string|null $redeemer = null, string|null $entity = null);
+// Reset model class names.
+Config::resetModels();
+```
 Following methods apply to `Vouchers::generate()`, `Vouchers::batch()` and `Vouchers::create()` calls.
 ```php
 // Override characters list.

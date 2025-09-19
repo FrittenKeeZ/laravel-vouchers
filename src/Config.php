@@ -18,6 +18,13 @@ class Config
     protected array $options = [];
 
     /**
+     * Overridden model class names.
+     *
+     * @var array<string, string>
+     */
+    protected static array $models = [];
+
+    /**
      * Get dynamically set options.
      */
     public function getOptions(): array
@@ -320,11 +327,27 @@ class Config
     }
 
     /**
-     * Get model class name from config.
+     * Set model class name overrides.
+     */
+    public static function withModels(?string $voucher = null, ?string $redeemer = null, ?string $entity = null): void
+    {
+        static::$models = compact('entity', 'redeemer', 'voucher');
+    }
+
+    /**
+     * Reset model class name overrides.
+     */
+    public static function resetModels(): void
+    {
+        static::$models = [];
+    }
+
+    /**
+     * Get model class name from override or config.
      */
     public static function model(string $name): ?string
     {
-        return config('vouchers.models.' . $name);
+        return static::$models[$name] ?? config("vouchers.models.{$name}");
     }
 
     /**
@@ -332,6 +355,6 @@ class Config
      */
     public static function table(string $name): ?string
     {
-        return config('vouchers.tables.' . $name);
+        return config("vouchers.tables.{$name}");
     }
 }
