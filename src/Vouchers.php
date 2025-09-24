@@ -27,6 +27,7 @@ use Illuminate\Support\Str;
  * @method string          getSeparator()
  * @method self            withSeparator(?string $separator)
  * @method self            withoutSeparator()
+ * @method self            withCode(string $code)
  * @method ?array          getMetadata()
  * @method self            withMetadata(?array $metadata)
  * @method ?\Carbon\Carbon getStartTime()
@@ -95,6 +96,8 @@ class Vouchers
      * Create an amount of vouchers.
      *
      * Defaults to a single voucher if amount is absent.
+     *
+     * @throws \FrittenKeeZ\Vouchers\Exceptions\InfiniteLoopException
      */
     public function create(int $amount = 1): array|object
     {
@@ -246,6 +249,8 @@ class Vouchers
      *
      * Codes are checked against the database to ensure uniqueness.
      *
+     * @throws \FrittenKeeZ\Vouchers\Exceptions\InfiniteLoopException
+     *
      * @return array|string[]
      */
     public function batch(int $amount): array
@@ -254,10 +259,16 @@ class Vouchers
             return [];
         }
 
+        $attempts = substr_count($this->config->getMask(), '*') * Str::length($this->config->getCharacters());
         $codes = [];
         for ($i = 0; $i < $amount; $i++) {
+            $attempt = 0;
             do {
                 $code = $this->generate();
+                // Prevent infinite loop.
+                if ($attempt++ > $attempts) {
+                    throw new Exceptions\InfiniteLoopException();
+                }
             } while ($this->exists($code, $codes));
 
             $codes[] = $code;
@@ -277,7 +288,7 @@ class Vouchers
         $mask = $mask ?: $this->config->getMask();
         $characters = $characters ?: $this->config->getCharacters();
 
-        $code = preg_replace_callback('/\*/', fn () => $characters[random_int(0, mb_strlen($characters) - 1)], $mask);
+        $code = preg_replace_callback('/\*/', fn () => $characters[random_int(0, Str::length($characters) - 1)], $mask);
 
         return $this->wrap(
             $code,

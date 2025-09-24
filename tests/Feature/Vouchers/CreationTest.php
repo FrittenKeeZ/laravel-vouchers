@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
+use FrittenKeeZ\Vouchers\Exceptions\InfiniteLoopException;
 use FrittenKeeZ\Vouchers\Models\Voucher;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
 use FrittenKeeZ\Vouchers\Vouchers;
@@ -56,4 +57,15 @@ test('voucher creation', function () {
 
     // Test negative amount.
     expect($vouchers->create(-5))->toBeEmpty();
+
+    // Test single static code.
+    $voucher = $vouchers->withMask('MYVOUCHER')->create();
+    expect($voucher)->not->toBeNull();
 });
+
+/**
+ * Test infinite loop detection.
+ */
+test('Inifinite loop detected', function (string $mask, ?string $characters, int $amount) {
+    (new Vouchers())->withMask($mask)->withCharacters($characters)->create($amount);
+})->throws(InfiniteLoopException::class)->with([['FREE', null, 2], ['FREE*', 'A', 2]]);

@@ -171,6 +171,8 @@ Vouchers::withoutSuffix();
 Vouchers::withSeparator(string|null $separator);
 // Disable prefix and suffix separator.
 Vouchers::withoutSeparator();
+// Override code mask and disable prefix, suffix and separator.
+Vouchers::withCode(string $code);
 ```
 Following methods only apply to `Vouchers::create()` call.
 ```php
@@ -208,6 +210,15 @@ $voucher = Vouchers::withMask('***-***-***')
     ->withExpireDateIn(CarbonInterval::create('P30D'))
     ->create();
 $voucher = Vouchers::withOwner($user)->withPrefix('USR');
+```
+Using a static code or a code mask without replacement asterisks, you can end up in an infinite loop when trying to create multiple vouchers or a voucher which already exists.  
+To prevent this, an exception will be thrown after a calculated number of attempts depending on the amount of asterisks and the replacement characters.
+```php
+try {
+    $vouchers = Vouchers::withCode('FIXED-CODE')->create(5);
+} catch (FrittenKeeZ\Vouchers\Exceptions\InfiniteLoopException $e) {
+    // Infinite loop detected when trying to create vouchers.
+}
 ```
 
 ### Events

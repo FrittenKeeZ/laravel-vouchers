@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string                                                                      getSeparator()
  * @method static \FrittenKeeZ\Vouchers\Vouchers                                              withSeparator(?string $separator)
  * @method static \FrittenKeeZ\Vouchers\Vouchers                                              withoutSeparator()
+ * @method static \FrittenKeeZ\Vouchers\Vouchers                                              withCode(string $code)
  * @method static ?array                                                                      getMetadata()
  * @method static \FrittenKeeZ\Vouchers\Vouchers                                              withMetadata(?array $metadata)
  * @method static ?\Carbon\Carbon                                                             getStartTime()

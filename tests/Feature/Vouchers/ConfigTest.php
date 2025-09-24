@@ -159,6 +159,13 @@ test('dynamically overridden options', function () {
     expect($config->getPrefix())->toBe(config('vouchers.prefix'));
     expect($config->getSuffix())->toBe(config('vouchers.suffix'));
     expect($config->getSeparator())->toBe(config('vouchers.separator'));
+
+    // Test 'withCode' call.
+    $config->withCode('MYVOUCHER');
+    expect($config->getMask())->toBe('MYVOUCHER');
+    expect($config->getPrefix())->toBe('');
+    expect($config->getSuffix())->toBe('');
+    expect($config->getSeparator())->toBe('');
 });
 
 /**

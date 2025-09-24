@@ -167,6 +167,14 @@ class Config
     }
 
     /**
+     * With static code - disables prefix, suffix and separator.
+     */
+    public function withCode(string $code): self
+    {
+        return $this->withMask($code)->withoutPrefix()->withoutSuffix()->withoutSeparator();
+    }
+
+    /**
      * Get metadata.
      */
     public function getMetadata(): ?array
