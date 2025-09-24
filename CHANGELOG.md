@@ -1,5 +1,16 @@
 # Release Notes
 
+## [v0.7.2 (2025-09-24)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.7.1...0.7.2)
+
+### Added
+- Add  `Config::withCode()` / `Vouchers::withCode()` as short-hand call for chaining `withMask()`, `withoutPrefix()`, `withoutSuffix()` and `withoutSeparator()`
+- Add infinite loop detection when using `Vouchers::batch()` and `Vouchers::create()`
+
+## [v0.7.1 (2025-09-19)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.7.0...0.7.1)
+
+### Added
+- Easy way to override model class names on runtime with `Config::withModels()` and `Config::resetModels()`
+
 ## [v0.7.0 (2025-07-23)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.6.2...0.7.0)
 
 ### Added
