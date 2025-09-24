@@ -59,7 +59,7 @@ test('voucher creation', function () {
     expect($vouchers->create(-5))->toBeEmpty();
 
     // Test single static code.
-    $voucher = $vouchers->withMask('MYVOUCHER')->create();
+    $voucher = $vouchers->withCode('MYVOUCHER')->create();
     expect($voucher)->not->toBeNull();
 });
 
