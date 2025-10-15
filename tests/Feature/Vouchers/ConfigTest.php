@@ -173,6 +173,7 @@ test('dynamically overridden options', function () {
  */
 test('additional options', function () {
     $config = new Config();
+    Carbon::setTestNow(Carbon::now());
 
     // Test metadata
     $metadata = [
@@ -244,4 +245,6 @@ test('additional options', function () {
             yield $entity;
         }
     })())->getEntities())->toBe($entities);
+
+    Carbon::setTestNow();
 });

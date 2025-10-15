@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": "^8.2",
+        "illuminate/collections": "^10.0|^11.0|^12.0",
         "illuminate/config": "^10.0|^11.0|^12.0",
         "illuminate/console": "^10.0|^11.0|^12.0",
         "illuminate/database": "^10.0|^11.0|^12.0",
