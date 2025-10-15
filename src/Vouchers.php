@@ -116,10 +116,11 @@ class Vouchers
         // Ensure nothing is committed to the database if anything fails.
         DB::transaction(function () use ($amount, $options, $owner, $entities, &$vouchers) {
             foreach ($this->batch($amount) as $code) {
-                $voucher = $this->vouchers()->create(compact('code') + $options);
+                $voucher = $this->vouchers()->fill(compact('code') + $options);
                 if (!empty($owner)) {
-                    $voucher->owner()->associate($owner)->save();
+                    $voucher->owner()->associate($owner);
                 }
+                $voucher->save();
                 if (!empty($entities)) {
                     $voucher->addEntities(...$entities);
                 }
