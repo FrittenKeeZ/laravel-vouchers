@@ -10,6 +10,7 @@
         "concat_space": {
             "spacing": "one"
         },
+        "fully_qualified_strict_types": false,
         "multiline_whitespace_before_semicolons": {
             "strategy": "new_line_for_chained_calls"
         },

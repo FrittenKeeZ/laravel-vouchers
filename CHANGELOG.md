@@ -1,5 +1,23 @@
 # Release Notes
 
+## [v0.8.0 (2026-05-01)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.7.3...0.8.0)
+
+### Added
+- Added support for Laravel 13
+- Added support for PEST 4
+- Added support for PHP 8.5
+
+### Deprecated
+- Dropped support for Laravel 10
+- Dropped support for PEST 2
+- Dropped support for PHP 8.2
+
+## [v0.7.3 (2025-10-15)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.7.2...0.7.3)
+
+### Changed
+- Update `Vouchers::create()` to include owner in first save in [5c257dd](https://github.com/FrittenKeeZ/laravel-vouchers/commit/5c257dd1e23b4854834376fc3d318513efe7e189)
+- Workflow version bumps
+
 ## [v0.7.2 (2025-09-24)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.7.1...0.7.2)
 
 ### Added

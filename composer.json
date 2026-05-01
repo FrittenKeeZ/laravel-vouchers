@@ -1,6 +1,6 @@
 {
     "name": "frittenkeez/laravel-vouchers",
-    "description": "Voucher system for Laravel 9+",
+    "description": "Voucher system for Laravel 11+",
     "license": "MIT",
     "keywords": [
         "coupon",
@@ -16,19 +16,24 @@
         }
     ],
     "require": {
-        "php": "^8.2",
-        "illuminate/collections": "^10.0|^11.0|^12.0",
-        "illuminate/config": "^10.0|^11.0|^12.0",
-        "illuminate/console": "^10.0|^11.0|^12.0",
-        "illuminate/database": "^10.0|^11.0|^12.0",
-        "illuminate/support": "^10.0|^11.0|^12.0"
+        "php": "^8.3",
+        "illuminate/collections": "^11.0|^12.0|^13.0",
+        "illuminate/config": "^11.0|^12.0|^13.0",
+        "illuminate/console": "^11.0|^12.0|^13.0",
+        "illuminate/database": "^11.0|^12.0|^13.0",
+        "illuminate/support": "^11.0|^12.0|^13.0"
     },
     "require-dev": {
-        "illuminate/support": "^10.0|^11.0|^12.0",
+        "guzzlehttp/promises": "^2.0.3",
+        "illuminate/support": "^11.0|^12.0|^13.0",
         "laravel/pint": "^1.20",
-        "nesbot/carbon": "^2.63|^3.8.4",
-        "orchestra/testbench": "^8.0|^9.0|^10.0",
-        "pestphp/pest": "^2.2|^3.0"
+        "mockery/mockery": "^1.6.10",
+        "nesbot/carbon": "^3.8.4",
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
+        "pestphp/pest": "^3.0|^4.0",
+        "spatie/laravel-ray": "^1.36.2",
+        "spatie/ray": "^1.43.0",
+        "symfony/translation": "^7.0.4"
     },
     "config": {
         "allow-plugins": {
