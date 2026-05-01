@@ -1,5 +1,16 @@
 # Release Notes
 
+## Unreleased
+
+### Added
+- Added support for Laravel 13
+- Added support for PEST 4
+
+### Deprecated
+- Dropped support for Laravel 10
+- Dropped support for PHP 8.2
+- Dropped support for PEST 2
+
 ## [v0.7.2 (2025-09-24)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.7.1...0.7.2)
 
 ### Added
