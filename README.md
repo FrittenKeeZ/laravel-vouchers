@@ -370,8 +370,11 @@ Voucher::isUnredeemable(): bool;
 ```
 
 ### Scopes
-For convenience we also provide Voucher scopes matching the helper methods.
+For convenience we also provide Voucher scopes matching the helper methods.  
+All scopes are defined using the `#[Illuminate\Database\Eloquent\Attributes\Scope]` attribute.
 ```php
+// Scope voucher query to a specific code.
+Voucher::withCode(string $code);
 // Scope voucher query to a specific prefix, optionally specifying a separator different from config.
 Voucher::withPrefix(string $prefix, string|null $separator = null);
 // Scope voucher query to exclude a specific prefix, optionally specifying a separator different from config.
