@@ -35,18 +35,6 @@ class Voucher extends Model
     ];
 
     /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'metadata'    => 'array',
-        'starts_at'   => 'datetime',
-        'expires_at'  => 'datetime',
-        'redeemed_at' => 'datetime',
-    ];
-
-    /**
      * User exposed observable events.
      *
      * These are extra user-defined events observers may subscribe to.
@@ -73,11 +61,26 @@ class Voucher extends Model
     }
 
     /**
+     * The attributes that should be cast to native types.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'metadata'    => 'array',
+            'starts_at'   => 'datetime',
+            'expires_at'  => 'datetime',
+            'redeemed_at' => 'datetime',
+        ];
+    }
+
+    /**
      * Whether voucher has prefix, optionally specifying a separator different from config.
      */
     public function hasPrefix(string $prefix, ?string $separator = null): bool
     {
-        $clause = sprintf('%s%s', $prefix, $separator === null ? config('vouchers.separator') : $separator);
+        $clause = \sprintf('%s%s', $prefix, $separator === null ? config('vouchers.separator') : $separator);
 
         return Str::startsWith($this->code, $clause);
     }
@@ -87,7 +90,7 @@ class Voucher extends Model
      */
     public function hasSuffix(string $suffix, ?string $separator = null): bool
     {
-        $clause = sprintf('%s%s', $separator === null ? config('vouchers.separator') : $separator, $suffix);
+        $clause = \sprintf('%s%s', $separator === null ? config('vouchers.separator') : $separator, $suffix);
 
         return Str::endsWith($this->code, $clause);
     }
