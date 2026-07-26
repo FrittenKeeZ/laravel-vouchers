@@ -135,22 +135,22 @@ class Vouchers
     }
 
     /**
-     * Redeem a voucher code.
+     * Redeem a voucher code or voucher instance.
      *
      * Returns whether redeeming was successful.
      *
-     * @param \Illuminate\Database\Eloquent\Model $entity   Redeemer entity.
-     * @param array                               $metadata Additional metadata for redeemer.
+     * @param \FrittenKeeZ\Vouchers\Models\Voucher|string $voucher  Voucher code or instance.
+     * @param \Illuminate\Database\Eloquent\Model         $entity   Redeemer entity.
+     * @param array                                       $metadata Additional metadata for redeemer.
      *
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherRedeemedException
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherUnstartedException
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherExpiredException
      */
-    public function redeem(string $code, Model $entity, array $metadata = []): bool
+    public function redeem(string|Voucher $voucher, Model $entity, array $metadata = []): bool
     {
-        /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
-        $voucher = $this->vouchers()->withCode($code)->first();
+        $voucher = $this->resolveVoucher($voucher);
         // If the voucher is null or not redeemable, throw an appropriate exception.
         if (!$voucher?->isRedeemable()) {
             match (true) {
@@ -176,10 +176,11 @@ class Vouchers
     }
 
     /**
-     * Unredeem a voucher code.
+     * Unredeem a voucher code or voucher instance.
      *
      * Returns whether unredeeming was successful.
      *
+     * @param \FrittenKeeZ\Vouchers\Models\Voucher|string          $voucher  Voucher code or instance.
      * @param \Illuminate\Database\Eloquent\Model|null             $entity   Redeemer entity.
      * @param \Closure(\Illuminate\Database\Eloquent\Builder)|null $callback Optional callback to filter redeemer query.
      *
@@ -188,10 +189,9 @@ class Vouchers
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherUnstartedException
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherExpiredException
      */
-    public function unredeem(string $code, ?Model $entity = null, ?Closure $callback = null): bool
+    public function unredeem(string|Voucher $voucher, ?Model $entity = null, ?Closure $callback = null): bool
     {
-        /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
-        $voucher = $this->vouchers()->withCode($code)->first();
+        $voucher = $this->resolveVoucher($voucher);
         if ($voucher === null) {
             throw new Exceptions\VoucherNotFoundException();
         }
@@ -220,27 +220,27 @@ class Vouchers
     }
 
     /**
-     * Whether a voucher code is redeemable.
+     * Whether a voucher code or voucher instance is redeemable.
      *
+     * @param \FrittenKeeZ\Vouchers\Models\Voucher|string         $voucher  Voucher code or instance.
      * @param \Closure(\FrittenKeeZ\Vouchers\Models\Voucher)|null $callback Optional callback to perform extra checks.
      */
-    public function redeemable(string $code, ?Closure $callback = null): bool
+    public function redeemable(string|Voucher $voucher, ?Closure $callback = null): bool
     {
-        /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
-        $voucher = $this->vouchers()->withCode($code)->first();
+        $voucher = $this->resolveVoucher($voucher);
 
         return $voucher !== null && $voucher->isRedeemable() && ($callback === null || $callback($voucher));
     }
 
     /**
-     * Whether a voucher code is unredeemable.
+     * Whether a voucher code or voucher instance is unredeemable.
      *
+     * @param \FrittenKeeZ\Vouchers\Models\Voucher|string         $voucher  Voucher code or instance.
      * @param \Closure(\FrittenKeeZ\Vouchers\Models\Voucher)|null $callback Optional callback to perform extra checks.
      */
-    public function unredeemable(string $code, ?Closure $callback = null): bool
+    public function unredeemable(string|Voucher $voucher, ?Closure $callback = null): bool
     {
-        /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
-        $voucher = $this->vouchers()->withCode($code)->first();
+        $voucher = $this->resolveVoucher($voucher);
 
         return $voucher !== null && $voucher->isUnredeemable() && ($callback === null || $callback($voucher));
     }
@@ -327,6 +327,25 @@ class Vouchers
     public function reset(): void
     {
         $this->config = new Config();
+    }
+
+    /**
+     * Resolve a voucher from either a code or an existing voucher instance.
+     *
+     * Codes are looked up in the database, whereas instances are used as-is - meaning their
+     * current in-memory state is trusted. Refresh the instance first if it might be stale.
+     *
+     * Returns null when a code has no match, or when an instance doesn't exist in the database.
+     *
+     * @param \FrittenKeeZ\Vouchers\Models\Voucher|string $voucher Voucher code or instance.
+     */
+    protected function resolveVoucher(string|Voucher $voucher): ?Voucher
+    {
+        if (\is_string($voucher)) {
+            return $this->vouchers()->withCode($voucher)->first();
+        }
+
+        return $voucher->exists ? $voucher : null;
     }
 
     /**

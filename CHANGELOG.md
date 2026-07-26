@@ -4,6 +4,10 @@
 
 Please read the [upgrade guide](UPGRADING.md) for implications of this change.
 
+### Added
+- `Vouchers::redeem()`, `Vouchers::unredeem()`, `Vouchers::redeemable()` and `Vouchers::unredeemable()` now accept a `Voucher` instance in addition to a code, skipping the code lookup query
+- Added missing `unredeem()` and `unredeemable()` methods to the `Vouchers` facade docblock
+
 ### Changed
 - Converted all model scopes from the `scopeXxx()` prefix to the `#[Illuminate\Database\Eloquent\Attributes\Scope]` attribute
 - Trimmed redundant dev dependencies that only mirrored constraints already enforced by `laravel/framework` and `orchestra/testbench`
@@ -16,6 +20,7 @@ Please read the [upgrade guide](UPGRADING.md) for implications of this change.
 - Minimum supported Laravel version is now `12.4`, where the `#[Scope]` attribute was introduced
 - Renamed the `Voucher::code()` scope to `Voucher::withCode()` - a scope named `code` shadows the `code` column and breaks `$voucher->code` when the attribute is not loaded
 - Scope methods are now `protected` instead of `public` - only relevant if you extend the models and override a scope
+- Renamed the first parameter of `Vouchers::redeem()`, `Vouchers::unredeem()`, `Vouchers::redeemable()` and `Vouchers::unredeemable()` from `$code` to `$voucher` - only relevant if you call them using named arguments
 
 ## [v0.8.1 (2026-07-26)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.8.0...0.8.1)
 
