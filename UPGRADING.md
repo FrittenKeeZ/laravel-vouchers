@@ -39,6 +39,24 @@ protected function withPrefix(Builder $query, string $prefix): Builder
 ```
 Note that scope methods must **not** be `public` - a public method bypasses Eloquent's `__call()` forwarding, which would pass your first argument as the query builder. Use `protected` as shown above.
 
+#### Redeem methods accept a voucher instance
+`Vouchers::redeem()`, `Vouchers::unredeem()`, `Vouchers::redeemable()` and `Vouchers::unredeemable()` now accept either a voucher code or a `Voucher` instance. Passing an instance skips the code lookup query:
+```php
+// Both are valid.
+Vouchers::redeem('123-456-789', $user);
+Vouchers::redeem($voucher, $user);
+```
+An instance is used as-is, so its current in-memory state is trusted - refresh it first if it might be stale. An instance that does not exist in the database is treated as not found.
+
+As a consequence the first parameter was renamed from `$code` to `$voucher`, which is only a breaking change if you call these methods using named arguments:
+```php
+// Before
+Vouchers::unredeem(code: '123-456-789', callback: $callback);
+
+// After
+Vouchers::unredeem(voucher: '123-456-789', callback: $callback);
+```
+
 #### Renamed `Voucher::code()` scope to `Voucher::withCode()`
 The `code` scope has been renamed to `withCode`, both to match the naming of the other scopes and because a scope named `code` would shadow the `code` column - Eloquent would resolve `$voucher->code` as a relationship method and throw an `ArgumentCountError` whenever the attribute was not loaded.
 ```php

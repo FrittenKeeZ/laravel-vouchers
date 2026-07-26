@@ -78,11 +78,16 @@ $vouchers = Vouchers::create(10);
 ### Redeem Vouchers
 Redeeming vouchers requires that you provide a redeemer entity.  
 Additional metadata for the redeemer can be provided.
+
+A voucher can be referenced either by its code or by passing a voucher instance directly - the latter skips the code lookup query.  
+Note that an instance is used as-is, so its current in-memory state is trusted; refresh it first if it might be stale.
 ```php
-Vouchers::redeem(string $code, Illuminate\Database\Eloquent\Model $entity, array $metadata = []): bool;
+Vouchers::redeem(FrittenKeeZ\Vouchers\Models\Voucher|string $voucher, Illuminate\Database\Eloquent\Model $entity, array $metadata = []): bool;
 
 try {
     $success = Vouchers::redeem('123-456-789', $user, ['foo' => 'bar']);
+    // Or using an existing voucher instance.
+    $success = Vouchers::redeem($voucher, $user, ['foo' => 'bar']);
 } catch (FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException $e) {
     // Voucher was not found with the provided code.
 } catch (FrittenKeeZ\Vouchers\Exceptions\VoucherRedeemedException $e) {
@@ -105,10 +110,12 @@ try {
 ### Unredeem Vouchers
 Unredeeming voucher can be done by either providing a related redeemer entity, or by using a redeemer query filter to let the package find the redeemer for you.
 ```php
-Vouchers::unredeem(string $code, Illuminate\Database\Eloquent\Model|null $entity = null, Closure(Illuminate\Database\Eloquent\Builder)|null $callback = null): bool;
+Vouchers::unredeem(FrittenKeeZ\Vouchers\Models\Voucher|string $voucher, Illuminate\Database\Eloquent\Model|null $entity = null, Closure(Illuminate\Database\Eloquent\Builder)|null $callback = null): bool;
 
 try {
     $success = Vouchers::unredeem('123-456-789', $user);
+    // Or using an existing voucher instance.
+    $success = Vouchers::unredeem($voucher, $user);
 } catch (FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException $e) {
     // Voucher was not found with the provided code.
 } catch (FrittenKeeZ\Vouchers\Exceptions\VoucherRedeemerNotFoundException $e) {
@@ -138,7 +145,7 @@ try {
 With specifying a redeemer query filter:
 ```php
 try {
-    $success = Vouchers::unredeem(code: '123-456-789', callback: fn (Illuminate\Database\Eloquent\Builder $query) => $query->where('metadata->foo', 'bar));
+    $success = Vouchers::unredeem(voucher: '123-456-789', callback: fn (Illuminate\Database\Eloquent\Builder $query) => $query->where('metadata->foo', 'bar));
 } catch (FrittenKeeZ\Vouchers\Exceptions\VoucherException $e) {
     // Voucher was not possible to unredeem.
 }
@@ -325,7 +332,7 @@ $vouchers = $user->createVouchers(3, function (FrittenKeeZ\Vouchers\Vouchers $vo
 ### Helpers
 Check whether a voucher code is redeemable without throwing any errors.
 ```php
-Vouchers::redeemable(string $code, Closure(FrittenKeeZ\Vouchers\Models\Voucher)|null $callback = null): bool;
+Vouchers::redeemable(FrittenKeeZ\Vouchers\Models\Voucher|string $voucher, Closure(FrittenKeeZ\Vouchers\Models\Voucher)|null $callback = null): bool;
 
 // Without using callback.
 $valid = Vouchers::redeemable('123-456-789');
@@ -336,7 +343,7 @@ $valid = Vouchers::redeemable('123-456-789', function (FrittenKeeZ\Vouchers\Mode
 ```
 Check whether a voucher code is unredeemable without throwing any errors.
 ```php
-Vouchers::unredeemable(string $code, Closure(FrittenKeeZ\Vouchers\Models\Voucher)|null $callback = null): bool;
+Vouchers::unredeemable(FrittenKeeZ\Vouchers\Models\Voucher|string $voucher, Closure(FrittenKeeZ\Vouchers\Models\Voucher)|null $callback = null): bool;
 
 // Without using callback.
 $valid = Vouchers::unredeemable('123-456-789');
