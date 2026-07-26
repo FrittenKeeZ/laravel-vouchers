@@ -198,6 +198,9 @@ test('entities scope', function () {
     expect(Voucher::withEntities()->count())->toBe(3);
     expect(Voucher::withEntities(Color::class)->count())->toBe(2);
     expect(Voucher::withEntities(User::class)->count())->toBe(2);
+    // Passing a morph map alias must yield the same result as passing the class name.
+    expect(Voucher::withEntities('Color')->count())->toBe(2);
+    expect(Voucher::withEntities('User')->count())->toBe(2);
 });
 
 /**
@@ -218,6 +221,8 @@ test('owner scopes', function () {
     expect(Voucher::count())->toBe(8);
     expect(Voucher::withoutOwner()->count())->toBe(2);
     expect(Voucher::withOwnerType(User::class)->count())->toBe(6);
+    // Passing a morph map alias must yield the same result as passing the class name.
+    expect(Voucher::withOwnerType('User')->count())->toBe(6);
     expect(Voucher::withOwner($first)->count())->toBe(1);
     expect(Voucher::withOwner($second)->count())->toBe(2);
     expect(Voucher::withOwner($third)->count())->toBe(3);

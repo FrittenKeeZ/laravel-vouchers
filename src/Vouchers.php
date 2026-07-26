@@ -289,7 +289,8 @@ class Vouchers
         $mask = $mask ?: $this->config->getMask();
         $characters = $characters ?: $this->config->getCharacters();
 
-        $code = preg_replace_callback('/\*/', fn () => $characters[random_int(0, Str::length($characters) - 1)], $mask);
+        $max = Str::length($characters) - 1;
+        $code = preg_replace_callback('/\*/', fn () => $characters[random_int(0, $max)], $mask);
 
         return $this->wrap(
             $code,

@@ -39,6 +39,9 @@
         "allow-plugins": {
             "kylekatarnls/update-helper": false,
             "pestphp/pest-plugin": true
+        },
+        "audit": {
+            "block-insecure": false
         }
     },
     "autoload": {
