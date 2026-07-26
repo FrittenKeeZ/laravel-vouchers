@@ -1,5 +1,15 @@
 # Release Notes
 
+## [v0.8.1 (2026-07-26)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.8.0...0.8.1)
+
+### Changed
+- Moved the model `$casts` property to the Laravel 11+ `casts()` method on `Voucher` and `Redeemer`
+- Resolve morph aliases via `Relation::getMorphAlias()` in the `withOwnerType()` and `withEntityType()` scopes instead of instantiating the related model
+- Minor optimization to `Vouchers::generate()` - the character list length is now computed once per code instead of once per mask asterisk
+
+### Added
+- Additional tests covering morph map alias resolution in the voucher and entity scopes
+
 ## [v0.8.0 (2026-05-01)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.7.3...0.8.0)
 
 ### Added
