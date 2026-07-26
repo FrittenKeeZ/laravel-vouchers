@@ -150,7 +150,7 @@ class Vouchers
     public function redeem(string $code, Model $entity, array $metadata = []): bool
     {
         /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
-        $voucher = $this->vouchers()->code($code)->first();
+        $voucher = $this->vouchers()->withCode($code)->first();
         // If the voucher is null or not redeemable, throw an appropriate exception.
         if (!$voucher?->isRedeemable()) {
             match (true) {
@@ -191,7 +191,7 @@ class Vouchers
     public function unredeem(string $code, ?Model $entity = null, ?Closure $callback = null): bool
     {
         /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
-        $voucher = $this->vouchers()->code($code)->first();
+        $voucher = $this->vouchers()->withCode($code)->first();
         if ($voucher === null) {
             throw new Exceptions\VoucherNotFoundException();
         }
@@ -227,7 +227,7 @@ class Vouchers
     public function redeemable(string $code, ?Closure $callback = null): bool
     {
         /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
-        $voucher = $this->vouchers()->code($code)->first();
+        $voucher = $this->vouchers()->withCode($code)->first();
 
         return $voucher !== null && $voucher->isRedeemable() && ($callback === null || $callback($voucher));
     }
@@ -240,7 +240,7 @@ class Vouchers
     public function unredeemable(string $code, ?Closure $callback = null): bool
     {
         /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
-        $voucher = $this->vouchers()->code($code)->first();
+        $voucher = $this->vouchers()->withCode($code)->first();
 
         return $voucher !== null && $voucher->isUnredeemable() && ($callback === null || $callback($voucher));
     }
@@ -318,7 +318,7 @@ class Vouchers
      */
     public function exists(string $code, array $codes = []): bool
     {
-        return \in_array($code, $codes, true) || $this->vouchers()->code($code)->exists();
+        return \in_array($code, $codes, true) || $this->vouchers()->withCode($code)->exists();
     }
 
     /**

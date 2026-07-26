@@ -1,10 +1,53 @@
 # Upgrade Guide
 
 ## Table of Contents
+- [0.8.x to 0.9.x](#08x-to-09x)
+    - [Installation](#installation)
+    - [Backward Incompatible Changes](#backward-incompatible-changes)
 - [0.1.x to 0.2.x](#01x-to-02x)
     - [Installation](#installation)
     - [Migrating](#migrating)
     - [Backward Incompatible Changes](#backward-incompatible-changes)
+
+## 0.8.x to 0.9.x
+### Installation
+Start by installing version `0.9.x`:
+```bash
+$ composer require frittenkeez/laravel-vouchers:^0.9.0
+```
+
+### Backward Incompatible Changes
+#### Dropped support for Laravel 11
+Laravel 11 is no longer supported - it is past its security support window and all `11.x` framework releases are flagged by security advisories, making them impossible to install without disabling composer's audit blocking.
+
+Laravel `12.4` is now the minimum supported version, as that is where the `#[Scope]` attribute was introduced.
+
+#### Model scopes now use the `#[Scope]` attribute
+All query scopes have been converted from the `scopeXxx()` method prefix to the `#[Illuminate\Database\Eloquent\Attributes\Scope]` attribute. Calling the scopes is unchanged:
+```php
+// Still works exactly as before.
+Voucher::withPrefix('FOO')->withoutExpired()->get();
+```
+If you have **extended** the `Voucher`, `VoucherEntity` or `Redeemer` models and overridden any scope method, you must rename the method and add the attribute:
+```php
+// Before
+public function scopeWithPrefix(Builder $query, string $prefix): Builder
+
+// After
+#[Scope]
+protected function withPrefix(Builder $query, string $prefix): Builder
+```
+Note that scope methods must **not** be `public` - a public method bypasses Eloquent's `__call()` forwarding, which would pass your first argument as the query builder. Use `protected` as shown above.
+
+#### Renamed `Voucher::code()` scope to `Voucher::withCode()`
+The `code` scope has been renamed to `withCode`, both to match the naming of the other scopes and because a scope named `code` would shadow the `code` column - Eloquent would resolve `$voucher->code` as a relationship method and throw an `ArgumentCountError` whenever the attribute was not loaded.
+```php
+// Before
+Voucher::code('123-456-789')->first();
+
+// After
+Voucher::withCode('123-456-789')->first();
+```
 
 ## 0.1.x to 0.2.x
 ### Installation

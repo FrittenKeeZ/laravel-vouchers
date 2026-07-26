@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrittenKeeZ\Vouchers\Models\Scopes;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -13,7 +14,8 @@ trait VoucherEntity
     /**
      * Scope voucher query to specific entity type (class or alias).
      */
-    public function scopeWithEntityType(Builder $query, string $type): Builder
+    #[Scope]
+    protected function withEntityType(Builder $query, string $type): Builder
     {
         $class = Relation::getMorphedModel($type) ?? $type;
 
@@ -23,7 +25,8 @@ trait VoucherEntity
     /**
      * Scope voucher query to specific entity.
      */
-    public function scopeWithEntity(Builder $query, Model $entity): Builder
+    #[Scope]
+    protected function withEntity(Builder $query, Model $entity): Builder
     {
         return $query
             ->withEntityType(\get_class($entity))

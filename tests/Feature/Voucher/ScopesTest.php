@@ -9,13 +9,16 @@ use FrittenKeeZ\Vouchers\Tests\Models\User;
 use FrittenKeeZ\Vouchers\Tests\Models\Voucher;
 
 /**
- * Test Voucher::scopeCode().
+ * Test Voucher::withCode().
  */
 test('code scope', function () {
     $voucher = Vouchers::create();
 
-    expect(Voucher::code($voucher->code)->exists())->toBeTrue();
-    expect(Voucher::code('NOPE')->exists())->toBeFalse();
+    expect(Voucher::withCode($voucher->code)->exists())->toBeTrue();
+    expect(Voucher::withCode('NOPE')->exists())->toBeFalse();
+    // The code attribute must stay readable - a scope named `code` would shadow the column.
+    expect($voucher->code)->toBeString();
+    expect((new Voucher())->code)->toBeNull();
 });
 
 /**

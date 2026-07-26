@@ -1,5 +1,22 @@
 # Release Notes
 
+## [v0.9.0 (unreleased)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.8.1...0.9.0)
+
+Please read the [upgrade guide](UPGRADING.md) for implications of this change.
+
+### Changed
+- Converted all model scopes from the `scopeXxx()` prefix to the `#[Illuminate\Database\Eloquent\Attributes\Scope]` attribute
+- Trimmed redundant dev dependencies that only mirrored constraints already enforced by `laravel/framework` and `orchestra/testbench`
+
+### Deprecated
+- Dropped support for Laravel 11
+- Dropped support for PEST 3
+
+### Breaking Changes
+- Minimum supported Laravel version is now `12.4`, where the `#[Scope]` attribute was introduced
+- Renamed the `Voucher::code()` scope to `Voucher::withCode()` - a scope named `code` shadows the `code` column and breaks `$voucher->code` when the attribute is not loaded
+- Scope methods are now `protected` instead of `public` - only relevant if you extend the models and override a scope
+
 ## [v0.8.1 (2026-07-26)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.8.0...0.8.1)
 
 ### Changed
