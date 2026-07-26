@@ -17,11 +17,11 @@ function _generate_code_validation_regex(
     $match = preg_quote($characters, '/');
     $inner = preg_replace_callback(
         "/(?:\\\\\*)+/",
-        fn (array $matches) => sprintf('[%s]{%d}', $match, mb_strlen($matches[0]) / 2),
+        fn (array $matches) => \sprintf('[%s]{%d}', $match, mb_strlen($matches[0]) / 2),
         preg_quote($mask, '/')
     );
 
-    return sprintf(
+    return \sprintf(
         '/%s%s%s/',
         empty($prefix) ? '' : preg_quote($prefix . $separator, '/'),
         $inner,

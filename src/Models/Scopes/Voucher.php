@@ -28,7 +28,7 @@ trait Voucher
         ?string $separator = null,
         bool $not = false
     ): Builder {
-        $clause = sprintf('%s%s%%', $prefix, $separator === null ? config('vouchers.separator') : $separator);
+        $clause = \sprintf('%s%s%%', $prefix, $separator === null ? config('vouchers.separator') : $separator);
 
         return $query->where($this->getTable() . '.code', $not ? 'not like' : 'like', $clause);
     }
@@ -50,7 +50,7 @@ trait Voucher
         ?string $separator = null,
         bool $not = false
     ): Builder {
-        $clause = sprintf('%%%s%s', $separator === null ? config('vouchers.separator') : $separator, $suffix);
+        $clause = \sprintf('%%%s%s', $separator === null ? config('vouchers.separator') : $separator, $suffix);
 
         return $query->where($this->getTable() . '.code', $not ? 'not like' : 'like', $clause);
     }
@@ -191,7 +191,7 @@ trait Voucher
     {
         $class = Relation::getMorphedModel($type) ?? $type;
 
-        return $query->where($this->getTable() . '.owner_type', '=', (new $class())->getMorphClass());
+        return $query->where($this->getTable() . '.owner_type', '=', Relation::getMorphAlias($class));
     }
 
     /**

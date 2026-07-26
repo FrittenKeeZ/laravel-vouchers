@@ -21,15 +21,6 @@ class Redeemer extends Model
     ];
 
     /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'metadata' => 'array',
-    ];
-
-    /**
      * Constructor.
      */
     public function __construct(array $attributes = [])
@@ -37,6 +28,18 @@ class Redeemer extends Model
         $this->table = Config::table('redeemers');
 
         parent::__construct($attributes);
+    }
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'metadata' => 'array',
+        ];
     }
 
     /**
