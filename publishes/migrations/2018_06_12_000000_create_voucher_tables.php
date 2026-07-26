@@ -15,7 +15,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create(Config::table('vouchers'), function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->id();
             $table->string('code')->unique();
             $table->nullableMorphs('owner');
             $table->text('metadata')->nullable();
@@ -26,36 +26,20 @@ return new class extends Migration
         });
 
         Schema::create(Config::table('redeemers'), function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->bigInteger('voucher_id')->unsigned();
+            $table->id();
+            $table->foreignId('voucher_id')->constrained(Config::table('vouchers'))->cascadeOnDelete();
             $table->morphs('redeemer');
             $table->text('metadata')->nullable();
             $table->timestamps();
-
-            // Foreign key references.
-            $table
-                ->foreign('voucher_id')
-                ->references('id')
-                ->on(Config::table('vouchers'))
-                ->onDelete('cascade')
-            ;
         });
 
         Schema::create(Config::table('entities'), function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->bigInteger('voucher_id')->unsigned();
+            $table->id();
+            $table->foreignId('voucher_id')->constrained(Config::table('vouchers'))->cascadeOnDelete();
             $table->morphs('entity');
 
             // Unique index.
             $table->unique(['voucher_id', 'entity_type', 'entity_id'], 'entity');
-
-            // Foreign key references.
-            $table
-                ->foreign('voucher_id')
-                ->references('id')
-                ->on(Config::table('vouchers'))
-                ->onDelete('cascade')
-            ;
         });
     }
 

@@ -10,6 +10,7 @@ Please read the [upgrade guide](UPGRADING.md) for implications of this change.
 
 ### Changed
 - Converted all model scopes from the `scopeXxx()` prefix to the `#[Illuminate\Database\Eloquent\Attributes\Scope]` attribute
+- Modernised the published migration to use `$table->id()` and `$table->foreignId()->constrained()->cascadeOnDelete()` - the resulting schema is unchanged, so no action is needed for existing installs
 - Trimmed redundant dev dependencies that only mirrored constraints already enforced by `laravel/framework` and `orchestra/testbench`
 
 ### Deprecated
