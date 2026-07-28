@@ -15,6 +15,7 @@
     - [Create Vouchers](#create-vouchers)
     - [Redeem Vouchers](#redeem-vouchers)
     - [Options](#options)
+    - [Counter Codes](#counter-codes)
     - [Events](#events)
     - [Traits](#traits)
     - [Helpers](#helpers)
@@ -180,6 +181,18 @@ Vouchers::withSeparator(string|null $separator);
 Vouchers::withoutSeparator();
 // Override code mask and disable prefix, suffix and separator.
 Vouchers::withCode(string $code);
+// Enable counter for static codes and set its starting value - null disables it.
+Vouchers::withCounter(int|null $start = 1);
+// Override counter step - must be a positive integer greater than zero.
+Vouchers::withCounterStep(int|null $step);
+// Override separator between the base code and the counter - defaults to none.
+Vouchers::withCounterSeparator(string|null $separator);
+// Left-pad the counter to a fixed length - null resets to the calculated padding.
+Vouchers::withCounterPadding(int|null $length, string $pad = '0');
+// Disable counter padding, including the automatically calculated one.
+Vouchers::withoutCounterPadding();
+// Take full control of the final code - receives a CodeFormat instance.
+Vouchers::withCodeFormatter(Closure(FrittenKeeZ\Vouchers\CodeFormat): string|null $formatter);
 ```
 Following methods only apply to `Vouchers::create()` call.
 ```php
@@ -218,11 +231,112 @@ $voucher = Vouchers::withMask('***-***-***')
     ->create();
 $voucher = Vouchers::withOwner($user)->withPrefix('USR');
 ```
-Using a static code or a code mask without replacement asterisks, you can end up in an infinite loop when trying to create multiple vouchers or a voucher which already exists.  
+### Counter Codes
+Creating more than one voucher from a static code set with `Vouchers::withCode()` would collide, so an incrementing counter is appended to keep the codes unique.
+
+If the code ends in a number, that number is used as the counter - inheriting any zero padding.
+```php
+$vouchers = Vouchers::withCode('FIXED2025')->create(3);
+// FIXED2025, FIXED2026, FIXED2027
+$vouchers = Vouchers::withCode('FIXED0025')->create(3);
+// FIXED0025, FIXED0026, FIXED0027
+```
+Otherwise the counter starts at one, or wherever `Vouchers::withCounter()` says.
+```php
+$vouchers = Vouchers::withCode('FIXED')->create(3);
+// FIXED1, FIXED2, FIXED3
+$vouchers = Vouchers::withCode('FIXED')->withCounter(2025)->create(3);
+// FIXED2025, FIXED2026, FIXED2027
+```
+Note that an explicit counter is always appended to the full code, and is honoured even for a single voucher.
+```php
+$vouchers = Vouchers::withCode('FIXED2025')->withCounter(1)->create(2);
+// FIXED20251, FIXED20252
+$voucher = Vouchers::withCode('FIXED')->withCounter(2025)->create();
+// FIXED2025
+```
+By default the counter is padded to fit the highest value of the batch, calculated as `start + step * (amount - 1)`, so every code in a batch ends up the same width. Note that skipping codes which already exist can push the counter beyond that width.
+```php
+$vouchers = Vouchers::withCode('FIXED')->create(100);
+// FIXED001, FIXED002, ... FIXED010, ... FIXED100
+```
+Padding inherited from the code itself takes precedence over the calculated padding, and `Vouchers::withoutCounterPadding()` disables padding altogether.
+```php
+$vouchers = Vouchers::withCode('FIXED0025')->create(100);
+// FIXED0025, FIXED0026, ... FIXED0124
+$vouchers = Vouchers::withCode('FIXED')->withoutCounterPadding()->create(100);
+// FIXED1, FIXED2, ... FIXED10, ... FIXED100
+```
+Codes which already exist are skipped, so the counter advances past them.
+```php
+// Given an existing FIXED2026 voucher.
+$vouchers = Vouchers::withCode('FIXED2025')->create(2);
+// FIXED2025, FIXED2027
+```
+The step, separator and padding can all be overridden.
+```php
+$vouchers = Vouchers::withCode('FIXED')
+    ->withCounter(1)
+    ->withCounterStep(10)
+    ->withCounterSeparator('-')
+    ->withCounterPadding(4)
+    ->create(3);
+// FIXED-0001, FIXED-0011, FIXED-0021
+```
+For full control, use `Vouchers::withCodeFormatter()`. The closure receives a `FrittenKeeZ\Vouchers\CodeFormat` instance holding the base code, current counter, separator, padding length and padding character - casting it to string yields the default formatting.
+```php
+$vouchers = Vouchers::withCode('FIXED')
+    ->withCounter(5)
+    ->withCounterPadding(3)
+    ->withCodeFormatter(fn (FrittenKeeZ\Vouchers\CodeFormat $format) => sprintf(
+        '%s/%s',
+        strtolower($format->code),
+        $format->paddedCounter()
+    ))
+    ->create(2);
+// fixed/005, fixed/006
+```
+Note the difference between `$format->counter` and `$format->paddedCounter()` - the former is the raw integer, the latter the padded string. Reach for the integer when the counter needs converting, fx. to hexadecimal, and re-use `$format->padding` and `$format->pad` to keep the configured padding applied to the converted value.
+```php
+$vouchers = Vouchers::withCode('GIFT')
+    ->withCounter(250)
+    ->withCounterSeparator('-')
+    ->withCounterPadding(4)
+    ->withCodeFormatter(fn (FrittenKeeZ\Vouchers\CodeFormat $format) => sprintf(
+        '%s%s%s',
+        $format->code,
+        $format->separator,
+        Illuminate\Support\Str::padLeft(strtoupper(dechex($format->counter)), $format->padding, $format->pad)
+    ))
+    ->create(3);
+// GIFT-00FA, GIFT-00FB, GIFT-00FC
+```
+Be aware that a formatter which ignores the counter returns the same code every time, and can therefore only ever produce a single unique code. Creating more than one voucher then throws `InfiniteLoopException` once the attempts are exhausted - as does a single voucher if that code already exists.
+```php
+try {
+    $vouchers = Vouchers::withCode('FIXED')
+        ->withCodeFormatter(fn (FrittenKeeZ\Vouchers\CodeFormat $format) => 'CONSTANT')
+        ->create(2);
+} catch (FrittenKeeZ\Vouchers\Exceptions\InfiniteLoopException $e) {
+    // The formatter never produced a unique code.
+}
+```
+The number of attempts allowed per code is based on steps, amount and padding.
+
+Counter options are only supported for static codes - combining them with a mask containing asterisks throws an exception.
+```php
+try {
+    $vouchers = Vouchers::withMask('FOO-****')->withCounter(1)->create(2);
+} catch (FrittenKeeZ\Vouchers\Exceptions\CounterException $e) {
+    // Counter options are only supported for static codes.
+}
+```
+
+Using a code mask without replacement asterisks, you can end up in an infinite loop when trying to create multiple vouchers or a voucher which already exists.  
 To prevent this, an exception will be thrown after a calculated number of attempts depending on the amount of asterisks and the replacement characters.
 ```php
 try {
-    $vouchers = Vouchers::withCode('FIXED-CODE')->create(5);
+    $vouchers = Vouchers::withMask('FIXED-CODE')->create(5);
 } catch (FrittenKeeZ\Vouchers\Exceptions\InfiniteLoopException $e) {
     // Infinite loop detected when trying to create vouchers.
 }

@@ -5,6 +5,16 @@
 Please read the [upgrade guide](UPGRADING.md) for implications of this change.
 
 ### Added
+- Counter based codes for static codes set with `Vouchers::withCode()`, so creating more than one voucher no longer collides:  
+  `Vouchers::withCounter()`  
+  `Vouchers::withCounterStep()`  
+  `Vouchers::withCounterSeparator()`  
+  `Vouchers::withCounterPadding()`  
+  `Vouchers::withoutCounterPadding()`  
+  `Vouchers::withCodeFormatter()`
+- New `FrittenKeeZ\Vouchers\CodeFormat` value object passed to a custom code formatter, where casting to string yields the default formatting
+- New `FrittenKeeZ\Vouchers\Exceptions\CounterException` thrown when counter options are combined with a mask containing asterisks
+- New `Config::getCode()` and `Config::hasCounterOptions()` helpers
 - `Vouchers::redeem()`, `Vouchers::unredeem()`, `Vouchers::redeemable()` and `Vouchers::unredeemable()` now accept a `Voucher` instance in addition to a code, skipping the code lookup query
 - Added missing `unredeem()` and `unredeemable()` methods to the `Vouchers` facade docblock
 
@@ -22,6 +32,7 @@ Please read the [upgrade guide](UPGRADING.md) for implications of this change.
 - Renamed the `Voucher::code()` scope to `Voucher::withCode()` - a scope named `code` shadows the `code` column and breaks `$voucher->code` when the attribute is not loaded
 - Scope methods are now `protected` instead of `public` - only relevant if you extend the models and override a scope
 - Renamed the first parameter of `Vouchers::redeem()`, `Vouchers::unredeem()`, `Vouchers::redeemable()` and `Vouchers::unredeemable()` from `$code` to `$voucher` - only relevant if you call them using named arguments
+- `Vouchers::withCode()` combined with an amount greater than one now appends a counter instead of throwing `InfiniteLoopException`. Using `Vouchers::withMask()` with a static mask still throws as before
 
 ## [v0.8.1 (2026-07-26)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.8.0...0.8.1)
 
