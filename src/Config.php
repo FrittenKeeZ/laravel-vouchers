@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace FrittenKeeZ\Vouchers;
 
 use Carbon\Carbon;
+use Closure;
 use DateInterval;
 use DateTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 
 class Config
 {
@@ -167,11 +169,173 @@ class Config
     }
 
     /**
+     * Get static code, if one was set.
+     */
+    public function getCode(): ?string
+    {
+        return Arr::get($this->options, 'code');
+    }
+
+    /**
      * With static code - disables prefix, suffix and separator.
      */
     public function withCode(string $code): self
     {
+        Arr::set($this->options, 'code', $code);
+
         return $this->withMask($code)->withoutPrefix()->withoutSuffix()->withoutSeparator();
+    }
+
+    /**
+     * Whether any counter related options have been set.
+     */
+    public function hasCounterOptions(): bool
+    {
+        return Arr::hasAny($this->options, [
+            'counter',
+            'counter_step',
+            'counter_separator',
+            'counter_padding',
+            'code_formatter',
+        ]);
+    }
+
+    /**
+     * Get counter start value.
+     */
+    public function getCounter(): ?int
+    {
+        return Arr::get($this->options, 'counter');
+    }
+
+    /**
+     * With counter start value - enables the counter for static codes.
+     */
+    public function withCounter(?int $start = 1): self
+    {
+        if ($start === null) {
+            Arr::forget($this->options, 'counter');
+        } else {
+            Arr::set($this->options, 'counter', $start);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get counter step.
+     */
+    public function getCounterStep(): int
+    {
+        return Arr::get($this->options, 'counter_step', 1);
+    }
+
+    /**
+     * With counter step - must be greater than zero.
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function withCounterStep(?int $step): self
+    {
+        if ($step === null) {
+            Arr::forget($this->options, 'counter_step');
+        } else {
+            if ($step < 1) {
+                throw new InvalidArgumentException('Counter step must be a positive integer greater than zero.');
+            }
+
+            Arr::set($this->options, 'counter_step', $step);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get counter separator.
+     */
+    public function getCounterSeparator(): string
+    {
+        return Arr::get($this->options, 'counter_separator', '');
+    }
+
+    /**
+     * With counter separator - placed between the base code and the counter.
+     */
+    public function withCounterSeparator(?string $separator): self
+    {
+        if ($separator === null) {
+            Arr::forget($this->options, 'counter_separator');
+        } else {
+            Arr::set($this->options, 'counter_separator', $separator);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get counter padding length.
+     */
+    public function getCounterPadding(): ?int
+    {
+        return Arr::get($this->options, 'counter_padding');
+    }
+
+    /**
+     * Get counter padding character.
+     */
+    public function getCounterPad(): string
+    {
+        return Arr::get($this->options, 'counter_pad', '0');
+    }
+
+    /**
+     * With counter padding - left-pads the counter to the given length.
+     *
+     * Passing null resets to the automatically calculated padding, whereas zero disables it.
+     */
+    public function withCounterPadding(?int $length, string $pad = '0'): self
+    {
+        if ($length === null) {
+            Arr::forget($this->options, 'counter_padding');
+            Arr::forget($this->options, 'counter_pad');
+        } else {
+            Arr::set($this->options, 'counter_padding', max(0, $length));
+            Arr::set($this->options, 'counter_pad', $pad);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Without counter padding - disables padding, including the automatically calculated one.
+     */
+    public function withoutCounterPadding(): self
+    {
+        return $this->withCounterPadding(0);
+    }
+
+    /**
+     * Get code formatter.
+     */
+    public function getCodeFormatter(): ?Closure
+    {
+        return Arr::get($this->options, 'code_formatter');
+    }
+
+    /**
+     * With code formatter - receives a CodeFormat instance and returns the final code.
+     *
+     * @param \Closure(\FrittenKeeZ\Vouchers\CodeFormat): string|null $formatter
+     */
+    public function withCodeFormatter(?Closure $formatter): self
+    {
+        if ($formatter === null) {
+            Arr::forget($this->options, 'code_formatter');
+        } else {
+            Arr::set($this->options, 'code_formatter', $formatter);
+        }
+
+        return $this;
     }
 
     /**

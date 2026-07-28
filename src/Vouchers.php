@@ -27,7 +27,20 @@ use Illuminate\Support\Str;
  * @method string          getSeparator()
  * @method self            withSeparator(?string $separator)
  * @method self            withoutSeparator()
+ * @method ?string         getCode()
  * @method self            withCode(string $code)
+ * @method ?int            getCounter()
+ * @method self            withCounter(?int $start = 1)
+ * @method int             getCounterStep()
+ * @method self            withCounterStep(?int $step)
+ * @method string          getCounterSeparator()
+ * @method self            withCounterSeparator(?string $separator)
+ * @method ?int            getCounterPadding()
+ * @method string          getCounterPad()
+ * @method self            withCounterPadding(?int $length, string $pad = '0')
+ * @method self            withoutCounterPadding()
+ * @method ?\Closure       getCodeFormatter()
+ * @method self            withCodeFormatter(?\Closure $formatter)
  * @method ?array          getMetadata()
  * @method self            withMetadata(?array $metadata)
  * @method ?\Carbon\Carbon getStartTime()
@@ -260,7 +273,18 @@ class Vouchers
             return [];
         }
 
-        $attempts = substr_count($this->config->getMask(), '*') * Str::length($this->config->getCharacters());
+        $wildcards = substr_count($this->config->getMask(), '*');
+        // Counter options only make sense for static codes.
+        if ($wildcards > 0 && $this->config->hasCounterOptions()) {
+            throw new Exceptions\CounterException();
+        }
+        // Counter handling applies to static codes, either with an explicit counter
+        // or when creating more than one voucher from a code set with withCode().
+        if ($wildcards === 0 && $this->shouldUseCounter($amount)) {
+            return $this->counterBatch($amount);
+        }
+
+        $attempts = $wildcards * Str::length($this->config->getCharacters());
         $codes = [];
         for ($i = 0; $i < $amount; $i++) {
             $attempt = 0;
@@ -327,6 +351,108 @@ class Vouchers
     public function reset(): void
     {
         $this->config = new Config();
+    }
+
+    /**
+     * Whether counter handling should be used for the given amount.
+     *
+     * An explicit counter is always honoured, whereas a counter derived from the code
+     * only kicks in when creating more than one voucher from a static code.
+     */
+    protected function shouldUseCounter(int $amount): bool
+    {
+        return $this->config->getCounter() !== null
+            || ($this->config->getCode() !== null && $amount > 1);
+    }
+
+    /**
+     * Generate a batch of counter based codes for a static code.
+     *
+     * Codes are checked against the database to ensure uniqueness, advancing the
+     * counter past any code which is already taken.
+     *
+     * @throws \FrittenKeeZ\Vouchers\Exceptions\InfiniteLoopException
+     *
+     * @return array|string[]
+     */
+    protected function counterBatch(int $amount): array
+    {
+        [$base, $counter, $padding] = $this->resolveCounter($amount);
+        $step = $this->config->getCounterStep();
+        $counterSeparator = $this->config->getCounterSeparator();
+        $pad = $this->config->getCounterPad();
+        $formatter = $this->config->getCodeFormatter();
+        // Wrapping options are the same for every code.
+        $prefix = $this->config->getPrefix();
+        $suffix = $this->config->getSuffix();
+        $separator = $this->config->getSeparator();
+        // Allow the counter to skip codes without scanning indefinitely. Both the batch span
+        // and the range the padding can represent are damped by their square root, so large
+        // steps, amounts and paddings fail fast rather than hammering the database. The
+        // padding contribution tops out at 100, and without padding a single spare attempt
+        // is left per code.
+        $attempts = (int) round(sqrt($step * $amount) + sqrt(10 ** min($padding, 4)));
+
+        $codes = [];
+        for ($i = 0; $i < $amount; $i++) {
+            $attempt = 0;
+            do {
+                $format = new CodeFormat($base, $counter, $counterSeparator, $padding, $pad);
+                $code = $this->wrap(
+                    $formatter === null ? (string) $format : $formatter($format),
+                    $prefix,
+                    $suffix,
+                    $separator
+                );
+                $counter += $step;
+                // Prevent runaway loops, fx. from a formatter returning a constant code.
+                if ($attempt++ > $attempts) {
+                    throw new Exceptions\InfiniteLoopException();
+                }
+            } while ($this->exists($code, $codes));
+
+            $codes[] = $code;
+        }
+
+        return $codes;
+    }
+
+    /**
+     * Resolve the counter base code, start value and padding length.
+     *
+     * Padding precedence is withCounterPadding() and withoutCounterPadding(), then
+     * inherited from the trailing digits of the code, then calculated from the batch.
+     *
+     * @return array{0: string, 1: int, 2: int}
+     */
+    protected function resolveCounter(int $amount): array
+    {
+        $code = $this->config->getMask();
+        $counter = $this->config->getCounter();
+        $padding = $this->config->getCounterPadding();
+        $step = $this->config->getCounterStep();
+
+        // An explicit counter is always appended to the full code.
+        if ($counter !== null) {
+            return [$code, $counter, $padding ?? $this->calculatePadding($counter, $step, $amount)];
+        }
+
+        // Otherwise derive the counter from a trailing number, inheriting its padding.
+        if (preg_match('/^(.*?)(\d+)$/', $code, $matches) === 1) {
+            return [$matches[1], (int) $matches[2], $padding ?? \strlen($matches[2])];
+        }
+
+        return [$code, 1, $padding ?? $this->calculatePadding(1, $step, $amount)];
+    }
+
+    /**
+     * Calculate the padding length needed to fit the highest counter value of a batch.
+     *
+     * Note that skipping existing codes can push the counter beyond this width.
+     */
+    protected function calculatePadding(int $start, int $step, int $amount): int
+    {
+        return \strlen((string) ($start + $step * ($amount - 1)));
     }
 
     /**

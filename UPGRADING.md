@@ -39,6 +39,20 @@ protected function withPrefix(Builder $query, string $prefix): Builder
 ```
 Note that scope methods must **not** be `public` - a public method bypasses Eloquent's `__call()` forwarding, which would pass your first argument as the query builder. Use `protected` as shown above.
 
+#### `withCode()` with an amount greater than one no longer throws
+Creating multiple vouchers from a static code previously threw `InfiniteLoopException`, since every generated code was identical. A counter is now appended instead:
+```php
+// Before - threw InfiniteLoopException.
+// After  - FIXED1, FIXED2, FIXED3.
+Vouchers::withCode('FIXED')->create(3);
+```
+If you relied on the exception as a guard, note that `Vouchers::withMask()` with a static mask still behaves as before:
+```php
+// Still throws InfiniteLoopException.
+Vouchers::withMask('FIXED')->create(3);
+```
+See the [Counter Codes](README.md#counter-codes) section for the full behaviour and the new `withCounter*()` options.
+
 #### Redeem methods accept a voucher instance
 `Vouchers::redeem()`, `Vouchers::unredeem()`, `Vouchers::redeemable()` and `Vouchers::unredeemable()` now accept either a voucher code or a `Voucher` instance. Passing an instance skips the code lookup query:
 ```php
