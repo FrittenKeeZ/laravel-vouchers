@@ -15,11 +15,14 @@ Please read the [upgrade guide](UPGRADING.md) for implications of this change.
 - New `FrittenKeeZ\Vouchers\CodeFormat` value object passed to a custom code formatter, where casting to string yields the default formatting
 - New `FrittenKeeZ\Vouchers\Exceptions\CounterException` thrown when counter options are combined with a mask containing asterisks
 - New `Config::getCode()` and `Config::hasCounterOptions()` helpers
+- New `FrittenKeeZ\Vouchers\Casts\AsNullableArrayObject` cast, behaving like Laravel's `AsArrayObject` while preserving `null` instead of storing the JSON string `'null'`
 - `Vouchers::redeem()`, `Vouchers::unredeem()`, `Vouchers::redeemable()` and `Vouchers::unredeemable()` now accept a `Voucher` instance in addition to a code, skipping the code lookup query
 - Added missing `unredeem()` and `unredeemable()` methods to the `Vouchers` facade docblock
 
 ### Changed
 - Converted all model scopes from the `scopeXxx()` prefix to the `#[Illuminate\Database\Eloquent\Attributes\Scope]` attribute
+- Metadata on `Voucher` and `Redeemer` is now cast to an array object, so it can be mutated in place instead of being reassigned wholesale
+- Changed the published migration `metadata` columns from `text` to `json` - this only affects new installs, existing installs keep `text` and continue to work
 - Modernised the published migration to use `$table->id()` and `$table->foreignId()->constrained()->cascadeOnDelete()` - the resulting schema is unchanged, so no action is needed for existing installs
 - Trimmed redundant dev dependencies that only mirrored constraints already enforced by `laravel/framework` and `orchestra/testbench`
 
@@ -32,6 +35,7 @@ Please read the [upgrade guide](UPGRADING.md) for implications of this change.
 - Renamed the `Voucher::code()` scope to `Voucher::withCode()` - a scope named `code` shadows the `code` column and breaks `$voucher->code` when the attribute is not loaded
 - Scope methods are now `protected` instead of `public` - only relevant if you extend the models and override a scope
 - Renamed the first parameter of `Vouchers::redeem()`, `Vouchers::unredeem()`, `Vouchers::redeemable()` and `Vouchers::unredeemable()` from `$code` to `$voucher` - only relevant if you call them using named arguments
+- `Voucher::$metadata` and `Redeemer::$metadata` now return an `ArrayObject` instead of an `array`, so code passing them to array functions must call `toArray()` first
 - `Vouchers::withCode()` combined with an amount greater than one now appends a counter instead of throwing `InfiniteLoopException`. Using `Vouchers::withMask()` with a static mask still throws as before
 
 ## [v0.8.1 (2026-07-26)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.8.0...0.8.1)

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrittenKeeZ\Vouchers\Models;
 
+use FrittenKeeZ\Vouchers\Casts\AsNullableArrayObject;
 use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -68,7 +69,7 @@ class Voucher extends Model
     protected function casts(): array
     {
         return [
-            'metadata'    => 'array',
+            'metadata'    => AsNullableArrayObject::class,
             'starts_at'   => 'datetime',
             'expires_at'  => 'datetime',
             'redeemed_at' => 'datetime',

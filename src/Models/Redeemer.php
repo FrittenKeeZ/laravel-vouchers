@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrittenKeeZ\Vouchers\Models;
 
+use FrittenKeeZ\Vouchers\Casts\AsNullableArrayObject;
 use FrittenKeeZ\Vouchers\Config;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -38,7 +39,7 @@ class Redeemer extends Model
     protected function casts(): array
     {
         return [
-            'metadata' => 'array',
+            'metadata' => AsNullableArrayObject::class,
         ];
     }
 

@@ -35,7 +35,7 @@ test('redeeming with voucher instance', function () {
 
     $redeemer = $voucher->redeemers->first();
     expect($user->is($redeemer->redeemer))->toBeTrue();
-    expect($redeemer->metadata)->toBe($metadata);
+    expect($redeemer->metadata->toArray())->toBe($metadata);
 });
 
 /**
