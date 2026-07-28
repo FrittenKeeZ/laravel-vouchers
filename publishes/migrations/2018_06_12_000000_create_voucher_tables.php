@@ -18,7 +18,7 @@ return new class extends Migration
             $table->id();
             $table->string('code')->unique();
             $table->nullableMorphs('owner');
-            $table->text('metadata')->nullable();
+            $table->json('metadata')->nullable();
             $table->dateTime('starts_at')->nullable()->index();
             $table->dateTime('expires_at')->nullable()->index();
             $table->dateTime('redeemed_at')->nullable()->index();
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('voucher_id')->constrained(Config::table('vouchers'))->cascadeOnDelete();
             $table->morphs('redeemer');
-            $table->text('metadata')->nullable();
+            $table->json('metadata')->nullable();
             $table->timestamps();
         });
 

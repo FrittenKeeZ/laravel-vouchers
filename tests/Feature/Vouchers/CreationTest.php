@@ -39,7 +39,7 @@ test('voucher creation', function () {
         ->create()
     ;
     expect($voucher)->toBeInstanceOf(Voucher::class);
-    expect($voucher->metadata)->toBe($metadata);
+    expect($voucher->metadata->toArray())->toBe($metadata);
     expect($voucher->starts_at->toDateTimeString())->toBe($start_time->toDateTimeString());
     expect($voucher->expires_at->toDateTimeString())->toBe($expire_time->toDateTimeString());
     expect($user->is($voucher->owner))->toBeTrue();

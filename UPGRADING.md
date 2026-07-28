@@ -53,6 +53,41 @@ Vouchers::withMask('FIXED')->create(3);
 ```
 See the [Counter Codes](README.md#counter-codes) section for the full behaviour and the new `withCounter*()` options.
 
+#### Metadata is cast to an array object
+Metadata on `Voucher` and `Redeemer` is now cast to an `Illuminate\Database\Eloquent\Casts\ArrayObject` rather than a plain `array`, which allows it to be mutated in place:
+```php
+// Before - the whole array had to be reassigned.
+$voucher->metadata = array_merge($voucher->metadata, ['amount' => 2]);
+
+// After - mutating in place is persisted on save.
+$voucher->metadata['amount'] = 2;
+$voucher->save();
+```
+Reading values is unchanged, but anything passing metadata straight to an array function needs `toArray()`:
+```php
+// Before
+array_merge($voucher->metadata, $extra);
+count($voucher->metadata);
+
+// After
+array_merge($voucher->metadata->toArray(), $extra);
+count($voucher->metadata); // Countable, so this still works.
+```
+Nested values can be mutated the same way, since chained array access writes through to the underlying array - see the [Metadata](README.md#metadata) section for details.
+
+Assigning `null` still clears the column, and `whereNull('metadata')` keeps working. This is why the package ships its own `FrittenKeeZ\Vouchers\Casts\AsNullableArrayObject` rather than using Laravel's `AsArrayObject`, which would store the JSON string `'null'`.
+
+#### The published migration uses `json` for metadata
+The `metadata` columns in the published migration changed from `text` to `json`. This **only affects new installs** - existing installs keep their `text` columns and continue to work unchanged, since both store the same JSON payload.
+
+SQLite is unaffected either way, as it maps `json` to `text`. If you want to align an existing MySQL or PostgreSQL install, alter the columns yourself:
+```php
+Schema::table('vouchers', function (Blueprint $table) {
+    $table->json('metadata')->nullable()->change();
+});
+```
+Be aware that altering a column to `json` fails if any existing row holds a value which is not valid JSON.
+
 #### Redeem methods accept a voucher instance
 `Vouchers::redeem()`, `Vouchers::unredeem()`, `Vouchers::redeemable()` and `Vouchers::unredeemable()` now accept either a voucher code or a `Voucher` instance. Passing an instance skips the code lookup query:
 ```php

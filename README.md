@@ -16,6 +16,7 @@
     - [Redeem Vouchers](#redeem-vouchers)
     - [Options](#options)
     - [Counter Codes](#counter-codes)
+    - [Metadata](#metadata)
     - [Events](#events)
     - [Traits](#traits)
     - [Helpers](#helpers)
@@ -340,6 +341,49 @@ try {
 } catch (FrittenKeeZ\Vouchers\Exceptions\InfiniteLoopException $e) {
     // Infinite loop detected when trying to create vouchers.
 }
+```
+
+### Metadata
+Metadata on both the `Voucher` and `Redeemer` models is cast to an `Illuminate\Database\Eloquent\Casts\ArrayObject`, which supports array access, property access and the usual helpers.
+```php
+$voucher = Vouchers::withMetadata(['foo' => 'bar'])->create();
+
+$voucher->metadata['foo'];        // 'bar'
+$voucher->metadata->foo;          // 'bar'
+$voucher->metadata->toArray();    // ['foo' => 'bar']
+$voucher->metadata->collect();    // Illuminate\Support\Collection
+isset($voucher->metadata['foo']); // true
+```
+Unlike a plain array cast, metadata can be mutated in place and the changes are persisted on save.
+```php
+$voucher->metadata['amount'] = 2;
+$voucher->metadata['extra'] = 'added';
+unset($voucher->metadata['foo']);
+$voucher->save();
+```
+Nested values work the same way, as chained array access writes through to the underlying array.
+```php
+$voucher->metadata['nested']['foo'] = 'changed';
+$voucher->metadata['counts']['amount']--;
+$voucher->save();
+```
+Keep in mind that assigning a nested array to a variable copies it, since arrays are value types in PHP - mutating the copy leaves the metadata untouched until it is assigned back.
+```php
+$nested = $voucher->metadata['nested'];
+$nested['foo'] = 'changed';             // Only the copy changed.
+$voucher->metadata['nested'] = $nested; // Assign it back to persist.
+$voucher->save();
+```
+Assigning a plain array replaces the metadata entirely, and `null` clears it - leaving the column null rather than an empty object.
+```php
+$voucher->metadata = ['baz' => 'boom'];
+$voucher->metadata = null;
+```
+JSON path queries work as expected.
+```php
+Voucher::where('metadata->foo', 'bar')->get();
+Voucher::where('metadata->nested->deep', 'value')->get();
+Voucher::whereNull('metadata')->get();
 ```
 
 ### Events
