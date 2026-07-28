@@ -203,6 +203,10 @@ trait Voucher
 
     /**
      * Scope voucher query to specific owner type (class or alias).
+     *
+     * A class name is resolved to its morph map alias when one is registered. A custom type
+     * from an overridden getMorphClass() cannot be derived from the class name, so pass it
+     * directly instead.
      */
     #[Scope]
     protected function withOwnerType(Builder $query, string $type): Builder
@@ -214,12 +218,14 @@ trait Voucher
 
     /**
      * Scope voucher query to specific owner.
+     *
+     * Uses the owner's own morph class, so an overridden getMorphClass() is honoured.
      */
     #[Scope]
     protected function withOwner(Builder $query, Model $owner): Builder
     {
         return $query
-            ->withOwnerType(\get_class($owner))
+            ->withOwnerType($owner->getMorphClass())
             ->where($this->getTable() . '.owner_id', '=', $owner->getKey())
         ;
     }
