@@ -57,7 +57,7 @@ class VoucherFactory extends Factory
         return $this->state([
             'expires_at' => $expired
                 ? $this->faker->dateTime('-1 day')
-                : $this->faker->dateTimeBetween('+1 dat', '+1 month'),
+                : $this->faker->dateTimeBetween('+1 day', '+1 month'),
         ]);
     }
 }

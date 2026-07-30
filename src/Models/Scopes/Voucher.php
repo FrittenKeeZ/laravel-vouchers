@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrittenKeeZ\Vouchers\Models\Scopes;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -14,7 +15,8 @@ trait Voucher
     /**
      * Scope voucher query to a specific code.
      */
-    public function scopeCode(Builder $query, string $code): Builder
+    #[Scope]
+    protected function withCode(Builder $query, string $code): Builder
     {
         return $query->where($this->getTable() . '.code', '=', $code);
     }
@@ -22,7 +24,8 @@ trait Voucher
     /**
      * Scope voucher query to (or exclude) a specific prefix, optionally specifying a separator different from config.
      */
-    public function scopeWithPrefix(
+    #[Scope]
+    protected function withPrefix(
         Builder $query,
         string $prefix,
         ?string $separator = null,
@@ -36,15 +39,17 @@ trait Voucher
     /**
      * Scope voucher query to exclude a specific prefix, optionally specifying a separator different from config.
      */
-    public function scopeWithoutPrefix(Builder $query, string $prefix, ?string $separator = null): Builder
+    #[Scope]
+    protected function withoutPrefix(Builder $query, string $prefix, ?string $separator = null): Builder
     {
-        return $this->scopeWithPrefix($query, $prefix, $separator, true);
+        return $this->withPrefix($query, $prefix, $separator, true);
     }
 
     /**
      * Scope voucher query to (or exclude) a specific suffix, optionally specifying a separator different from config.
      */
-    public function scopeWithSuffix(
+    #[Scope]
+    protected function withSuffix(
         Builder $query,
         string $suffix,
         ?string $separator = null,
@@ -58,15 +63,17 @@ trait Voucher
     /**
      * Scope voucher query to exclude a specific suffix, optionally specifying a separator different from config.
      */
-    public function scopeWithoutSuffix(Builder $query, string $suffix, ?string $separator = null): Builder
+    #[Scope]
+    protected function withoutSuffix(Builder $query, string $suffix, ?string $separator = null): Builder
     {
-        return $this->scopeWithSuffix($query, $suffix, $separator, true);
+        return $this->withSuffix($query, $suffix, $separator, true);
     }
 
     /**
      * Scope voucher query to started or unstarted vouchers.
      */
-    public function scopeWithStarted(Builder $query, bool $started = true): Builder
+    #[Scope]
+    protected function withStarted(Builder $query, bool $started = true): Builder
     {
         $column = $this->getTable() . '.starts_at';
 
@@ -82,15 +89,17 @@ trait Voucher
     /**
      * Scope voucher query to unstarted vouchers.
      */
-    public function scopeWithoutStarted(Builder $query): Builder
+    #[Scope]
+    protected function withoutStarted(Builder $query): Builder
     {
-        return $this->scopeWithStarted($query, false);
+        return $this->withStarted($query, false);
     }
 
     /**
      * Scope voucher query to expired or unexpired vouchers.
      */
-    public function scopeWithExpired(Builder $query, bool $expired = true): Builder
+    #[Scope]
+    protected function withExpired(Builder $query, bool $expired = true): Builder
     {
         $column = $this->getTable() . '.expires_at';
 
@@ -103,15 +112,17 @@ trait Voucher
     /**
      * Scope voucher query to unexpired vouchers.
      */
-    public function scopeWithoutExpired(Builder $query): Builder
+    #[Scope]
+    protected function withoutExpired(Builder $query): Builder
     {
-        return $this->scopeWithExpired($query, false);
+        return $this->withExpired($query, false);
     }
 
     /**
      * Scope voucher query to redeemed or without redeemed vouchers.
      */
-    public function scopeWithRedeemed(Builder $query, bool $redeemed = true): Builder
+    #[Scope]
+    protected function withRedeemed(Builder $query, bool $redeemed = true): Builder
     {
         $column = $this->getTable() . '.redeemed_at';
 
@@ -121,15 +132,17 @@ trait Voucher
     /**
      * Scope voucher query to without redeemed vouchers.
      */
-    public function scopeWithoutRedeemed(Builder $query): Builder
+    #[Scope]
+    protected function withoutRedeemed(Builder $query): Builder
     {
-        return $this->scopeWithRedeemed($query, false);
+        return $this->withRedeemed($query, false);
     }
 
     /**
      * Scope voucher query to redeemable or without redeemable vouchers.
      */
-    public function scopeWithRedeemable(Builder $query, bool $redeemable = true): Builder
+    #[Scope]
+    protected function withRedeemable(Builder $query, bool $redeemable = true): Builder
     {
         if ($redeemable) {
             return $query->withRedeemed(false)->withStarted(true)->withExpired(false);
@@ -145,15 +158,17 @@ trait Voucher
     /**
      * Scope voucher query to without redeemable vouchers.
      */
-    public function scopeWithoutRedeemable(Builder $query): Builder
+    #[Scope]
+    protected function withoutRedeemable(Builder $query): Builder
     {
-        return $this->scopeWithRedeemable($query, false);
+        return $this->withRedeemable($query, false);
     }
 
     /**
      * Scope voucher query to unredeemable or without unredeemable vouchers.
      */
-    public function scopeWithUnredeemable(Builder $query, bool $unredeemable = true): Builder
+    #[Scope]
+    protected function withUnredeemable(Builder $query, bool $unredeemable = true): Builder
     {
         if ($unredeemable) {
             return $query->has('redeemers')->withStarted(true)->withExpired(false);
@@ -169,15 +184,17 @@ trait Voucher
     /**
      * Scope voucher query to without unredeemable vouchers.
      */
-    public function scopeWithoutUnredeemable(Builder $query): Builder
+    #[Scope]
+    protected function withoutUnredeemable(Builder $query): Builder
     {
-        return $this->scopeWithUnredeemable($query, false);
+        return $this->withUnredeemable($query, false);
     }
 
     /**
      * Scope voucher query to have voucher entities, optionally of a specific type (class or alias).
      */
-    public function scopeWithEntities(Builder $query, ?string $type = null): Builder
+    #[Scope]
+    protected function withEntities(Builder $query, ?string $type = null): Builder
     {
         return empty($type)
             ? $query->has('voucherEntities')
@@ -186,8 +203,13 @@ trait Voucher
 
     /**
      * Scope voucher query to specific owner type (class or alias).
+     *
+     * A class name is resolved to its morph map alias when one is registered. A custom type
+     * from an overridden getMorphClass() cannot be derived from the class name, so pass it
+     * directly instead.
      */
-    public function scopeWithOwnerType(Builder $query, string $type): Builder
+    #[Scope]
+    protected function withOwnerType(Builder $query, string $type): Builder
     {
         $class = Relation::getMorphedModel($type) ?? $type;
 
@@ -196,11 +218,14 @@ trait Voucher
 
     /**
      * Scope voucher query to specific owner.
+     *
+     * Uses the owner's own morph class, so an overridden getMorphClass() is honoured.
      */
-    public function scopeWithOwner(Builder $query, Model $owner): Builder
+    #[Scope]
+    protected function withOwner(Builder $query, Model $owner): Builder
     {
         return $query
-            ->withOwnerType(\get_class($owner))
+            ->withOwnerType($owner->getMorphClass())
             ->where($this->getTable() . '.owner_id', '=', $owner->getKey())
         ;
     }
@@ -208,7 +233,8 @@ trait Voucher
     /**
      * Scope voucher query to no owners.
      */
-    public function scopeWithoutOwner(Builder $query): Builder
+    #[Scope]
+    protected function withoutOwner(Builder $query): Builder
     {
         return $query->whereNull($this->getTable() . '.owner_type')->whereNull($this->getTable() . '.owner_id');
     }

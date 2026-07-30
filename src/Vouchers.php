@@ -27,7 +27,20 @@ use Illuminate\Support\Str;
  * @method string          getSeparator()
  * @method self            withSeparator(?string $separator)
  * @method self            withoutSeparator()
+ * @method ?string         getCode()
  * @method self            withCode(string $code)
+ * @method ?int            getCounter()
+ * @method self            withCounter(?int $start = 1)
+ * @method int             getCounterStep()
+ * @method self            withCounterStep(?int $step)
+ * @method string          getCounterSeparator()
+ * @method self            withCounterSeparator(?string $separator)
+ * @method ?int            getCounterPadding()
+ * @method string          getCounterPad()
+ * @method self            withCounterPadding(?int $length, string $pad = '0')
+ * @method self            withoutCounterPadding()
+ * @method ?\Closure       getCodeFormatter()
+ * @method self            withCodeFormatter(?\Closure $formatter)
  * @method ?array          getMetadata()
  * @method self            withMetadata(?array $metadata)
  * @method ?\Carbon\Carbon getStartTime()
@@ -49,6 +62,11 @@ use Illuminate\Support\Str;
  */
 class Vouchers
 {
+    /**
+     * Maximum amount of codes checked against the database in a single query.
+     */
+    protected const int CHUNK_SIZE = 500;
+
     /**
      * Voucher config.
      */
@@ -135,22 +153,22 @@ class Vouchers
     }
 
     /**
-     * Redeem a voucher code.
+     * Redeem a voucher code or voucher instance.
      *
      * Returns whether redeeming was successful.
      *
-     * @param \Illuminate\Database\Eloquent\Model $entity   Redeemer entity.
-     * @param array                               $metadata Additional metadata for redeemer.
+     * @param \FrittenKeeZ\Vouchers\Models\Voucher|string $voucher  Voucher code or instance.
+     * @param \Illuminate\Database\Eloquent\Model         $entity   Redeemer entity.
+     * @param array                                       $metadata Additional metadata for redeemer.
      *
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherRedeemedException
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherUnstartedException
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherExpiredException
      */
-    public function redeem(string $code, Model $entity, array $metadata = []): bool
+    public function redeem(string|Voucher $voucher, Model $entity, array $metadata = []): bool
     {
-        /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
-        $voucher = $this->vouchers()->code($code)->first();
+        $voucher = $this->resolveVoucher($voucher);
         // If the voucher is null or not redeemable, throw an appropriate exception.
         if (!$voucher?->isRedeemable()) {
             match (true) {
@@ -176,10 +194,11 @@ class Vouchers
     }
 
     /**
-     * Unredeem a voucher code.
+     * Unredeem a voucher code or voucher instance.
      *
      * Returns whether unredeeming was successful.
      *
+     * @param \FrittenKeeZ\Vouchers\Models\Voucher|string          $voucher  Voucher code or instance.
      * @param \Illuminate\Database\Eloquent\Model|null             $entity   Redeemer entity.
      * @param \Closure(\Illuminate\Database\Eloquent\Builder)|null $callback Optional callback to filter redeemer query.
      *
@@ -188,10 +207,9 @@ class Vouchers
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherUnstartedException
      * @throws \FrittenKeeZ\Vouchers\Exceptions\VoucherExpiredException
      */
-    public function unredeem(string $code, ?Model $entity = null, ?Closure $callback = null): bool
+    public function unredeem(string|Voucher $voucher, ?Model $entity = null, ?Closure $callback = null): bool
     {
-        /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
-        $voucher = $this->vouchers()->code($code)->first();
+        $voucher = $this->resolveVoucher($voucher);
         if ($voucher === null) {
             throw new Exceptions\VoucherNotFoundException();
         }
@@ -220,27 +238,27 @@ class Vouchers
     }
 
     /**
-     * Whether a voucher code is redeemable.
+     * Whether a voucher code or voucher instance is redeemable.
      *
+     * @param \FrittenKeeZ\Vouchers\Models\Voucher|string         $voucher  Voucher code or instance.
      * @param \Closure(\FrittenKeeZ\Vouchers\Models\Voucher)|null $callback Optional callback to perform extra checks.
      */
-    public function redeemable(string $code, ?Closure $callback = null): bool
+    public function redeemable(string|Voucher $voucher, ?Closure $callback = null): bool
     {
-        /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
-        $voucher = $this->vouchers()->code($code)->first();
+        $voucher = $this->resolveVoucher($voucher);
 
         return $voucher !== null && $voucher->isRedeemable() && ($callback === null || $callback($voucher));
     }
 
     /**
-     * Whether a voucher code is unredeemable.
+     * Whether a voucher code or voucher instance is unredeemable.
      *
+     * @param \FrittenKeeZ\Vouchers\Models\Voucher|string         $voucher  Voucher code or instance.
      * @param \Closure(\FrittenKeeZ\Vouchers\Models\Voucher)|null $callback Optional callback to perform extra checks.
      */
-    public function unredeemable(string $code, ?Closure $callback = null): bool
+    public function unredeemable(string|Voucher $voucher, ?Closure $callback = null): bool
     {
-        /** @var \FrittenKeeZ\Vouchers\Models\Voucher $voucher */
-        $voucher = $this->vouchers()->code($code)->first();
+        $voucher = $this->resolveVoucher($voucher);
 
         return $voucher !== null && $voucher->isUnredeemable() && ($callback === null || $callback($voucher));
     }
@@ -260,22 +278,20 @@ class Vouchers
             return [];
         }
 
-        $attempts = substr_count($this->config->getMask(), '*') * Str::length($this->config->getCharacters());
-        $codes = [];
-        for ($i = 0; $i < $amount; $i++) {
-            $attempt = 0;
-            do {
-                $code = $this->generate();
-                // Prevent infinite loop.
-                if ($attempt++ > $attempts) {
-                    throw new Exceptions\InfiniteLoopException();
-                }
-            } while ($this->exists($code, $codes));
-
-            $codes[] = $code;
+        $wildcards = substr_count($this->config->getMask(), '*');
+        // Counter options only make sense for static codes.
+        if ($wildcards > 0 && $this->config->hasCounterOptions()) {
+            throw new Exceptions\CounterException();
+        }
+        // Counter handling applies to static codes, either with an explicit counter
+        // or when creating more than one voucher from a code set with withCode().
+        if ($wildcards === 0 && $this->shouldUseCounter($amount)) {
+            return $this->counterBatch($amount);
         }
 
-        return $codes;
+        $attempts = $wildcards * Str::length($this->config->getCharacters());
+
+        return $this->collectCodes($amount, $attempts, fn () => $this->generate());
     }
 
     /**
@@ -318,7 +334,7 @@ class Vouchers
      */
     public function exists(string $code, array $codes = []): bool
     {
-        return \in_array($code, $codes, true) || $this->vouchers()->code($code)->exists();
+        return \in_array($code, $codes, true) || $this->vouchers()->withCode($code)->exists();
     }
 
     /**
@@ -327,6 +343,206 @@ class Vouchers
     public function reset(): void
     {
         $this->config = new Config();
+    }
+
+    /**
+     * Whether counter handling should be used for the given amount.
+     *
+     * An explicit counter is always honoured, whereas a counter derived from the code
+     * only kicks in when creating more than one voucher from a static code.
+     */
+    protected function shouldUseCounter(int $amount): bool
+    {
+        return $this->config->getCounter() !== null
+            || ($this->config->getCode() !== null && $amount > 1);
+    }
+
+    /**
+     * Generate a batch of counter based codes for a static code.
+     *
+     * Codes are checked against the database to ensure uniqueness, advancing the
+     * counter past any code which is already taken.
+     *
+     * @throws \FrittenKeeZ\Vouchers\Exceptions\InfiniteLoopException
+     *
+     * @return array|string[]
+     */
+    protected function counterBatch(int $amount): array
+    {
+        [$base, $counter, $padding] = $this->resolveCounter($amount);
+        $step = $this->config->getCounterStep();
+        $counterSeparator = $this->config->getCounterSeparator();
+        $pad = $this->config->getCounterPad();
+        $formatter = $this->config->getCodeFormatter();
+        // Wrapping options are the same for every code.
+        $prefix = $this->config->getPrefix();
+        $suffix = $this->config->getSuffix();
+        $separator = $this->config->getSeparator();
+        // Allow the counter to skip codes without scanning indefinitely. Both the batch span
+        // and the range the padding can represent are damped by their square root, so large
+        // steps, amounts and paddings fail fast rather than hammering the database. The
+        // padding contribution tops out at 100, and without padding a single spare attempt
+        // is left per code.
+        $attempts = (int) round(sqrt($step * $amount) + sqrt(10 ** min($padding, 4)));
+
+        return $this->collectCodes($amount, $attempts, function () use (
+            $base,
+            &$counter,
+            $step,
+            $counterSeparator,
+            $padding,
+            $pad,
+            $formatter,
+            $prefix,
+            $suffix,
+            $separator
+        ) {
+            $format = new CodeFormat($base, $counter, $counterSeparator, $padding, $pad);
+            $counter += $step;
+
+            return $this->wrap(
+                $formatter === null ? (string) $format : $formatter($format),
+                $prefix,
+                $suffix,
+                $separator
+            );
+        });
+    }
+
+    /**
+     * Collect an amount of unique codes from the given generator.
+     *
+     * Candidates are pooled and checked against the database in as few queries as possible,
+     * rather than one query per code. Codes which have already been seen - either collected,
+     * still pooled, or found to be taken - are never offered again.
+     *
+     * @param \Closure(): string $generator
+     *
+     * @throws \FrittenKeeZ\Vouchers\Exceptions\InfiniteLoopException
+     *
+     * @return array|string[]
+     */
+    protected function collectCodes(int $amount, int $attempts, Closure $generator): array
+    {
+        $codes = [];
+        $seen = [];
+        $attempt = 0;
+        $slack = 0;
+
+        while (\count($codes) < $amount) {
+            // Pool enough candidates for what's left, overshooting by however many were taken
+            // last round - otherwise a long run of taken codes degenerates into a query each.
+            $size = $amount - \count($codes) + $slack;
+            $candidates = [];
+            while (\count($candidates) < $size) {
+                $code = $generator();
+                // Prevent infinite loop.
+                if (isset($seen[$code])) {
+                    if ($attempt++ > $attempts) {
+                        throw new Exceptions\InfiniteLoopException();
+                    }
+
+                    continue;
+                }
+
+                $seen[$code] = true;
+                $candidates[] = $code;
+            }
+            // Check the whole pool against the database at once, keeping the ones still free.
+            $taken = $this->taken($candidates);
+            $slack = 0;
+            foreach ($candidates as $code) {
+                if (isset($taken[$code])) {
+                    $slack++;
+                    // Prevent infinite loop.
+                    if ($attempt++ > $attempts) {
+                        throw new Exceptions\InfiniteLoopException();
+                    }
+                } elseif (\count($codes) < $amount) {
+                    $codes[] = $code;
+                }
+            }
+        }
+
+        return $codes;
+    }
+
+    /**
+     * Get which of the given codes already exist, keyed by code.
+     *
+     * Chunked to stay well within database parameter limits.
+     *
+     * @param array|string[] $codes
+     *
+     * @return array<string, true>
+     */
+    protected function taken(array $codes): array
+    {
+        $taken = [];
+        foreach (array_chunk($codes, static::CHUNK_SIZE) as $chunk) {
+            foreach ($this->vouchers()->whereIn('code', $chunk)->pluck('code') as $code) {
+                $taken[$code] = true;
+            }
+        }
+
+        return $taken;
+    }
+
+    /**
+     * Resolve the counter base code, start value and padding length.
+     *
+     * Padding precedence is withCounterPadding() and withoutCounterPadding(), then
+     * inherited from the trailing digits of the code, then calculated from the batch.
+     *
+     * @return array{0: string, 1: int, 2: int}
+     */
+    protected function resolveCounter(int $amount): array
+    {
+        $code = $this->config->getMask();
+        $counter = $this->config->getCounter();
+        $padding = $this->config->getCounterPadding();
+        $step = $this->config->getCounterStep();
+
+        // An explicit counter is always appended to the full code.
+        if ($counter !== null) {
+            return [$code, $counter, $padding ?? $this->calculatePadding($counter, $step, $amount)];
+        }
+
+        // Otherwise derive the counter from a trailing number, inheriting its padding.
+        if (preg_match('/^(.*?)(\d+)$/', $code, $matches) === 1) {
+            return [$matches[1], (int) $matches[2], $padding ?? \strlen($matches[2])];
+        }
+
+        return [$code, 1, $padding ?? $this->calculatePadding(1, $step, $amount)];
+    }
+
+    /**
+     * Calculate the padding length needed to fit the highest counter value of a batch.
+     *
+     * Note that skipping existing codes can push the counter beyond this width.
+     */
+    protected function calculatePadding(int $start, int $step, int $amount): int
+    {
+        return \strlen((string) ($start + $step * ($amount - 1)));
+    }
+
+    /**
+     * Resolve a voucher from either a code or an existing voucher instance.
+     *
+     * Codes are looked up in the database, whereas instances are used as-is - meaning their
+     * current in-memory state is trusted. Refresh the instance first if it might be stale.
+     *
+     * Returns null when a code has no match, or when an instance doesn't exist in the database.
+     *
+     * @param \FrittenKeeZ\Vouchers\Models\Voucher|string $voucher Voucher code or instance.
+     */
+    protected function resolveVoucher(string|Voucher $voucher): ?Voucher
+    {
+        if (\is_string($voucher)) {
+            return $this->vouchers()->withCode($voucher)->first();
+        }
+
+        return $voucher->exists ? $voucher : null;
     }
 
     /**

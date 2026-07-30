@@ -1,5 +1,49 @@
 # Release Notes
 
+## [v0.9.0 (unreleased)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.8.1...0.9.0)
+
+Please read the [upgrade guide](UPGRADING.md) for implications of this change.
+
+### Added
+- Counter based codes for static codes set with `Vouchers::withCode()`, so creating more than one voucher no longer collides:  
+  `Vouchers::withCounter()`  
+  `Vouchers::withCounterStep()`  
+  `Vouchers::withCounterSeparator()`  
+  `Vouchers::withCounterPadding()`  
+  `Vouchers::withoutCounterPadding()`  
+  `Vouchers::withCodeFormatter()`
+- New `FrittenKeeZ\Vouchers\CodeFormat` value object passed to a custom code formatter, where casting to string yields the default formatting
+- New `FrittenKeeZ\Vouchers\Exceptions\CounterException` thrown when counter options are combined with a mask containing asterisks
+- New `Config::getCode()` and `Config::hasCounterOptions()` helpers
+- New `FrittenKeeZ\Vouchers\Casts\AsNullableArrayObject` cast, behaving like Laravel's `AsArrayObject` while preserving `null` instead of storing the JSON string `'null'`
+- `Vouchers::redeem()`, `Vouchers::unredeem()`, `Vouchers::redeemable()` and `Vouchers::unredeemable()` now accept a `Voucher` instance in addition to a code, skipping the code lookup query
+- Added missing `unredeem()` and `unredeemable()` methods to the `Vouchers` facade docblock
+
+### Optimization
+- `Vouchers::batch()` and counter code generation now check candidate codes against the database in as few queries as possible, instead of one query per code - creating 100 vouchers went from 100 lookups to 1, chunked at 500 codes per query
+
+### Fixed
+- `Voucher::withOwner()` and `VoucherEntity::withEntity()` now use the given instance's own `getMorphClass()`, so they match rows written by a model overriding its morph type without a morph map entry
+
+### Changed
+- Converted all model scopes from the `scopeXxx()` prefix to the `#[Illuminate\Database\Eloquent\Attributes\Scope]` attribute
+- Metadata on `Voucher` and `Redeemer` is now cast to an array object, so it can be mutated in place instead of being reassigned wholesale
+- Changed the published migration `metadata` columns from `text` to `json` - this only affects new installs, existing installs keep `text` and continue to work
+- Modernised the published migration to use `$table->id()` and `$table->foreignId()->constrained()->cascadeOnDelete()` - the resulting schema is unchanged, so no action is needed for existing installs
+- Trimmed redundant dev dependencies that only mirrored constraints already enforced by `laravel/framework` and `orchestra/testbench`
+
+### Deprecated
+- Dropped support for Laravel 11
+- Dropped support for PEST 3
+
+### Breaking Changes
+- Minimum supported Laravel version is now `12.4`, where the `#[Scope]` attribute was introduced
+- Renamed the `Voucher::code()` scope to `Voucher::withCode()` - a scope named `code` shadows the `code` column and breaks `$voucher->code` when the attribute is not loaded
+- Scope methods are now `protected` instead of `public` - only relevant if you extend the models and override a scope
+- Renamed the first parameter of `Vouchers::redeem()`, `Vouchers::unredeem()`, `Vouchers::redeemable()` and `Vouchers::unredeemable()` from `$code` to `$voucher` - only relevant if you call them using named arguments
+- `Voucher::$metadata` and `Redeemer::$metadata` now return an `ArrayObject` instead of an `array`, so code passing them to array functions must call `toArray()` first
+- `Vouchers::withCode()` combined with an amount greater than one now appends a counter instead of throwing `InfiniteLoopException`. Using `Vouchers::withMask()` with a static mask still throws as before
+
 ## [v0.8.1 (2026-07-26)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.8.0...0.8.1)
 
 ### Changed

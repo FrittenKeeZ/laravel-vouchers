@@ -4,18 +4,22 @@ declare(strict_types=1);
 
 use FrittenKeeZ\Vouchers\Facades\Vouchers;
 use FrittenKeeZ\Vouchers\Tests\Models\Color;
+use FrittenKeeZ\Vouchers\Tests\Models\CustomMorphUser;
 use FrittenKeeZ\Vouchers\Tests\Models\Redeemer;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
 use FrittenKeeZ\Vouchers\Tests\Models\Voucher;
 
 /**
- * Test Voucher::scopeCode().
+ * Test Voucher::withCode().
  */
 test('code scope', function () {
     $voucher = Vouchers::create();
 
-    expect(Voucher::code($voucher->code)->exists())->toBeTrue();
-    expect(Voucher::code('NOPE')->exists())->toBeFalse();
+    expect(Voucher::withCode($voucher->code)->exists())->toBeTrue();
+    expect(Voucher::withCode('NOPE')->exists())->toBeFalse();
+    // The code attribute must stay readable - a scope named `code` would shadow the column.
+    expect($voucher->code)->toBeString();
+    expect((new Voucher())->code)->toBeNull();
 });
 
 /**
@@ -226,4 +230,19 @@ test('owner scopes', function () {
     expect(Voucher::withOwner($first)->count())->toBe(1);
     expect(Voucher::withOwner($second)->count())->toBe(2);
     expect(Voucher::withOwner($third)->count())->toBe(3);
+});
+
+/**
+ * Test owner scopes with a model overriding getMorphClass() without a morph map entry.
+ */
+test('owner scopes with custom morph class', function () {
+    $owner = CustomMorphUser::create(['name' => 'Custom', 'email' => 'custom@example.com', 'password' => 'secret']);
+    $owner->createVouchers(2);
+    User::factory()->create()->createVoucher();
+
+    // The custom morph class is what actually gets stored.
+    expect(Voucher::withOwnerType('custom-morph-user')->count())->toBe(2);
+    // Passing the instance must honour the override rather than using the class name.
+    expect(Voucher::withOwner($owner)->count())->toBe(2);
+    expect(Voucher::withOwnerType(User::class)->count())->toBe(1);
 });

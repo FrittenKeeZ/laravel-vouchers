@@ -37,7 +37,7 @@ test('voucher redeeming single', function () {
     $redeemer = $voucher->redeemers->first();
     expect($redeemer)->toBeInstanceOf(Redeemer::class);
     expect($user->is($redeemer->redeemer))->toBeTrue();
-    expect($redeemer->metadata)->toBe($metadata);
+    expect($redeemer->metadata->toArray())->toBe($metadata);
     expect($redeemer->is($user->redeemers->first()))->toBeTrue();
     expect($voucher->is($redeemer->voucher))->toBeTrue();
 });
@@ -47,7 +47,8 @@ test('voucher redeeming single', function () {
  */
 test('voucher redeeming multiple', function () {
     Voucher::shouldMarkRedeemed(function (Voucher $voucher) {
-        $voucher->metadata = array_merge($voucher->metadata, ['amount' => $voucher->metadata['amount'] - 1]);
+        // Metadata can be mutated in place thanks to the array object cast.
+        $voucher->metadata['amount']--;
 
         return $voucher->metadata['amount'] <= 0;
     });

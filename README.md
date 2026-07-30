@@ -15,6 +15,8 @@
     - [Create Vouchers](#create-vouchers)
     - [Redeem Vouchers](#redeem-vouchers)
     - [Options](#options)
+    - [Counter Codes](#counter-codes)
+    - [Metadata](#metadata)
     - [Events](#events)
     - [Traits](#traits)
     - [Helpers](#helpers)
@@ -78,11 +80,16 @@ $vouchers = Vouchers::create(10);
 ### Redeem Vouchers
 Redeeming vouchers requires that you provide a redeemer entity.  
 Additional metadata for the redeemer can be provided.
+
+A voucher can be referenced either by its code or by passing a voucher instance directly - the latter skips the code lookup query.  
+Note that an instance is used as-is, so its current in-memory state is trusted; refresh it first if it might be stale.
 ```php
-Vouchers::redeem(string $code, Illuminate\Database\Eloquent\Model $entity, array $metadata = []): bool;
+Vouchers::redeem(FrittenKeeZ\Vouchers\Models\Voucher|string $voucher, Illuminate\Database\Eloquent\Model $entity, array $metadata = []): bool;
 
 try {
     $success = Vouchers::redeem('123-456-789', $user, ['foo' => 'bar']);
+    // Or using an existing voucher instance.
+    $success = Vouchers::redeem($voucher, $user, ['foo' => 'bar']);
 } catch (FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException $e) {
     // Voucher was not found with the provided code.
 } catch (FrittenKeeZ\Vouchers\Exceptions\VoucherRedeemedException $e) {
@@ -105,10 +112,12 @@ try {
 ### Unredeem Vouchers
 Unredeeming voucher can be done by either providing a related redeemer entity, or by using a redeemer query filter to let the package find the redeemer for you.
 ```php
-Vouchers::unredeem(string $code, Illuminate\Database\Eloquent\Model|null $entity = null, Closure(Illuminate\Database\Eloquent\Builder)|null $callback = null): bool;
+Vouchers::unredeem(FrittenKeeZ\Vouchers\Models\Voucher|string $voucher, Illuminate\Database\Eloquent\Model|null $entity = null, Closure(Illuminate\Database\Eloquent\Builder)|null $callback = null): bool;
 
 try {
     $success = Vouchers::unredeem('123-456-789', $user);
+    // Or using an existing voucher instance.
+    $success = Vouchers::unredeem($voucher, $user);
 } catch (FrittenKeeZ\Vouchers\Exceptions\VoucherNotFoundException $e) {
     // Voucher was not found with the provided code.
 } catch (FrittenKeeZ\Vouchers\Exceptions\VoucherRedeemerNotFoundException $e) {
@@ -138,7 +147,7 @@ try {
 With specifying a redeemer query filter:
 ```php
 try {
-    $success = Vouchers::unredeem(code: '123-456-789', callback: fn (Illuminate\Database\Eloquent\Builder $query) => $query->where('metadata->foo', 'bar));
+    $success = Vouchers::unredeem(voucher: '123-456-789', callback: fn (Illuminate\Database\Eloquent\Builder $query) => $query->where('metadata->foo', 'bar));
 } catch (FrittenKeeZ\Vouchers\Exceptions\VoucherException $e) {
     // Voucher was not possible to unredeem.
 }
@@ -173,6 +182,18 @@ Vouchers::withSeparator(string|null $separator);
 Vouchers::withoutSeparator();
 // Override code mask and disable prefix, suffix and separator.
 Vouchers::withCode(string $code);
+// Enable counter for static codes and set its starting value - null disables it.
+Vouchers::withCounter(int|null $start = 1);
+// Override counter step - must be a positive integer greater than zero.
+Vouchers::withCounterStep(int|null $step);
+// Override separator between the base code and the counter - defaults to none.
+Vouchers::withCounterSeparator(string|null $separator);
+// Left-pad the counter to a fixed length - null resets to the calculated padding.
+Vouchers::withCounterPadding(int|null $length, string $pad = '0');
+// Disable counter padding, including the automatically calculated one.
+Vouchers::withoutCounterPadding();
+// Take full control of the final code - receives a CodeFormat instance.
+Vouchers::withCodeFormatter(Closure(FrittenKeeZ\Vouchers\CodeFormat): string|null $formatter);
 ```
 Following methods only apply to `Vouchers::create()` call.
 ```php
@@ -211,14 +232,158 @@ $voucher = Vouchers::withMask('***-***-***')
     ->create();
 $voucher = Vouchers::withOwner($user)->withPrefix('USR');
 ```
-Using a static code or a code mask without replacement asterisks, you can end up in an infinite loop when trying to create multiple vouchers or a voucher which already exists.  
+### Counter Codes
+Creating more than one voucher from a static code set with `Vouchers::withCode()` would collide, so an incrementing counter is appended to keep the codes unique.
+
+If the code ends in a number, that number is used as the counter - inheriting any zero padding.
+```php
+$vouchers = Vouchers::withCode('FIXED2025')->create(3);
+// FIXED2025, FIXED2026, FIXED2027
+$vouchers = Vouchers::withCode('FIXED0025')->create(3);
+// FIXED0025, FIXED0026, FIXED0027
+```
+Otherwise the counter starts at one, or wherever `Vouchers::withCounter()` says.
+```php
+$vouchers = Vouchers::withCode('FIXED')->create(3);
+// FIXED1, FIXED2, FIXED3
+$vouchers = Vouchers::withCode('FIXED')->withCounter(2025)->create(3);
+// FIXED2025, FIXED2026, FIXED2027
+```
+Note that an explicit counter is always appended to the full code, and is honoured even for a single voucher.
+```php
+$vouchers = Vouchers::withCode('FIXED2025')->withCounter(1)->create(2);
+// FIXED20251, FIXED20252
+$voucher = Vouchers::withCode('FIXED')->withCounter(2025)->create();
+// FIXED2025
+```
+By default the counter is padded to fit the highest value of the batch, calculated as `start + step * (amount - 1)`, so every code in a batch ends up the same width. Note that skipping codes which already exist can push the counter beyond that width.
+```php
+$vouchers = Vouchers::withCode('FIXED')->create(100);
+// FIXED001, FIXED002, ... FIXED010, ... FIXED100
+```
+Padding inherited from the code itself takes precedence over the calculated padding, and `Vouchers::withoutCounterPadding()` disables padding altogether.
+```php
+$vouchers = Vouchers::withCode('FIXED0025')->create(100);
+// FIXED0025, FIXED0026, ... FIXED0124
+$vouchers = Vouchers::withCode('FIXED')->withoutCounterPadding()->create(100);
+// FIXED1, FIXED2, ... FIXED10, ... FIXED100
+```
+Codes which already exist are skipped, so the counter advances past them.
+```php
+// Given an existing FIXED2026 voucher.
+$vouchers = Vouchers::withCode('FIXED2025')->create(2);
+// FIXED2025, FIXED2027
+```
+The step, separator and padding can all be overridden.
+```php
+$vouchers = Vouchers::withCode('FIXED')
+    ->withCounter(1)
+    ->withCounterStep(10)
+    ->withCounterSeparator('-')
+    ->withCounterPadding(4)
+    ->create(3);
+// FIXED-0001, FIXED-0011, FIXED-0021
+```
+For full control, use `Vouchers::withCodeFormatter()`. The closure receives a `FrittenKeeZ\Vouchers\CodeFormat` instance holding the base code, current counter, separator, padding length and padding character - casting it to string yields the default formatting.
+```php
+$vouchers = Vouchers::withCode('FIXED')
+    ->withCounter(5)
+    ->withCounterPadding(3)
+    ->withCodeFormatter(fn (FrittenKeeZ\Vouchers\CodeFormat $format) => sprintf(
+        '%s/%s',
+        strtolower($format->code),
+        $format->paddedCounter()
+    ))
+    ->create(2);
+// fixed/005, fixed/006
+```
+Note the difference between `$format->counter` and `$format->paddedCounter()` - the former is the raw integer, the latter the padded string. Reach for the integer when the counter needs converting, fx. to hexadecimal, and re-use `$format->padding` and `$format->pad` to keep the configured padding applied to the converted value.
+```php
+$vouchers = Vouchers::withCode('GIFT')
+    ->withCounter(250)
+    ->withCounterSeparator('-')
+    ->withCounterPadding(4)
+    ->withCodeFormatter(fn (FrittenKeeZ\Vouchers\CodeFormat $format) => sprintf(
+        '%s%s%s',
+        $format->code,
+        $format->separator,
+        Illuminate\Support\Str::padLeft(strtoupper(dechex($format->counter)), $format->padding, $format->pad)
+    ))
+    ->create(3);
+// GIFT-00FA, GIFT-00FB, GIFT-00FC
+```
+Be aware that a formatter which ignores the counter returns the same code every time, and can therefore only ever produce a single unique code. Creating more than one voucher then throws `InfiniteLoopException` once the attempts are exhausted - as does a single voucher if that code already exists.
+```php
+try {
+    $vouchers = Vouchers::withCode('FIXED')
+        ->withCodeFormatter(fn (FrittenKeeZ\Vouchers\CodeFormat $format) => 'CONSTANT')
+        ->create(2);
+} catch (FrittenKeeZ\Vouchers\Exceptions\InfiniteLoopException $e) {
+    // The formatter never produced a unique code.
+}
+```
+The number of attempts allowed per code is based on steps, amount and padding.
+
+Counter options are only supported for static codes - combining them with a mask containing asterisks throws an exception.
+```php
+try {
+    $vouchers = Vouchers::withMask('FOO-****')->withCounter(1)->create(2);
+} catch (FrittenKeeZ\Vouchers\Exceptions\CounterException $e) {
+    // Counter options are only supported for static codes.
+}
+```
+
+Using a code mask without replacement asterisks, you can end up in an infinite loop when trying to create multiple vouchers or a voucher which already exists.  
 To prevent this, an exception will be thrown after a calculated number of attempts depending on the amount of asterisks and the replacement characters.
 ```php
 try {
-    $vouchers = Vouchers::withCode('FIXED-CODE')->create(5);
+    $vouchers = Vouchers::withMask('FIXED-CODE')->create(5);
 } catch (FrittenKeeZ\Vouchers\Exceptions\InfiniteLoopException $e) {
     // Infinite loop detected when trying to create vouchers.
 }
+```
+
+### Metadata
+Metadata on both the `Voucher` and `Redeemer` models is cast to an `Illuminate\Database\Eloquent\Casts\ArrayObject`, which supports array access, property access and the usual helpers.
+```php
+$voucher = Vouchers::withMetadata(['foo' => 'bar'])->create();
+
+$voucher->metadata['foo'];        // 'bar'
+$voucher->metadata->foo;          // 'bar'
+$voucher->metadata->toArray();    // ['foo' => 'bar']
+$voucher->metadata->collect();    // Illuminate\Support\Collection
+isset($voucher->metadata['foo']); // true
+```
+Unlike a plain array cast, metadata can be mutated in place and the changes are persisted on save.
+```php
+$voucher->metadata['amount'] = 2;
+$voucher->metadata['extra'] = 'added';
+unset($voucher->metadata['foo']);
+$voucher->save();
+```
+Nested values work the same way, as chained array access writes through to the underlying array.
+```php
+$voucher->metadata['nested']['foo'] = 'changed';
+$voucher->metadata['counts']['amount']--;
+$voucher->save();
+```
+Keep in mind that assigning a nested array to a variable copies it, since arrays are value types in PHP - mutating the copy leaves the metadata untouched until it is assigned back.
+```php
+$nested = $voucher->metadata['nested'];
+$nested['foo'] = 'changed';             // Only the copy changed.
+$voucher->metadata['nested'] = $nested; // Assign it back to persist.
+$voucher->save();
+```
+Assigning a plain array replaces the metadata entirely, and `null` clears it - leaving the column null rather than an empty object.
+```php
+$voucher->metadata = ['baz' => 'boom'];
+$voucher->metadata = null;
+```
+JSON path queries work as expected.
+```php
+Voucher::where('metadata->foo', 'bar')->get();
+Voucher::where('metadata->nested->deep', 'value')->get();
+Voucher::whereNull('metadata')->get();
 ```
 
 ### Events
@@ -325,7 +490,7 @@ $vouchers = $user->createVouchers(3, function (FrittenKeeZ\Vouchers\Vouchers $vo
 ### Helpers
 Check whether a voucher code is redeemable without throwing any errors.
 ```php
-Vouchers::redeemable(string $code, Closure(FrittenKeeZ\Vouchers\Models\Voucher)|null $callback = null): bool;
+Vouchers::redeemable(FrittenKeeZ\Vouchers\Models\Voucher|string $voucher, Closure(FrittenKeeZ\Vouchers\Models\Voucher)|null $callback = null): bool;
 
 // Without using callback.
 $valid = Vouchers::redeemable('123-456-789');
@@ -336,7 +501,7 @@ $valid = Vouchers::redeemable('123-456-789', function (FrittenKeeZ\Vouchers\Mode
 ```
 Check whether a voucher code is unredeemable without throwing any errors.
 ```php
-Vouchers::unredeemable(string $code, Closure(FrittenKeeZ\Vouchers\Models\Voucher)|null $callback = null): bool;
+Vouchers::unredeemable(FrittenKeeZ\Vouchers\Models\Voucher|string $voucher, Closure(FrittenKeeZ\Vouchers\Models\Voucher)|null $callback = null): bool;
 
 // Without using callback.
 $valid = Vouchers::unredeemable('123-456-789');
@@ -370,8 +535,11 @@ Voucher::isUnredeemable(): bool;
 ```
 
 ### Scopes
-For convenience we also provide Voucher scopes matching the helper methods.
+For convenience we also provide Voucher scopes matching the helper methods.  
+All scopes are defined using the `#[Illuminate\Database\Eloquent\Attributes\Scope]` attribute.
 ```php
+// Scope voucher query to a specific code.
+Voucher::withCode(string $code);
 // Scope voucher query to a specific prefix, optionally specifying a separator different from config.
 Voucher::withPrefix(string $prefix, string|null $separator = null);
 // Scope voucher query to exclude a specific prefix, optionally specifying a separator different from config.
@@ -409,6 +577,31 @@ Voucher::withOwner(Illuminate\Database\Eloquent\Model $owner);
 // Scope voucher query to no owners.
 Voucher::withoutOwner();
 ```
+The type based scopes accept either a class name or a [morph map](https://laravel.com/docs/eloquent-relationships#custom-polymorphic-types) alias, and resolve a class name to its alias when one is registered.
+```php
+Relation::morphMap(['user' => App\Models\User::class]);
+
+// Both match rows stored with the 'user' morph type.
+Voucher::withOwnerType(App\Models\User::class);
+Voucher::withOwnerType('user');
+```
+If a model instead overrides `getMorphClass()` to return a custom type **without** registering it in the morph map, that custom type cannot be derived from the class name - pass it directly:
+```php
+class Team extends Model
+{
+    public function getMorphClass(): string
+    {
+        return 'team-owner';
+    }
+}
+
+// Does not match, as the custom type is not registered in the morph map.
+Voucher::withOwnerType(Team::class);
+
+// Matches.
+Voucher::withOwnerType('team-owner');
+```
+The same applies to `VoucherEntity::withEntityType()`. Registering the type in the morph map instead of overriding `getMorphClass()` avoids the problem entirely, and is the approach Laravel recommends.
 
 ## Testing
 Running tests can be done either through composer, or directly calling the Pest binary.

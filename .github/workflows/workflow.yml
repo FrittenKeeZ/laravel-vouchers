@@ -2,14 +2,6 @@ name: Linting & Testing
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - "release/**"
-    paths:
-      - "**.json"
-      - "**.php"
-      - "**.yml"
   pull_request:
     branches:
       - master
@@ -51,7 +43,7 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.5, 8.4, 8.3]
-        testbench: [11.0, 10.0, 9.0] # Laravel 13.x, 12.x, 11.x
+        testbench: [11.0, 10.0] # Laravel 13.x, 12.x
         version: [prefer-stable, prefer-lowest]
 
     name: P${{ matrix.php }} - T${{ matrix.testbench }} - ${{ matrix.version }}
