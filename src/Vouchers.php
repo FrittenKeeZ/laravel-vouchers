@@ -63,6 +63,11 @@ use Illuminate\Support\Str;
 class Vouchers
 {
     /**
+     * Maximum amount of codes checked against the database in a single query.
+     */
+    protected const int CHUNK_SIZE = 500;
+
+    /**
      * Voucher config.
      */
     protected Config $config;
@@ -285,21 +290,8 @@ class Vouchers
         }
 
         $attempts = $wildcards * Str::length($this->config->getCharacters());
-        $codes = [];
-        for ($i = 0; $i < $amount; $i++) {
-            $attempt = 0;
-            do {
-                $code = $this->generate();
-                // Prevent infinite loop.
-                if ($attempt++ > $attempts) {
-                    throw new Exceptions\InfiniteLoopException();
-                }
-            } while ($this->exists($code, $codes));
 
-            $codes[] = $code;
-        }
-
-        return $codes;
+        return $this->collectCodes($amount, $attempts, fn () => $this->generate());
     }
 
     /**
@@ -393,28 +385,107 @@ class Vouchers
         // is left per code.
         $attempts = (int) round(sqrt($step * $amount) + sqrt(10 ** min($padding, 4)));
 
-        $codes = [];
-        for ($i = 0; $i < $amount; $i++) {
-            $attempt = 0;
-            do {
-                $format = new CodeFormat($base, $counter, $counterSeparator, $padding, $pad);
-                $code = $this->wrap(
-                    $formatter === null ? (string) $format : $formatter($format),
-                    $prefix,
-                    $suffix,
-                    $separator
-                );
-                $counter += $step;
-                // Prevent runaway loops, fx. from a formatter returning a constant code.
-                if ($attempt++ > $attempts) {
-                    throw new Exceptions\InfiniteLoopException();
-                }
-            } while ($this->exists($code, $codes));
+        return $this->collectCodes($amount, $attempts, function () use (
+            $base,
+            &$counter,
+            $step,
+            $counterSeparator,
+            $padding,
+            $pad,
+            $formatter,
+            $prefix,
+            $suffix,
+            $separator
+        ) {
+            $format = new CodeFormat($base, $counter, $counterSeparator, $padding, $pad);
+            $counter += $step;
 
-            $codes[] = $code;
+            return $this->wrap(
+                $formatter === null ? (string) $format : $formatter($format),
+                $prefix,
+                $suffix,
+                $separator
+            );
+        });
+    }
+
+    /**
+     * Collect an amount of unique codes from the given generator.
+     *
+     * Candidates are pooled and checked against the database in as few queries as possible,
+     * rather than one query per code. Codes which have already been seen - either collected,
+     * still pooled, or found to be taken - are never offered again.
+     *
+     * @param \Closure(): string $generator
+     *
+     * @throws \FrittenKeeZ\Vouchers\Exceptions\InfiniteLoopException
+     *
+     * @return array|string[]
+     */
+    protected function collectCodes(int $amount, int $attempts, Closure $generator): array
+    {
+        $codes = [];
+        $seen = [];
+        $attempt = 0;
+        $slack = 0;
+
+        while (\count($codes) < $amount) {
+            // Pool enough candidates for what's left, overshooting by however many were taken
+            // last round - otherwise a long run of taken codes degenerates into a query each.
+            $size = $amount - \count($codes) + $slack;
+            $candidates = [];
+            while (\count($candidates) < $size) {
+                $code = $generator();
+                // Prevent infinite loop.
+                if (isset($seen[$code])) {
+                    if ($attempt++ > $attempts) {
+                        throw new Exceptions\InfiniteLoopException();
+                    }
+
+                    continue;
+                }
+
+                $seen[$code] = true;
+                $candidates[] = $code;
+            }
+            // Check the whole pool against the database at once, keeping the ones still free.
+            $taken = $this->taken($candidates);
+            $slack = 0;
+            foreach ($candidates as $code) {
+                if (isset($taken[$code])) {
+                    $slack++;
+                    // Prevent infinite loop.
+                    if ($attempt++ > $attempts) {
+                        throw new Exceptions\InfiniteLoopException();
+                    }
+                } elseif (\count($codes) < $amount) {
+                    $codes[] = $code;
+                }
+            }
         }
 
         return $codes;
+    }
+
+    /**
+     * Get which of the given codes already exist, keyed by code.
+     *
+     * Chunked to stay well within database parameter limits.
+     *
+     * @param array|string[] $codes
+     *
+     * @return array<string, true>
+     */
+    protected function taken(array $codes): array
+    {
+        $taken = [];
+        foreach (array_chunk($codes, static::CHUNK_SIZE) as $chunk) {
+            foreach ($this->vouchers()->whereIn('code', $chunk)->pluck('code') as $code) {
+                $taken[$code] = true;
+            }
+        }
+
+        return $taken;
     }
 
     /**

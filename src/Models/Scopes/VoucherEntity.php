@@ -13,6 +13,10 @@ trait VoucherEntity
 {
     /**
      * Scope voucher query to specific entity type (class or alias).
+     *
+     * A class name is resolved to its morph map alias when one is registered. A custom type
+     * from an overridden getMorphClass() cannot be derived from the class name, so pass it
+     * directly instead.
      */
     #[Scope]
     protected function withEntityType(Builder $query, string $type): Builder
@@ -24,12 +28,14 @@ trait VoucherEntity
 
     /**
      * Scope voucher query to specific entity.
+     *
+     * Uses the entity's own morph class, so an overridden getMorphClass() is honoured.
      */
     #[Scope]
     protected function withEntity(Builder $query, Model $entity): Builder
     {
         return $query
-            ->withEntityType(\get_class($entity))
+            ->withEntityType($entity->getMorphClass())
             ->where($this->getTable() . '.entity_id', '=', $entity->getKey())
         ;
     }

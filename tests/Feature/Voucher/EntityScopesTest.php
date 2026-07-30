@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use FrittenKeeZ\Vouchers\Models\VoucherEntity;
 use FrittenKeeZ\Vouchers\Tests\Models\Color;
+use FrittenKeeZ\Vouchers\Tests\Models\CustomMorphUser;
 use FrittenKeeZ\Vouchers\Tests\Models\User;
 use FrittenKeeZ\Vouchers\Vouchers;
 
@@ -33,6 +34,21 @@ test('entity scopes', function () {
     expect($first->voucherEntities()->withEntityType(Color::class)->count())->toBe(3);
     expect($second->voucherEntities()->withEntityType(User::class)->count())->toBe(3);
     expect($second->voucherEntities()->withEntityType(Color::class)->count())->toBe(6);
+});
+
+/**
+ * Test entity scopes with a model overriding getMorphClass() without a morph map entry.
+ */
+test('entity scopes with custom morph class', function () {
+    $entity = CustomMorphUser::create(['name' => 'Custom', 'email' => 'custom@example.com', 'password' => 'secret']);
+
+    (new Vouchers())->withEntities($entity, User::factory()->create())->create();
+
+    // The custom morph class is what actually gets stored.
+    expect(VoucherEntity::withEntityType('custom-morph-user')->count())->toBe(1);
+    // Passing the instance must honour the override rather than using the class name.
+    expect(VoucherEntity::withEntity($entity)->exists())->toBeTrue();
+    expect(VoucherEntity::withEntityType(User::class)->count())->toBe(1);
 });
 
 /**

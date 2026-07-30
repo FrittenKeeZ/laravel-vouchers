@@ -19,6 +19,12 @@ Please read the [upgrade guide](UPGRADING.md) for implications of this change.
 - `Vouchers::redeem()`, `Vouchers::unredeem()`, `Vouchers::redeemable()` and `Vouchers::unredeemable()` now accept a `Voucher` instance in addition to a code, skipping the code lookup query
 - Added missing `unredeem()` and `unredeemable()` methods to the `Vouchers` facade docblock
 
+### Optimization
+- `Vouchers::batch()` and counter code generation now check candidate codes against the database in as few queries as possible, instead of one query per code - creating 100 vouchers went from 100 lookups to 1, chunked at 500 codes per query
+
+### Fixed
+- `Voucher::withOwner()` and `VoucherEntity::withEntity()` now use the given instance's own `getMorphClass()`, so they match rows written by a model overriding its morph type without a morph map entry
+
 ### Changed
 - Converted all model scopes from the `scopeXxx()` prefix to the `#[Illuminate\Database\Eloquent\Attributes\Scope]` attribute
 - Metadata on `Voucher` and `Redeemer` is now cast to an array object, so it can be mutated in place instead of being reassigned wholesale

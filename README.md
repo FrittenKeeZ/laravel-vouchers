@@ -577,6 +577,31 @@ Voucher::withOwner(Illuminate\Database\Eloquent\Model $owner);
 // Scope voucher query to no owners.
 Voucher::withoutOwner();
 ```
+The type based scopes accept either a class name or a [morph map](https://laravel.com/docs/eloquent-relationships#custom-polymorphic-types) alias, and resolve a class name to its alias when one is registered.
+```php
+Relation::morphMap(['user' => App\Models\User::class]);
+
+// Both match rows stored with the 'user' morph type.
+Voucher::withOwnerType(App\Models\User::class);
+Voucher::withOwnerType('user');
+```
+If a model instead overrides `getMorphClass()` to return a custom type **without** registering it in the morph map, that custom type cannot be derived from the class name - pass it directly:
+```php
+class Team extends Model
+{
+    public function getMorphClass(): string
+    {
+        return 'team-owner';
+    }
+}
+
+// Does not match, as the custom type is not registered in the morph map.
+Voucher::withOwnerType(Team::class);
+
+// Matches.
+Voucher::withOwnerType('team-owner');
+```
+The same applies to `VoucherEntity::withEntityType()`. Registering the type in the morph map instead of overriding `getMorphClass()` avoids the problem entirely, and is the approach Laravel recommends.
 
 ## Testing
 Running tests can be done either through composer, or directly calling the Pest binary.
