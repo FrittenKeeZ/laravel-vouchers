@@ -1,6 +1,6 @@
 # Release Notes
 
-## [v0.9.0 (unreleased)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.8.1...0.9.0)
+## [v0.9.0 (2026-07-30)](https://github.com/FrittenKeeZ/laravel-vouchers/compare/0.8.1...0.9.0)
 
 Please read the [upgrade guide](UPGRADING.md) for implications of this change.
 
